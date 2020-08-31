@@ -346,6 +346,13 @@ def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
 
     return new_data
 
+def fof_particles(fofgroups: AttrDict) -> AttrDict:
+    with h5.File(fofgroups.data.files[2], 'r') as h5file:
+        for pt in ['0', '1', '4']:
+            start = fofgroups.data.group_tab.FOF.GroupOffsetType[int(pt)]
+            end = start + fofgroups.data.group_tab.FOF.GroupLengthType[int(pt)]
+            groupnumber = h5file[f'/PartType{pt}/GroupNumber'][start:end]
+            pprint(groupnumber.size)
 
 def snap_groupnumbers(fofgroups: Dict[str, np.ndarray] = None):
     pgn = []
