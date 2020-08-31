@@ -152,10 +152,10 @@ def get_header(files: list) -> AttrDict:
 def fof_groups(files: list, header: AttrDict) -> AttrDict:
 
     # Conversion factors
-    conv_mass = 1e10 / header.data.HubbleParam
-    conv_length = header.data.ExpansionFactor / header.data.HubbleParam
-    conv_density = 1e10 * header.data.HubbleParam ** 2 / header.data.ExpansionFactor ** 3
-    conv_velocity = np.sqrt(header.data.ExpansionFactor)
+    conv_mass = 1e10 / header.data.subfind_particles.HubbleParam
+    conv_length = header.data.subfind_particles.ExpansionFactor / header.data.subfind_particles.HubbleParam
+    conv_density = 1e10 * header.data.subfind_particles.HubbleParam ** 2 / header.data.subfind_particles.ExpansionFactor ** 3
+    conv_velocity = np.sqrt(header.data.subfind_particles.ExpansionFactor)
 
     # Units
     unit_mass = unyt.Solar_Mass
