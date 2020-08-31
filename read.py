@@ -336,13 +336,13 @@ def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
 
     # Create an AttrDict object and push the filtered data
     new_data = fofgroups
-    filegroups = ['subfind_tab', 'group_tab']
-    categories = ['FOF', 'Subhalo']
-    for filegroup in filegroups:
-        for category in categories:
-            for dataset in fofgroups.data[filegroup][category]:
-                new_data.data[filegroup][category][dataset] = None
-                new_data.data[filegroup][category][dataset] = fofgroups.data[filegroup][category][dataset][filter_idx]
+    for category in ['FOF', 'Subhalo']:
+        for dataset in fofgroups.data['subfind_tab'][category]:
+            new_data.data['subfind_tab'][category][dataset] = None
+            new_data.data['subfind_tab'][category][dataset] = fofgroups.data['subfind_tab'][category][dataset][filter_idx]
+    for dataset in fofgroups.data['group_tab']['FOF']:
+        new_data.data['group_tab']['FOF'][dataset] = None
+        new_data.data['group_tab']['FOF'][dataset] = fofgroups.data['group_tab'][category]['FOF'][filter_idx]
 
     return new_data
 
