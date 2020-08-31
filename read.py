@@ -228,16 +228,12 @@ def fof_groups(files: list):
             subfind_tab_data['FOF'][key] = commune(subfind_tab_data['FOF'][key])
         elif key in reshape13:
             subfind_tab_data['FOF'][key] = commune(subfind_tab_data['FOF'][key].reshape(-1, 1)).reshape(-1, 3)
-        elif key in reshape16:
-            subfind_tab_data['FOF'][key] = commune(subfind_tab_data['FOF'][key].reshape(-1, 1)).reshape(-1, 6)
 
     for key in subfind_tab_data['Subhalo']:
         if key not in (reshape13 + reshape16):
             subfind_tab_data['Subhalo'][key] = commune(subfind_tab_data['Subhalo'][key])
         elif key in reshape13:
             subfind_tab_data['Subhalo'][key] = commune(subfind_tab_data['Subhalo'][key].reshape(-1, 1)).reshape(-1, 3)
-        elif key in reshape16:
-            subfind_tab_data['Subhalo'][key] = commune(subfind_tab_data['Subhalo'][key].reshape(-1, 1)).reshape(-1, 6)
 
     for key in group_tab_data['FOF']:
         if key not in (reshape13 + reshape16):
