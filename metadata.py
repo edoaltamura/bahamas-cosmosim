@@ -5,7 +5,7 @@
 # ======================================================================================
 # EXAMPLE IMPLEMENTATION
 #
-# from hdf5_metadata_read import Metadata
+# from metadata import Metadata
 #
 # print(Metadata)
 # >>> {'data': {'PATHS': {'computername': 'mizar.jb.man.ac.uk', 'dir_hydro': ...

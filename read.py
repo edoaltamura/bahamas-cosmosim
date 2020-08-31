@@ -15,7 +15,7 @@ def pprint(*args, **kwargs):
         print(*args, **kwargs)
 
 
-from hdf5_metadata_read import Metadata
+from metadata import Metadata
 
 from conversion import (
     comoving_density,
@@ -132,54 +132,11 @@ def find_files(simulation_type: str, redshift: str):
 
 
 
-    # z_value = ['z003p000', 'z002p750', 'z002p500', 'z002p250', 'z002p000', 'z001p750', 'z001p500', 'z001p250',
-    #            'z001p000', 'z000p750', 'z000p500', 'z000p375', 'z000p250', 'z000p125', 'z000p000']
-    # z_IDNumber = ['018', '019', '020', '021', '022', '023', '024', '025', '026', '027', '028', '029', '030', '031',
-    #               '032']
-    # sn = dict(zip(z_value, z_IDNumber))[redshift]
-    # path = '/scratch/nas_virgo/Cosmo-OWLS/AGN_TUNED_nu0_L400N1024_Planck'
-    # pprint(f"[+] Find simulation files {redshift:s}...")
-    #
-    # # Retrieve SUBFIND particle data
-    # pd = ''
-    # if os.path.isfile(path + '/particledata_' + sn + '/eagle_subfind_particles_' + sn + '.0.hdf5'):
-    #     pd = path + '/particledata_' + sn + '/eagle_subfind_particles_' + sn + '.0.hdf5'
-    #
-    # # Retrieve SUBFIND tab data
-    # sd = []
-    # for x in os.listdir(path + '/groups_' + sn + '/'):
-    #     if x.startswith('eagle_subfind_tab_'):
-    #         sd.append(path + '/groups_' + sn + '/' + x)
-    # odr = [int(x[94:-5]) for x in sd]
-    # odr = np.array(odr)
-    # so = np.argsort(odr)
-    # sd = list(np.array(sd)[so])
-    # del odr, so
-    #
-    # # Retrieve grouptab data
-    # grouptab = []
-    # for x in os.listdir(path + '/groups_' + sn + '/'):
-    #     if x.startswith('group_tab_'):
-    #         grouptab.append(path + '/groups_' + sn + '/' + x)
-    # odr = [int(x[86:-5]) for x in grouptab]
-    # odr = np.array(odr)
-    # so = np.argsort(odr)
-    # grouptab = list(np.array(grouptab)[so])
-    # del odr, so
-    #
-    # return [sd, pd, grouptab, snaps]
-
-
-def fof_header(files: list):
+def header(files: list):
     pprint(f"[+] Find header information...")
     header = {}
-    with h5.File(files[1], 'r') as f:
-        header['Hub'] = f['Header'].attrs['HubbleParam']
-        header['aexp'] = f['Header'].attrs['ExpansionFactor']
-        header['zred'] = f['Header'].attrs['Redshift']
-        header['OmgL'] = f['Header'].attrs['OmegaLambda']
-        header['OmgM'] = f['Header'].attrs['Omega0']
-        header['OmgB'] = f['Header'].attrs['OmegaBaryon']
+    with h5.File(files[2], 'r') as f:
+        print(f['\Header'].attrs)
     return header
 
 
