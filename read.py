@@ -136,7 +136,7 @@ def header(simulation_type: str, files: list):
     pprint(f"[+] Find header information...")
     header = {}
     with h5.File(files[2], 'r') as f:
-        print(f['Header'].attrs)
+        print(f['Header'].attrs.items())
     return header
 
 
