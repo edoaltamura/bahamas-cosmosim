@@ -14,4 +14,13 @@ for key in fof.data.subfind_tab.Subhalo:
 for key in fof.data.group_tab.FOF:
     read.pprint(f"{key:<30s} {len(fof.data.group_tab.FOF[key])}", fof.data.group_tab.FOF[key][:2])
 
-read.pprint(fof.data.files)
+foff = read.fof_group(0, fof)
+for key in foff.data.subfind_tab.FOF:
+    read.pprint(f"{key:<30s} {len(foff.data.subfind_tab.FOF[key])}", foff.data.subfind_tab.FOF[key])
+
+for key in foff.data.subfind_tab.Subhalo:
+    read.pprint(f"{key:<30s} {len(foff.data.subfind_tab.Subhalo[key])}", foff.data.subfind_tab.Subhalo[key])
+
+for key in foff.data.group_tab.FOF:
+    read.pprint(f"{key:<30s} {len(foff.data.group_tab.FOF[key])}", foff.data.group_tab.FOF[key])
+

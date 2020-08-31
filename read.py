@@ -326,27 +326,23 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
     return data_obj
 
 
-def fof_group(clusterID: int, fofgroups: Dict[str, np.ndarray] = None):
+def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
     # pprint(f"[+] Find group information for cluster {clusterID}")
-    new_data = {}
-    new_data['clusterID'] = clusterID
-    new_data['idx'] = fofgroups['idx'][clusterID]
-    new_data['Mfof'] = fofgroups['Mfof'][new_data['idx']]
-    new_data['M2500'] = fofgroups['M2500'][new_data['idx']]
-    new_data['R2500'] = fofgroups['R2500'][new_data['idx']]
-    new_data['M500'] = fofgroups['M500'][new_data['idx']]
-    new_data['R500'] = fofgroups['R500'][new_data['idx']]
-    new_data['M200'] = fofgroups['M200'][new_data['idx']]
-    new_data['R200'] = fofgroups['R200'][new_data['idx']]
-    new_data['COP'] = fofgroups['COP'][new_data['idx']]
-    new_data['NSUB'] = fofgroups['NSUB'][new_data['idx']]
-    new_data['FSID'] = fofgroups['FSID'][new_data['idx']]
-    new_data['SCOP'] = fofgroups['SCOP'][new_data['idx']]
-    new_data['group_offset_partype'] = fofgroups['group_offset_partype'][new_data['idx']]
-    new_data['group_length_partype'] = fofgroups['group_length_partype'][new_data['idx']]
-    new_data['groupfiles'] = fofgroups['groupfiles']
-    new_data['particlefiles'] = fofgroups['particlefiles']
-    new_data['grouptabfiles'] = fofgroups['grouptabfiles']
+
+    # Filter groups
+    filter_idx = np.where(
+        fofgroups.data.subfind_tab.Group_M_Crit500 > 1e13
+    )[0][clusterID]
+
+    # Create an AttrDict object and push the filtered data
+    new_data = fofgroups
+    filegroups = ['subfind_tab', 'group_tab']
+    categories = ['FOF', 'Subhalo']
+    for filegroup in filegroups:
+        for category in categories:
+            for dataset in fofgroups.data[filegroup][category]:
+                new_data.data[filegroup][category][dataset] = None
+                new_data.data[filegroup][category][dataset] = fofgroups.data[filegroup][category][dataset][filter_idx]
 
     return new_data
 
