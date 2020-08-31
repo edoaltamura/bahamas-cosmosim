@@ -15,7 +15,7 @@ def pprint(*args, **kwargs):
         print(*args, **kwargs)
 
 
-from metadata import Metadata
+from metadata import Metadata, AttrDict
 
 from conversion import (
     comoving_density,
@@ -132,11 +132,25 @@ def find_files(simulation_type: str, redshift: str):
 
 
 
-def header(simulation_type: str, files: list):
+def header(files: list) -> AttrDict:
     pprint(f"[+] Find header information...")
-    header = {}
+    master_header = {}
+
+    # Collect header information for the 3 file types
+    with h5.File(files[0][0], 'r') as f:
+        st_header = dict(f['Header'].attrs)
     with h5.File(files[2], 'r') as f:
-        print(dict(f['Header'].attrs))
+        sp_header = dict(f['Header'].attrs)
+    with h5.File(files[3][0], 'r') as f:
+        sn_header = dict(f['Header'].attrs)
+
+    master_header['subfind_groups'] = st_header
+    master_header['subfind_particles'] = sp_header
+    master_header['gadget_snaps'] = sn_header
+
+    # Construct the nested AttrDict instance
+    header = AttrDict()
+    header.data = master_header
     return header
 
 
