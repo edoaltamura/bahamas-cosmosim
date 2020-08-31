@@ -2,6 +2,7 @@ import os
 from typing import List, Dict
 import numpy as np
 import h5py as h5
+import unyt
 from scipy.sparse import csr_matrix
 from mpi4py import MPI
 
@@ -16,23 +17,6 @@ def pprint(*args, **kwargs):
 
 
 from metadata import Metadata, AttrDict
-
-from conversion import (
-    comoving_density,
-    comoving_length,
-    comoving_velocity,
-    comoving_mass,
-    comoving_kinetic_energy,
-    comoving_momentum,
-    comoving_ang_momentum,
-    density_units,
-    velocity_units,
-    length_units,
-    mass_units,
-    momentum_units,
-    energy_units,
-)
-
 
 def split(nfiles):
     nfiles = int(nfiles)
@@ -165,17 +149,31 @@ def get_header(files: list) -> AttrDict:
     return header
 
 
-def fof_groups(files: list):
+def fof_groups(files: list, header: AttrDict) -> AttrDict:
+
+    # Conversion factors
+    conv_mass = 1e10 / header.data.HubbleParam
+    conv_length = header.data.ExpansionFactor / header.data.HubbleParam
+    conv_density = 1e10 * header.data.HubbleParam ** 2 / header.data.ExpansionFactor ** 3
+    conv_velocity = np.sqrt(header.data.ExpansionFactor)
+
+    # Units
+    unit_mass = unyt.Solar_Mass
+    unit_length = unyt.Mpc
+    unit_density = unyt.Solar_Mass / unyt.Mpc ** 3
+    unit_velocity = unyt.km / unyt.s
+
+
     pprint(f"[+] Find groups information...")
 
     # Find eagle subfind tab hdf5 internal paths
     subfind_tab_data = {}
     subfind_tab_data['FOF'] = {}
-    subfind_tab_data['FOF']['FirstSubhaloID'] = np.empty(0, dtype=np.float32)
+    subfind_tab_data['FOF']['FirstSubhaloID'] = np.empty(0, dtype=np.int)
     subfind_tab_data['FOF']['GroupCentreOfPotential'] = np.empty(0, dtype=np.float32)
-    subfind_tab_data['FOF']['GroupLength'] = np.empty(0, dtype=np.float32)
+    subfind_tab_data['FOF']['GroupLength'] = np.empty(0, dtype=np.int)
     subfind_tab_data['FOF']['GroupMass'] = np.empty(0, dtype=np.float32)
-    subfind_tab_data['FOF']['GroupOffset'] = np.empty(0, dtype=np.float32)
+    subfind_tab_data['FOF']['GroupOffset'] = np.empty(0, dtype=np.int)
     subfind_tab_data['FOF']['Group_M_Crit200'] = np.empty(0, dtype=np.float32)
     subfind_tab_data['FOF']['Group_M_Crit2500'] = np.empty(0, dtype=np.float32)
     subfind_tab_data['FOF']['Group_M_Crit500'] = np.empty(0, dtype=np.float32)
@@ -190,7 +188,7 @@ def fof_groups(files: list):
     subfind_tab_data['FOF']['Group_R_Mean2500'] = np.empty(0, dtype=np.float32)
     subfind_tab_data['FOF']['Group_R_Mean500'] = np.empty(0, dtype=np.float32)
     subfind_tab_data['FOF']['Group_R_TopHat200'] = np.empty(0, dtype=np.float32)
-    subfind_tab_data['FOF']['NumOfSubhalos'] = np.empty(0, dtype=np.float32)
+    subfind_tab_data['FOF']['NumOfSubhalos'] = np.empty(0, dtype=np.int)
 
     subfind_tab_data['Subhalo'] = {}
     subfind_tab_data['Subhalo']['CentreOfMass'] = np.empty(0, dtype=np.float32)
@@ -199,9 +197,9 @@ def fof_groups(files: list):
     subfind_tab_data['Subhalo']['GroupNumber'] = np.empty(0, dtype=np.float32)
     subfind_tab_data['Subhalo']['HalfMassProjRad'] = np.empty(0, dtype=np.float32)
     subfind_tab_data['Subhalo']['HalfMassRad'] = np.empty(0, dtype=np.float32)
-    subfind_tab_data['Subhalo']['IDMostBound'] = np.empty(0, dtype=np.float32)
-    subfind_tab_data['Subhalo']['SubLength'] = np.empty(0, dtype=np.float32)
-    subfind_tab_data['Subhalo']['SubOffset'] = np.empty(0, dtype=np.float32)
+    subfind_tab_data['Subhalo']['IDMostBound'] = np.empty(0, dtype=np.int)
+    subfind_tab_data['Subhalo']['SubLength'] = np.empty(0, dtype=np.int)
+    subfind_tab_data['Subhalo']['SubOffset'] = np.empty(0, dtype=np.int)
     subfind_tab_data['Subhalo']['Velocity'] = np.empty(0, dtype=np.float32)
     subfind_tab_data['Subhalo']['Vmax'] = np.empty(0, dtype=np.float32)
     subfind_tab_data['Subhalo']['VmaxRadius'] = np.empty(0, dtype=np.float32)
@@ -214,11 +212,11 @@ def fof_groups(files: list):
     group_tab_data = {}
     group_tab_data['FOF'] = {}
     group_tab_data['FOF']['CentreOfMass'] = np.empty(0, dtype=np.float32)
-    group_tab_data['FOF']['GroupLength'] = np.empty(0, dtype=np.float32)
+    group_tab_data['FOF']['GroupLength'] = np.empty(0, dtype=np.int)
     group_tab_data['FOF']['GroupLengthType'] = np.empty(0, dtype=np.float32)
     group_tab_data['FOF']['GroupMassType'] = np.empty(0, dtype=np.float32)
-    group_tab_data['FOF']['GroupOffset'] = np.empty(0, dtype=np.float32)
-    group_tab_data['FOF']['GroupOffsetType'] = np.empty(0, dtype=np.float32)
+    group_tab_data['FOF']['GroupOffset'] = np.empty(0, dtype=np.int)
+    group_tab_data['FOF']['GroupOffsetType'] = np.empty(0, dtype=np.int)
     group_tab_data['FOF']['Mass'] = np.empty(0, dtype=np.float32)
 
     st, fh = split(len(files[0]))
@@ -274,48 +272,48 @@ def fof_groups(files: list):
             group_tab_data['FOF']['Mass'] = np.append(group_tab_data['FOF']['Mass'], f['FOF/Mass'][:])
 
     subfind_tab_data['FOF']['FirstSubhaloID'] = commune(subfind_tab_data['FOF']['FirstSubhaloID'])
-    subfind_tab_data['FOF']['GroupCentreOfPotential'] = commune(subfind_tab_data['FOF']['GroupCentreOfPotential'].reshape(-1, 1)).reshape(-1, 3)
+    subfind_tab_data['FOF']['GroupCentreOfPotential'] = commune(subfind_tab_data['FOF']['GroupCentreOfPotential'].reshape(-1, 1)).reshape(-1, 3) * conv_length * unit_length
     subfind_tab_data['FOF']['GroupLength'] = commune(subfind_tab_data['FOF']['GroupLength'])
-    subfind_tab_data['FOF']['GroupMass'] = commune(subfind_tab_data['FOF']['GroupMass'])
+    subfind_tab_data['FOF']['GroupMass'] = commune(subfind_tab_data['FOF']['GroupMass']) * conv_mass * unit_mass
     subfind_tab_data['FOF']['GroupOffset'] = commune(subfind_tab_data['FOF']['GroupOffset'])
-    subfind_tab_data['FOF']['Group_M_Crit200'] = commune(subfind_tab_data['FOF']['Group_M_Crit200'])
-    subfind_tab_data['FOF']['Group_M_Crit2500'] = commune(subfind_tab_data['FOF']['Group_M_Crit2500'])
-    subfind_tab_data['FOF']['Group_M_Crit500'] = commune(subfind_tab_data['FOF']['Group_M_Crit500'])
-    subfind_tab_data['FOF']['Group_M_Mean200'] = commune(subfind_tab_data['FOF']['Group_M_Mean200'])
-    subfind_tab_data['FOF']['Group_M_Mean2500'] = commune(subfind_tab_data['FOF']['Group_M_Mean2500'])
-    subfind_tab_data['FOF']['Group_M_Mean500'] = commune(subfind_tab_data['FOF']['Group_M_Mean500'])
-    subfind_tab_data['FOF']['Group_M_TopHat200'] = commune(subfind_tab_data['FOF']['Group_M_TopHat200'])
-    subfind_tab_data['FOF']['Group_R_Crit200'] = commune(subfind_tab_data['FOF']['Group_R_Crit200'])
-    subfind_tab_data['FOF']['Group_R_Crit2500'] = commune(subfind_tab_data['FOF']['Group_R_Crit2500'])
-    subfind_tab_data['FOF']['Group_R_Crit500'] = commune(subfind_tab_data['FOF']['Group_R_Crit500'])
-    subfind_tab_data['FOF']['Group_R_Mean200'] = commune(subfind_tab_data['FOF']['Group_R_Mean200'])
-    subfind_tab_data['FOF']['Group_R_Mean2500'] = commune(subfind_tab_data['FOF']['Group_R_Mean2500'])
-    subfind_tab_data['FOF']['Group_R_Mean500'] = commune(subfind_tab_data['FOF']['Group_R_Mean500'])
-    subfind_tab_data['FOF']['Group_R_TopHat200'] = commune(subfind_tab_data['FOF']['Group_R_TopHat200'])
+    subfind_tab_data['FOF']['Group_M_Crit200'] = commune(subfind_tab_data['FOF']['Group_M_Crit200']) * conv_mass * unit_mass
+    subfind_tab_data['FOF']['Group_M_Crit2500'] = commune(subfind_tab_data['FOF']['Group_M_Crit2500']) * conv_mass * unit_mass
+    subfind_tab_data['FOF']['Group_M_Crit500'] = commune(subfind_tab_data['FOF']['Group_M_Crit500']) * conv_mass * unit_mass
+    subfind_tab_data['FOF']['Group_M_Mean200'] = commune(subfind_tab_data['FOF']['Group_M_Mean200']) * conv_mass * unit_mass
+    subfind_tab_data['FOF']['Group_M_Mean2500'] = commune(subfind_tab_data['FOF']['Group_M_Mean2500']) * conv_mass * unit_mass
+    subfind_tab_data['FOF']['Group_M_Mean500'] = commune(subfind_tab_data['FOF']['Group_M_Mean500']) * conv_mass * unit_mass
+    subfind_tab_data['FOF']['Group_M_TopHat200'] = commune(subfind_tab_data['FOF']['Group_M_TopHat200']) * conv_mass * unit_mass
+    subfind_tab_data['FOF']['Group_R_Crit200'] = commune(subfind_tab_data['FOF']['Group_R_Crit200']) * conv_length * unit_length
+    subfind_tab_data['FOF']['Group_R_Crit2500'] = commune(subfind_tab_data['FOF']['Group_R_Crit2500']) * conv_length * unit_length
+    subfind_tab_data['FOF']['Group_R_Crit500'] = commune(subfind_tab_data['FOF']['Group_R_Crit500']) * conv_length * unit_length
+    subfind_tab_data['FOF']['Group_R_Mean200'] = commune(subfind_tab_data['FOF']['Group_R_Mean200']) * conv_length * unit_length
+    subfind_tab_data['FOF']['Group_R_Mean2500'] = commune(subfind_tab_data['FOF']['Group_R_Mean2500']) * conv_length * unit_length
+    subfind_tab_data['FOF']['Group_R_Mean500'] = commune(subfind_tab_data['FOF']['Group_R_Mean500']) * conv_length * unit_length
+    subfind_tab_data['FOF']['Group_R_TopHat200'] = commune(subfind_tab_data['FOF']['Group_R_TopHat200']) * conv_length * unit_length
     subfind_tab_data['FOF']['NumOfSubhalos'] = commune(subfind_tab_data['FOF']['NumOfSubhalos'])
-    subfind_tab_data['Subhalo']['CentreOfMass'] = commune(subfind_tab_data['Subhalo']['CentreOfMass'].reshape(-1, 1)).reshape(-1, 3)
-    subfind_tab_data['Subhalo']['CentreOfPotential'] = commune(subfind_tab_data['Subhalo']['CentreOfPotential'].reshape(-1, 1)).reshape(-1, 3)
+    subfind_tab_data['Subhalo']['CentreOfMass'] = commune(subfind_tab_data['Subhalo']['CentreOfMass'].reshape(-1, 1)).reshape(-1, 3) * conv_length * unit_length
+    subfind_tab_data['Subhalo']['CentreOfPotential'] = commune(subfind_tab_data['Subhalo']['CentreOfPotential'].reshape(-1, 1)).reshape(-1, 3) * conv_length * unit_length
     subfind_tab_data['Subhalo']['GasSpin'] = commune(subfind_tab_data['Subhalo']['GasSpin'])
     subfind_tab_data['Subhalo']['GroupNumber'] = commune(subfind_tab_data['Subhalo']['GroupNumber'])
-    subfind_tab_data['Subhalo']['HalfMassProjRad'] = commune(subfind_tab_data['Subhalo']['HalfMassProjRad'])
-    subfind_tab_data['Subhalo']['HalfMassRad'] = commune(subfind_tab_data['Subhalo']['HalfMassRad'])
+    subfind_tab_data['Subhalo']['HalfMassProjRad'] = commune(subfind_tab_data['Subhalo']['HalfMassProjRad']) * conv_mass * unit_mass
+    subfind_tab_data['Subhalo']['HalfMassRad'] = commune(subfind_tab_data['Subhalo']['HalfMassRad']) * conv_mass * unit_mass
     subfind_tab_data['Subhalo']['IDMostBound'] = commune(subfind_tab_data['Subhalo']['IDMostBound'])
     subfind_tab_data['Subhalo']['SubLength'] = commune(subfind_tab_data['Subhalo']['SubLength'])
     subfind_tab_data['Subhalo']['SubOffset'] = commune(subfind_tab_data['Subhalo']['SubOffset'])
-    subfind_tab_data['Subhalo']['Velocity'] = commune(subfind_tab_data['Subhalo']['Velocity'].reshape(-1, 1)).reshape(-1, 3)
-    subfind_tab_data['Subhalo']['Vmax'] = commune(subfind_tab_data['Subhalo']['Vmax'])
-    subfind_tab_data['Subhalo']['VmaxRadius'] = commune(subfind_tab_data['Subhalo']['VmaxRadius'])
-    subfind_tab_data['Subhalo']['StarsMass'] = commune(subfind_tab_data['Subhalo']['StarsMass'])
+    subfind_tab_data['Subhalo']['Velocity'] = commune(subfind_tab_data['Subhalo']['Velocity'].reshape(-1, 1)).reshape(-1, 3) * conv_velocity * unit_velocity
+    subfind_tab_data['Subhalo']['Vmax'] = commune(subfind_tab_data['Subhalo']['Vmax']) * conv_velocity * unit_velocity
+    subfind_tab_data['Subhalo']['VmaxRadius'] = commune(subfind_tab_data['Subhalo']['VmaxRadius']) * conv_length * unit_length
+    subfind_tab_data['Subhalo']['StarsMass'] = commune(subfind_tab_data['Subhalo']['StarsMass']) * conv_mass * unit_mass
     subfind_tab_data['Subhalo']['StarsSpin'] = commune(subfind_tab_data['Subhalo']['StarsSpin'])
     subfind_tab_data['Subhalo']['StarFormationRate'] = commune(subfind_tab_data['Subhalo']['StarFormationRate'])
-    subfind_tab_data['Subhalo']['StellarVelDisp'] = commune(subfind_tab_data['Subhalo']['StellarVelDisp'])
-    group_tab_data['FOF']['CentreOfMass'] = commune(group_tab_data['FOF']['CentreOfMass'])
+    subfind_tab_data['Subhalo']['StellarVelDisp'] = commune(subfind_tab_data['Subhalo']['StellarVelDisp']) * conv_velocity * unit_velocity
+    group_tab_data['FOF']['CentreOfMass'] = commune(group_tab_data['FOF']['CentreOfMass']) * conv_length * unit_length
     group_tab_data['FOF']['GroupLength'] = commune(group_tab_data['FOF']['GroupLength'])
     group_tab_data['FOF']['GroupLengthType'] = commune(group_tab_data['FOF']['GroupLengthType'].reshape(-1, 1)).reshape(-1, 6)
     group_tab_data['FOF']['GroupMassType'] = commune(group_tab_data['FOF']['GroupMassType'].reshape(-1, 1)).reshape(-1, 6)
     group_tab_data['FOF']['GroupOffset'] = commune(group_tab_data['FOF']['GroupOffset'])
     group_tab_data['FOF']['GroupOffsetType'] = commune(group_tab_data['FOF']['GroupOffsetType'].reshape(-1, 1)).reshape(-1, 6)
-    group_tab_data['FOF']['Mass'] = commune(group_tab_data['FOF']['Mass'])
+    group_tab_data['FOF']['Mass'] = commune(group_tab_data['FOF']['Mass']) * conv_mass * unit_mass
 
     # Gather all data into a large dictionary
     data_dict = {}
