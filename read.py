@@ -331,7 +331,7 @@ def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
 
     # Filter groups
     filter_idx = np.where(
-        fofgroups.data.subfind_tab.Group_M_Crit500 > 1e13
+        fofgroups.data.subfind_tab.FOF.Group_M_Crit500 > 1e13
     )[0][clusterID]
 
     # Create an AttrDict object and push the filtered data
