@@ -342,7 +342,7 @@ def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
             new_data.data['subfind_tab'][category][dataset] = fofgroups.data['subfind_tab'][category][dataset][filter_idx]
     for dataset in fofgroups.data['group_tab']['FOF']:
         new_data.data['group_tab']['FOF'][dataset] = None
-        new_data.data['group_tab']['FOF'][dataset] = fofgroups.data['group_tab'][category]['FOF'][filter_idx]
+        new_data.data['group_tab']['FOF'][dataset] = fofgroups.data['group_tab']['FOF'][dataset][filter_idx]
 
     return new_data
 
