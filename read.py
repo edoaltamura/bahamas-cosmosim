@@ -295,8 +295,8 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
     subfind_tab_data['Subhalo']['CentreOfPotential'] = commune(subfind_tab_data['Subhalo']['CentreOfPotential'].reshape(-1, 1)).reshape(-1, 3) * conv_length * unit_length
     subfind_tab_data['Subhalo']['GasSpin'] = commune(subfind_tab_data['Subhalo']['GasSpin'].reshape(-1, 1)).reshape(-1, 3)
     subfind_tab_data['Subhalo']['GroupNumber'] = commune(subfind_tab_data['Subhalo']['GroupNumber'])
-    subfind_tab_data['Subhalo']['HalfMassProjRad'] = commune(subfind_tab_data['Subhalo']['HalfMassProjRad'].reshape(-1, 1)).reshape(-1, 6) * conv_mass * unit_mass
-    subfind_tab_data['Subhalo']['HalfMassRad'] = commune(subfind_tab_data['Subhalo']['HalfMassRad'].reshape(-1, 1)).reshape(-1, 6) * conv_mass * unit_mass
+    subfind_tab_data['Subhalo']['HalfMassProjRad'] = commune(subfind_tab_data['Subhalo']['HalfMassProjRad'].reshape(-1, 1)).reshape(-1, 6) * conv_length * unit_length
+    subfind_tab_data['Subhalo']['HalfMassRad'] = commune(subfind_tab_data['Subhalo']['HalfMassRad'].reshape(-1, 1)).reshape(-1, 6) * conv_length * unit_length
     subfind_tab_data['Subhalo']['IDMostBound'] = commune(subfind_tab_data['Subhalo']['IDMostBound'])
     subfind_tab_data['Subhalo']['SubLength'] = commune(subfind_tab_data['Subhalo']['SubLength'])
     subfind_tab_data['Subhalo']['SubOffset'] = commune(subfind_tab_data['Subhalo']['SubOffset'])
@@ -318,6 +318,7 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
     # Gather all data into a large dictionary
     data_dict = {}
     data_dict['files'] = files
+    data_dict['header'] = header.data
     data_dict['subfind_tab'] = subfind_tab_data
     data_dict['group_tab'] = group_tab_data
     data_obj = AttrDict()
