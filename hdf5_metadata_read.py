@@ -28,8 +28,10 @@
 # >>> ['/FOF/ContaminationCount', '/FOF/ContaminationMass', '/FOF/FirstSubhaloID ...
 
 import yaml
+import os
+_dir_config = os.path.dirname(os.path.realpath(__file__))
 
-config_file = 'hdf5_metadata_config.yml'
+config_file = os.path.join(_dir_config, 'hdf5_metadata_config.yml')
 
 
 def walk_dict(d, depth=0):
