@@ -77,7 +77,6 @@ def get_indices_sparse(data):
 
 
 def find_files(simulation_type: str, redshift: str):
-
     # Import the Metadata preloaded class
     paths = Metadata.data.PATHS
     directory = paths.dir_hydro if simulation_type == "hydro" else paths.dir_dmo
@@ -131,11 +130,22 @@ def find_files(simulation_type: str, redshift: str):
     return subfind_st, subfind_gt, subfind_pd, gadget_sn
 
 
+def get_header(files: list) -> AttrDict:
+    """
+    Gathers the header information from the files into
+    an instance of the AttrDict class, which allows the access
+    of the header data as nested attributes.
+    Example: header.data.subfind_particles.MassTable
 
-def header(files: list) -> AttrDict:
-    pprint(f"[+] Find header information...")
-    master_header = {}
-
+    :param files: tuple(list, str, list, list)
+        Expected to parse the output from the find_files function.
+        Structure of the tuple: (subfind_st, subfind_gt, subfind_pd,
+        gadget_sn).
+    :return: AttrDict
+        It returns at AttrDict instance with nested attributes.
+        The object gathers header attributes for the three file
+        types: subfind group, particle data and Gadget snapshots.
+    """
     # Collect header information for the 3 file types
     with h5.File(files[0][0], 'r') as f:
         st_header = dict(f['Header'].attrs)
@@ -144,6 +154,7 @@ def header(files: list) -> AttrDict:
     with h5.File(files[3][0], 'r') as f:
         sn_header = dict(f['Header'].attrs)
 
+    master_header = {}
     master_header['subfind_groups'] = st_header
     master_header['subfind_particles'] = sp_header
     master_header['gadget_snaps'] = sn_header
@@ -154,100 +165,96 @@ def header(files: list) -> AttrDict:
     return header
 
 
-# def fof_mass_cut(files: list):
-# 	st, fh = split(len(files))
-# 	M500 = np.empty(0, dtype=np.float32)
-# 	for x in range(st, fh, 1):
-# 		with h5.File(files[x], 'r') as f:
-# 			M500 = np.append(M500, f['FOF/Group_M_Crit500'][:])
-#
-# 	header = {}
-# 	with h5.File(files[0][0], 'r') as f:
-# 		header['Hub'] = f['Header'].attrs['HubbleParam']
-# 		header['aexp'] = f['Header'].attrs['ExpansionFactor']
-# 		header['zred'] = f['Header'].attrs['Redshift']
-#
-# 	M500 = comoving_mass(header, M500 * 1.0e10)
-# 	M500_comm = commune(M500)
-# 	del M500, st, fh, header
-# 	idx = np.where(M500_comm > 1.0e13)[0]
-# 	pprint(f"\t Found {len(idx)} clusters with M500 > 10^13 M_sun")
-# 	return idx
-
 def fof_groups(files: list):
     pprint(f"[+] Find groups information...")
+
+    # Find eagle subfind tab hdf5 internal paths
+    subfind_tab_data = {}
+
+    subfind_tab_data['FOF'] = {}
+    h5det_fofpaths = []
+    for hdfpath, specifier in Metadata.data.HDF5_FILE_STRUCTURE_HYDRO.subfind_groups_st.items():
+        if specifier == "dataset" and hdfpath.startswith('/FOF/'):
+            h5det_fofpaths.append(hdfpath.lstrip('/'))
+            dataset_name = hdfpath.lstrip('/FOF/')
+            subfind_tab_data['FOF'][dataset_name] = np.empty(0, dtype=np.float32)
+
+    subfind_tab_data['Subhalo'] = {}
+    h5det_subpaths = []
+    for hdfpath, specifier in Metadata.data.HDF5_FILE_STRUCTURE_HYDRO.subfind_groups_st.items():
+        if specifier == "dataset" and hdfpath.startswith('/Subhalo/'):
+            h5det_subpaths.append(hdfpath.lstrip('/'))
+            dataset_name = hdfpath.lstrip('/Subhalo/')
+            subfind_tab_data['Subhalo'][dataset_name] = np.empty(0, dtype=np.float32)
+
     st, fh = split(len(files[0]))
-    Mfof = np.empty(0, dtype=np.float32)
-    M2500 = np.empty(0, dtype=np.float32)
-    M500 = np.empty(0, dtype=np.float32)
-    M200 = np.empty(0, dtype=np.float32)
-    R2500 = np.empty(0, dtype=np.float32)
-    R500 = np.empty(0, dtype=np.float32)
-    R200 = np.empty(0, dtype=np.float32)
-    COP = np.empty(0, dtype=np.float32)
-    NSUB = np.empty(0, dtype=np.int)
-    FSID = np.empty(0, dtype=np.int)
-    SCOP = np.empty(0, dtype=np.float32)
     for x in range(st, fh, 1):
         with h5.File(files[0][x], 'r') as f:
-            Mfof = np.append(Mfof, f['FOF/GroupMass'][:])
-            M2500 = np.append(M2500, f['FOF/Group_M_Crit2500'][:])
-            R2500 = np.append(R2500, f['FOF/Group_R_Crit2500'][:])
-            M500 = np.append(M500, f['FOF/Group_M_Crit500'][:])
-            R500 = np.append(R500, f['FOF/Group_R_Crit500'][:])
-            M200 = np.append(M200, f['FOF/Group_M_Crit200'][:])
-            R200 = np.append(R200, f['FOF/Group_R_Crit200'][:])
-            COP = np.append(COP, f['FOF/GroupCentreOfPotential'][:])
-            NSUB = np.append(NSUB, f['FOF/NumOfSubhalos'][:])
-            FSID = np.append(FSID, f['FOF/FirstSubhaloID'][:])
-            SCOP = np.append(SCOP, f['Subhalo/CentreOfPotential'][:])
 
-    del st, fh
-    st, fh = split(len(files[2]))
-    group_offset_partype = np.empty(0, dtype=np.int)
-    group_length_partype = np.empty(0, dtype=np.int)
+            for hdf5_path, dataset_name in zip(h5det_fofpaths, list(subfind_tab_data['FOF'].keys())):
+                subfind_tab_data['FOF'][dataset_name] = np.append(subfind_tab_data['FOF'][dataset_name], f[hdf5_path][:])
+            for hdf5_path, dataset_name in zip(h5det_fofpaths, list(subfind_tab_data['Subhalo'].keys())):
+                subfind_tab_data['Subhalo'][dataset_name] = np.append(subfind_tab_data['Subhalo'][dataset_name], f[hdf5_path][:])
+
+    # Find subfind group tab hdf5 internal paths
+    group_tab_data = {}
+    group_tab_data['FOF'] = {}
+    group_tab_data['FOF']['CentreOfMass'] = np.empty(0, dtype=np.float32)
+    group_tab_data['FOF']['GroupLength'] = np.empty(0, dtype=np.float32)
+    group_tab_data['FOF']['GroupLengthType'] = np.empty(0, dtype=np.float32)
+    group_tab_data['FOF']['GroupMassType'] = np.empty(0, dtype=np.float32)
+    group_tab_data['FOF']['GroupOffset'] = np.empty(0, dtype=np.float32)
+    group_tab_data['FOF']['GroupOffsetType'] = np.empty(0, dtype=np.float32)
+    group_tab_data['FOF']['Mass'] = np.empty(0, dtype=np.float32)
+
+    st, fh = split(len(files[1]))
     for x in range(st, fh, 1):
-        with h5.File(files[0][x], 'r') as f:
-            group_offset_partype = np.append(group_offset_partype, f['FOF/GroupOffsetType'][:])
-            group_length_partype = np.append(group_length_partype, f['FOF/GroupLengthType'][:])
+        with h5.File(files[1][x], 'r') as f:
+            group_tab_data['FOF']['CentreOfMass'] = np.append(group_tab_data['FOF']['CentreOfMass'], f['FOF/CentreOfMass'][:])
+            group_tab_data['FOF']['GroupLength'] = np.append(group_tab_data['FOF']['GroupLength'], f['FOF/GroupLength'][:])
+            group_tab_data['FOF']['GroupLengthType'] = np.append(group_tab_data['FOF']['GroupLengthType'], f['FOF/GroupLengthType'][:])
+            group_tab_data['FOF']['GroupMassType'] = np.append(group_tab_data['FOF']['GroupMassType'], f['FOF/GroupMassType'][:])
+            group_tab_data['FOF']['GroupOffset'] = np.append(group_tab_data['FOF']['GroupOffset'], f['FOF/GroupOffset'][:])
+            group_tab_data['FOF']['GroupOffsetType'] = np.append(group_tab_data['FOF']['GroupOffsetType'], f['FOF/GroupOffsetType'][:])
+            group_tab_data['FOF']['Mass'] = np.append(group_tab_data['FOF']['Mass'], f['FOF/Mass'][:])
 
-    header = {}
-    with h5.File(files[0][0], 'r') as f:
-        header['Hub'] = f['Header'].attrs['HubbleParam']
-        header['aexp'] = f['Header'].attrs['ExpansionFactor']
-        header['zred'] = f['Header'].attrs['Redshift']
 
-    # Conversion
-    Mfof = comoving_mass(header, Mfof * 1.0e10)
-    M2500 = comoving_mass(header, M2500 * 1.0e10)
-    M500 = comoving_mass(header, M500 * 1.0e10)
-    M200 = comoving_mass(header, M200 * 1.0e10)
-    R2500 = comoving_length(header, R2500)
-    R500 = comoving_length(header, R500)
-    R200 = comoving_length(header, R200)
-    COP = comoving_length(header, COP)
-    SCOP = comoving_length(header, SCOP)
+    # Specify the datasets which have to be reshaped
+    reshape13 = ['GroupCentreOfPotential', 'CentreOfPotential', 'Velocity', 'CentreOfMass']
+    reshape16 = ['GroupLength', 'GroupOffset', 'GroupLengthType', 'GroupMassType', 'GroupOffsetType']
 
-    data = {}
-    data['groupfiles'] = files[0]
-    data['particlefiles'] = files[1]
-    data['grouptabfiles'] = files[2]
-    data['Mfof'] = commune(Mfof)
-    data['M2500'] = commune(M2500)
-    data['R2500'] = commune(R2500)
-    data['M500'] = commune(M500)
-    data['R500'] = commune(R500)
-    data['M200'] = commune(M200)
-    data['R200'] = commune(R200)
-    data['COP'] = commune(COP.reshape(-1, 1)).reshape(-1, 3)
-    data['NSUB'] = commune(NSUB)
-    data['FSID'] = commune(FSID)
-    data['SCOP'] = commune(SCOP.reshape(-1, 1)).reshape(-1, 3)
-    data['group_offset_partype'] = commune(group_offset_partype.reshape(-1, 1)).reshape(-1, 6)
-    data['group_length_partype'] = commune(group_length_partype.reshape(-1, 1)).reshape(-1, 6)
-    data['idx'] = np.where(data['M500'] > 1.0e13)[0]
+    for key in subfind_tab_data['FOF']:
+        if key not in (reshape13 + reshape16):
+            subfind_tab_data['FOF'][key] = commune(subfind_tab_data['FOF'][key])
+        elif key in reshape13:
+            subfind_tab_data['FOF'][key] = commune(subfind_tab_data['FOF'][key].reshape(-1, 1)).reshape(-1, 3)
+        elif key in reshape16:
+            subfind_tab_data['FOF'][key] = commune(subfind_tab_data['FOF'][key].reshape(-1, 1)).reshape(-1, 6)
 
-    return data
+    for key in subfind_tab_data['Subhalo']:
+        if key not in (reshape13 + reshape16):
+            subfind_tab_data['Subhalo'][key] = commune(subfind_tab_data['Subhalo'][key])
+        elif key in reshape13:
+            subfind_tab_data['Subhalo'][key] = commune(subfind_tab_data['Subhalo'][key].reshape(-1, 1)).reshape(-1, 3)
+        elif key in reshape16:
+            subfind_tab_data['Subhalo'][key] = commune(subfind_tab_data['Subhalo'][key].reshape(-1, 1)).reshape(-1, 6)
+
+    for key in group_tab_data['FOF']:
+        if key not in (reshape13 + reshape16):
+            group_tab_data['FOF'][key] = commune(group_tab_data['FOF'][key])
+        elif key in reshape13:
+            group_tab_data['FOF'][key] = commune(group_tab_data['FOF'][key].reshape(-1, 1)).reshape(-1, 3)
+        elif key in reshape16:
+            group_tab_data['FOF'][key] = commune(group_tab_data['FOF'][key].reshape(-1, 1)).reshape(-1, 6)
+
+    # Gather all data into a large dictionary
+    data_dict = {}
+    data_dict['files'] = files
+    data_dict['subfind_tab_data'] = subfind_tab_data
+    data_dict['group_tab_data'] = group_tab_data
+    data_obj = AttrDict()
+    data_obj.data = data_dict
+    return data_obj
 
 
 def fof_group(clusterID: int, fofgroups: Dict[str, np.ndarray] = None):
