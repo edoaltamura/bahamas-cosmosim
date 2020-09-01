@@ -37,9 +37,8 @@ with h5.File(files[2], 'r') as h5file:
         GroupNumber[f'PartType{part_type}'] = np.empty(0, dtype=np.int)
         GroupNumber[f'PartType{part_type}'] = np.append(
             GroupNumber['PartType0'],
-            h5file['PartType0/GroupNumber'][start:end]
+            np.abs(h5file['PartType0/GroupNumber'][start:end])
         )
-        GroupNumber[f'PartType{part_type}'] = commune(np.abs(GroupNumber['PartType0']))
 
         # Generate the metadata in parallel through MPI
         unique, unique_indices, unique_counts = np.unique(
