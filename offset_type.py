@@ -80,15 +80,11 @@ with h5.File(files[2], 'r') as h5file:
         idx_repeat = master_unique_indices[np.where(master_unique_counts > 1)[0]]
         for idx in idx_repeat:
             metadata[f'PartType{part_type}']['length'][idx] += metadata[f'PartType{part_type}']['length'][idx+1]
-            metadata[f'PartType{part_type}']['length'][idx + 1] = np.nan
-            metadata[f'PartType{part_type}']['offset'][idx + 1] = np.nan
-            metadata[f'PartType{part_type}']['unique'][idx + 1] = np.nan
 
-        # Check that the cleaned dataset equals the numpy result
-        idx_cleaning = np.where(~np.isnan(metadata[f'PartType{part_type}']['unique']))[0]
-        metadata[f'PartType{part_type}']['unique'] = metadata[f'PartType{part_type}']['unique'][idx_cleaning]
-        metadata[f'PartType{part_type}']['length'] = metadata[f'PartType{part_type}']['length'][idx_cleaning]
-        metadata[f'PartType{part_type}']['offset'] = metadata[f'PartType{part_type}']['offset'][idx_cleaning]
+        metadata[f'PartType{part_type}']['length'] = np.delete(metadata[f'PartType{part_type}']['length'], idx_repeat)
+        metadata[f'PartType{part_type}']['offset'] = np.delete(metadata[f'PartType{part_type}']['offset'], idx_repeat)
+        metadata[f'PartType{part_type}']['unique'] = np.delete(metadata[f'PartType{part_type}']['unique'], idx_repeat)
+
         assert master_unique == metadata[f'PartType{part_type}']['unique']
 
         pprint(f'PartType{part_type} unique', metadata[f'PartType{part_type}']['unique'])
