@@ -343,17 +343,28 @@ def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
     return fofgroups
 
 def fof_particles(fofgroup: AttrDict) -> AttrDict:
-    with h5.File(fofgroup.data.files[2], 'r') as h5file:
-        for pt in ['0', '1', '4']:
-            offset = int(fofgroup.data.group_tab.FOF.GroupOffsetType[int(pt)])
-            length = int(fofgroup.data.group_tab.FOF.GroupLengthType[int(pt)])
-            start, end = split(length)
-            start += offset
-            end += offset
 
-            groupnumber = h5file[f'/PartType{pt}/GroupNumber'][start:end]
-            groupnumber = commune(groupnumber)
-            pprint(groupnumber)
+    with h5.File(fofgroup.data.files[2], 'r') as h5file:
+
+        # Create a HYDRO/DMO switch
+        is_hydro = "/PartType0" in h5file
+
+        if is_hydro:
+            for pt in ['0', '1', '4']:
+                offset = int(fofgroup.data.group_tab.FOF.GroupOffsetType[int(pt)])
+                length = int(fofgroup.data.group_tab.FOF.GroupLengthType[int(pt)])
+                start, end = split(length)
+                start += offset
+                end += offset
+
+                groupnumber = h5file[f'/PartType{pt}/GroupNumber'][start:end]
+                groupnumber = commune(groupnumber)
+                coords = h5file[f'/PartType{pt}/Coordinates'][start:end]
+                coords = commune(coords.reshape(-1, 1)).reshape(-1, 3)
+                pprint(groupnumber, coords)
+
+        else:
+            pass
 
 
 
