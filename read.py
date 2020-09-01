@@ -363,9 +363,8 @@ def fof_particles(fofgroup: AttrDict) -> AttrDict:
                 groupnumber = commune(groupnumber)
                 pprint(f"GroupNumber{pt}", offset, length, groupnumber)
                 coords = h5file[f'/PartType{pt}/Coordinates'][start:end]
-                print(f"Coordinates{pt}", offset, length, coords)
-                # coords = commune(coords.reshape(-1, 1)).reshape(-1, 3)
-                # pprint(groupnumber, coords)
+                coords = commune(coords.reshape(-1, 1)).reshape(-1, 3)
+                pprint(f"Coordinates{pt}", offset, length, coords)
 
         else:
             pass
