@@ -328,7 +328,6 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
 
 def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
     # pprint(f"[+] Find group information for cluster {clusterID}")
-
     # Filter groups
     filter_idx = np.where(
         fofgroups.data.subfind_tab.FOF.Group_M_Crit500 > 1e13
@@ -351,41 +350,7 @@ def fof_particles(fofgroups: AttrDict) -> AttrDict:
             groupnumber = h5file[f'/PartType{pt}/GroupNumber'][start:end]
             pprint(groupnumber.size)
 
-def snap_groupnumbers(fofgroups: Dict[str, np.ndarray] = None):
-    pgn = []
-    with h5.File(fofgroups['particlefiles'], 'r') as h5file:
-        for pt in ['0', '1', '4']:
-            Nparticles = h5file['Header'].attrs['NumPart_ThisFile'][int(pt)]
-            st, fh = split(Nparticles)
-            pprint(f"[+] Collecting particleType {pt} GroupNumber...")
-            groupnumber = h5file[f'/PartType{pt}/GroupNumber'][st:fh]
 
-            # Clip out negative values and exceeding values
-            groupnumber = np.clip(groupnumber, 0, fofgroups['idx'][-1] + 1)
-            pprint(f"\t Computing CSR indexing matrix...")
-            groupnumber_csrm = get_indices_sparse(groupnumber)
-            del groupnumber_csrm[0], groupnumber_csrm[-1]
-            pgn.append(groupnumber_csrm)
-            del groupnumber
-
-    return pgn
-
-
-def cluster_partgroupnumbers(fofgroup: Dict[str, np.ndarray] = None, groupNumbers: List[np.ndarray] = None):
-    # pprint(f"[+] Find particle groupnumbers for cluster {fofgroup['clusterID']}")
-    pgn = []
-    partTypes = ['0', '1', '4']
-    with h5.File(fofgroup['particlefiles'], 'r') as h5file:
-        for pt in partTypes:
-            # Gather groupnumbers from cores
-            Nparticles = h5file['Header'].attrs['NumPart_ThisFile'][int(pt)]
-            st, fh = split(Nparticles)
-            gn_cores = groupNumbers[partTypes.index(pt)][fofgroup['idx']][0] + st
-            gn_comm = commune(gn_cores)
-            pgn.append(gn_comm)
-            # pprint(f"\t PartType {pt} found {len(gn_comm)} particles")
-            del gn_cores, gn_comm
-    return pgn
 
 
 def snap_coordinates(fofgroups: Dict[str, np.ndarray] = None):
