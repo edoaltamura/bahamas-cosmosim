@@ -25,3 +25,6 @@ for key in foff.data.group_tab.FOF:
     read.pprint(f"{key:<30s}", foff.data.group_tab.FOF[key])
 
 particles = read.fof_particles(foff)
+for pt in ['0', '1', '4']:
+    for key in particles.data.subfind_particles[f'PartType{pt}']:
+        read.pprint(f"PartType{pt:s}\t{key:<30s}", particles.data.subfind_particles[f'PartType{pt}'][key])
