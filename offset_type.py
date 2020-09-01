@@ -76,17 +76,10 @@ with h5.File(files[2], 'r') as h5file:
             return_index=True,
             return_counts=True
         )
-        idx_repeat = master_unique_indices[np.where(master_unique_counts > 1)[0]]
-        pprint(master_unique)
-        pprint(master_unique_indices)
-        pprint(master_unique_counts)
-        pprint(idx_repeat)
-        for idx in idx_repeat:
-            metadata[f'PartType{part_type}']['length'][idx] += metadata[f'PartType{part_type}']['length'][idx+1]
-
-        metadata[f'PartType{part_type}']['length'] = np.delete(metadata[f'PartType{part_type}']['length'], idx_repeat+1)
-        metadata[f'PartType{part_type}']['offset'] = np.delete(metadata[f'PartType{part_type}']['offset'], idx_repeat+1)
-        metadata[f'PartType{part_type}']['unique'] = np.delete(metadata[f'PartType{part_type}']['unique'], idx_repeat+1)
+        gather = np.cumsum(np.insert(master_unique_counts, 0, 0))
+        metadata[f'PartType{part_type}']['length'] = np.add.reduceat(metadata[f'PartType{part_type}']['length'], gather)
+        metadata[f'PartType{part_type}']['offset'] = metadata[f'PartType{part_type}']['offset'][master_unique_indices]
+        metadata[f'PartType{part_type}']['unique'] = metadata[f'PartType{part_type}']['unique'][master_unique_indices]
 
         # assert master_unique == metadata[f'PartType{part_type}']['unique']
         pprint(f'PartType{part_type} Unique', master_unique)
@@ -99,9 +92,9 @@ with h5.File(files[2], 'r') as h5file:
         metadata[f'PartType{part_type}']['offset'] = metadata[f'PartType{part_type}']['offset'][sort_key]
         metadata[f'PartType{part_type}']['unique'] = metadata[f'PartType{part_type}']['unique'][sort_key]
 
-        pprint(f'PartType{part_type} unique', metadata[f'PartType{part_type}']['unique'])
-        pprint(f'PartType{part_type} length', metadata[f'PartType{part_type}']['length'])
-        pprint(f'PartType{part_type} offset', metadata[f'PartType{part_type}']['offset'])
+        # pprint(f'PartType{part_type} unique', metadata[f'PartType{part_type}']['unique'])
+        # pprint(f'PartType{part_type} length', metadata[f'PartType{part_type}']['length'])
+        # pprint(f'PartType{part_type} offset', metadata[f'PartType{part_type}']['offset'])
 
 
 
