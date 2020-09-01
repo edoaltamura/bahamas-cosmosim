@@ -42,7 +42,7 @@ with h5.File(files[2], 'r') as h5file:
 
         # Generate the metadata in parallel through MPI
         unique, unique_indices, unique_counts = np.unique(
-            GroupNumber[f'PartType{part_type}'][start:end],
+            GroupNumber[f'PartType{part_type}'],
             return_index=True,
             return_counts=True
         )
