@@ -76,25 +76,25 @@ with h5.File(files[2], 'r') as h5file:
             return_index=True,
             return_counts=True
         )
-        gather = np.cumsum(np.insert(master_unique_counts, 0, 0))
+        gather = np.cumsum(np.insert(master_unique_counts, 0, 0))[:-1]
         metadata[f'PartType{part_type}']['length'] = np.add.reduceat(metadata[f'PartType{part_type}']['length'], gather)
         metadata[f'PartType{part_type}']['offset'] = metadata[f'PartType{part_type}']['offset'][master_unique_indices]
         metadata[f'PartType{part_type}']['unique'] = metadata[f'PartType{part_type}']['unique'][master_unique_indices]
+        assert master_unique == metadata[f'PartType{part_type}']['unique']
 
-        # assert master_unique == metadata[f'PartType{part_type}']['unique']
-        pprint(f'PartType{part_type} Unique', master_unique)
         pprint(f'PartType{part_type} unique', metadata[f'PartType{part_type}']['unique'])
         pprint(f'PartType{part_type} length', metadata[f'PartType{part_type}']['length'])
         pprint(f'PartType{part_type} offset', metadata[f'PartType{part_type}']['offset'])
+
         # Sort the elements in the array from cluster 0 upwards
         sort_key = np.argsort(metadata[f'PartType{part_type}']['unique'])
         metadata[f'PartType{part_type}']['length'] = metadata[f'PartType{part_type}']['length'][sort_key]
         metadata[f'PartType{part_type}']['offset'] = metadata[f'PartType{part_type}']['offset'][sort_key]
         metadata[f'PartType{part_type}']['unique'] = metadata[f'PartType{part_type}']['unique'][sort_key]
 
-        # pprint(f'PartType{part_type} unique', metadata[f'PartType{part_type}']['unique'])
-        # pprint(f'PartType{part_type} length', metadata[f'PartType{part_type}']['length'])
-        # pprint(f'PartType{part_type} offset', metadata[f'PartType{part_type}']['offset'])
+        pprint(f'PartType{part_type} unique', metadata[f'PartType{part_type}']['unique'])
+        pprint(f'PartType{part_type} length', metadata[f'PartType{part_type}']['length'])
+        pprint(f'PartType{part_type} offset', metadata[f'PartType{part_type}']['offset'])
 
 
 
