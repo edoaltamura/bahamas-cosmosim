@@ -361,9 +361,9 @@ def fof_particles(fofgroup: AttrDict) -> AttrDict:
 
                 groupnumber = h5file[f'/PartType{pt}/GroupNumber'][start:end]
                 groupnumber = commune(groupnumber)
-                pprint(f"GroupNumber{pt}", start, end, groupnumber)
+                pprint(f"GroupNumber{pt}", offset, length, groupnumber)
                 coords = h5file[f'/PartType{pt}/Coordinates'][start:end]
-                print(f"Coordinates{pt}", start, end, coords)
+                print(f"Coordinates{pt}", offset, length, coords)
                 # coords = commune(coords.reshape(-1, 1)).reshape(-1, 3)
                 # pprint(groupnumber, coords)
 
