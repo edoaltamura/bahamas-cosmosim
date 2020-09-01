@@ -346,6 +346,8 @@ def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
 
 def fof_particles(fofgroup: AttrDict) -> AttrDict:
 
+    subfind_particle_data = {}
+
     with h5.File(fofgroup.data.files[2], 'r') as h5file:
 
         # Create a HYDRO/DMO switch
@@ -353,6 +355,9 @@ def fof_particles(fofgroup: AttrDict) -> AttrDict:
 
         if is_hydro:
             for pt in ['0', '1', '4']:
+                subfind_particle_data[f'PartType{pt}'] = {}
+
+                # Find bound particles using index metadata
                 n_particles = int(fofgroup.data.header.subfind_particles.NumPart_ThisFile[int(pt)])
                 offset = int(fofgroup.data.group_tab.FOF.GroupOffsetType[int(pt)])
                 length = int(fofgroup.data.group_tab.FOF.GroupLengthType[int(pt)])
@@ -363,10 +368,8 @@ def fof_particles(fofgroup: AttrDict) -> AttrDict:
 
                 groupnumber = h5file[f'/PartType{pt}/SubGroupNumber'][start:end]
                 groupnumber = commune(groupnumber)
-                pprint(f"GroupNumber{pt}", offset, length, groupnumber)
-                coords = h5file[f'/PartType{pt}/Coordinates'][start:end].reshape(-1, 1)
-                coords = commune(coords).reshape(-1, 3)
-                pprint(f"Coordinates{pt}", offset, length, coords)
+                pprint(f"GroupNumber{pt}", offset, length, start, end, groupnumber)
+
 
         else:
             pass
