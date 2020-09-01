@@ -80,7 +80,7 @@ with h5.File(files[2], 'r') as h5file:
         metadata[f'PartType{part_type}']['length'] = np.add.reduceat(metadata[f'PartType{part_type}']['length'], gather)
         metadata[f'PartType{part_type}']['offset'] = metadata[f'PartType{part_type}']['offset'][master_unique_indices]
         metadata[f'PartType{part_type}']['unique'] = metadata[f'PartType{part_type}']['unique'][master_unique_indices]
-        assert master_unique == metadata[f'PartType{part_type}']['unique']
+        assert ~np.all(master_unique - metadata[f'PartType{part_type}']['unique'])
 
         pprint(f'PartType{part_type} unique', metadata[f'PartType{part_type}']['unique'])
         pprint(f'PartType{part_type} length', metadata[f'PartType{part_type}']['length'])
