@@ -10,11 +10,13 @@ rank = comm.Get_rank()
 nproc = comm.Get_size()
 
 from read import find_files, split, commune, get_header, pprint
+from metadata import Metadata
 
 simulation_type = 'hydro'
 redshift = 'z003p000'
 output_directory = '/local/scratch/altamura/bahamas_metadata'
 
+redshift_idx = Metadata.data.REDSHIFTS[redshift]
 files = find_files(simulation_type, redshift)
 header = get_header(files)
 
@@ -117,6 +119,6 @@ if rank == 0:
     )).T
 
     # Write output to hdf5 file
-    with h5.File(f'{output_directory}/{simulation_type}_{redshift}.hdf5', 'w') as h5file:
+    with h5.File(f'{output_directory}/{simulation_type}_{redshift_idx}.hdf5', 'w') as h5file:
         h5file.create_dataset('GroupLengthType', dtype=np.int, shape=(len(GroupLengthType), 6), data=GroupLengthType)
         h5file.create_dataset('GroupOffsetType', dtype=np.int, shape=(len(GroupOffsetType), 6), data=GroupOffsetType)

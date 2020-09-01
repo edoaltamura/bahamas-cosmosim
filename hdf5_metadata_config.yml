@@ -12,6 +12,7 @@ PATHS:
   filename_subfind_groups_gt: "/group_tab_REDSHIFTIDX.SPLITIDX.hdf5"
   filename_subfind_particledata: "/eagle_subfind_particles_REDSHIFTIDX.0.hdf5"
   filename_gadget_snapshots: "/snap_REDSHIFTIDX.SPLITIDX.hdf5"
+  custom_metadata: "/local/scratch/altamura/bahamas_metadata/SIMTYPE_REDSHIFTIDX.hdf5"
 ---
 REDSHIFTS:
   z003p000: '018'
