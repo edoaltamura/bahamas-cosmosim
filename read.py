@@ -215,7 +215,7 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
     group_tab_data['FOF'] = {}
     group_tab_data['FOF']['CentreOfMass'] = np.empty(0, dtype=np.float32)
     group_tab_data['FOF']['GroupLength'] = np.empty(0, dtype=np.int)
-    group_tab_data['FOF']['GroupLengthType'] = np.empty(0, dtype=np.float32)
+    group_tab_data['FOF']['GroupLengthType'] = np.empty(0, dtype=np.int)
     group_tab_data['FOF']['GroupMassType'] = np.empty(0, dtype=np.float32)
     group_tab_data['FOF']['GroupOffset'] = np.empty(0, dtype=np.int)
     group_tab_data['FOF']['GroupOffsetType'] = np.empty(0, dtype=np.int)
