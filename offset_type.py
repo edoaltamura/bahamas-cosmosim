@@ -85,17 +85,17 @@ with h5.File(files[2], 'r') as h5file:
         metadata[f'PartType{part_type}']['offset'] = np.delete(metadata[f'PartType{part_type}']['offset'], idx_repeat+1)
         metadata[f'PartType{part_type}']['unique'] = np.delete(metadata[f'PartType{part_type}']['unique'], idx_repeat+1)
 
-        # assert master_unique == metadata[f'PartType{part_type}']['unique']
-
-        pprint(f'PartType{part_type} unique', metadata[f'PartType{part_type}']['unique'])
-        pprint(f'PartType{part_type} length', metadata[f'PartType{part_type}']['length'])
-        pprint(f'PartType{part_type} offset', metadata[f'PartType{part_type}']['offset'])
+        assert master_unique == metadata[f'PartType{part_type}']['unique']
 
         # Sort the elements in the array from cluster 0 upwards
         sort_key = np.argsort(metadata[f'PartType{part_type}']['unique'])
         metadata[f'PartType{part_type}']['length'] = metadata[f'PartType{part_type}']['length'][sort_key]
         metadata[f'PartType{part_type}']['offset'] = metadata[f'PartType{part_type}']['offset'][sort_key]
         metadata[f'PartType{part_type}']['unique'] = metadata[f'PartType{part_type}']['unique'][sort_key]
+
+        pprint(f'PartType{part_type} unique', metadata[f'PartType{part_type}']['unique'])
+        pprint(f'PartType{part_type} length', metadata[f'PartType{part_type}']['length'])
+        pprint(f'PartType{part_type} offset', metadata[f'PartType{part_type}']['offset'])
 
 
 
