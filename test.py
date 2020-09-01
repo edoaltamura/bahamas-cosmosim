@@ -3,7 +3,7 @@ import read
 files = read.find_files('hydro', 'z003p000')
 header = read.get_header(files)
 fofs = read.fof_groups(files, header)
-read.pprint(header.data.subfind_particles.MassTable)
+read.pprint("Dark matter particle mass:", fofs.data.mass_DMpart)
 
 for key in fofs.data.subfind_tab.FOF:
     read.pprint(f"subfind_tab.FOF.{key:<30s} {len(fofs.data.subfind_tab.FOF[key])}", fofs.data.subfind_tab.FOF[key][:2])

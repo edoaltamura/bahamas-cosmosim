@@ -323,6 +323,7 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
     data_dict['header'] = header.data
     data_dict['subfind_tab'] = subfind_tab_data
     data_dict['group_tab'] = group_tab_data
+    data_dict['mass_DMpart'] = header.data.subfind_particles.MassTable[1] * conv_mass * unit_mass
     data_obj = AttrDict()
     data_obj.data = data_dict
     return data_obj
