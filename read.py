@@ -435,7 +435,6 @@ def fof_particles(fofgroup: AttrDict) -> AttrDict:
             subfind_particle_data['PartType4']['Velocity'] = np.empty(0, dtype=np.float)
 
             # Fill arrays in every core with a chunk of the data
-            # Do np.append()
             subfind_particle_data['PartType0']['Coordinates'] = np.append(subfind_particle_data['PartType0']['Coordinates'], h5file['PartType0/Coordinates'][pd_idx0])
             subfind_particle_data['PartType0']['Density'] = np.append(subfind_particle_data['PartType0']['Density'], h5file['PartType0/Density'][pd_idx0])
             subfind_particle_data['PartType0']['GroupNumber'] = np.append(subfind_particle_data['PartType0']['GroupNumber'], h5file['PartType0/GroupNumber'][pd_idx0])
