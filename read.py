@@ -156,12 +156,14 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
     conv_length = header.data.subfind_particles.ExpansionFactor / header.data.subfind_particles.HubbleParam
     conv_density = 1e10 * header.data.subfind_particles.HubbleParam ** 2 / header.data.subfind_particles.ExpansionFactor ** 3
     conv_velocity = np.sqrt(header.data.subfind_particles.ExpansionFactor)
+    conv_starFormationRate = 1e10 * header.data.subfind_particles.HubbleParam ** 2 / header.data.subfind_particles.ExpansionFactor ** 3
 
     # Units
     unit_mass = unyt.Solar_Mass
     unit_length = unyt.Mpc
     unit_density = unyt.Solar_Mass / unyt.Mpc ** 3
     unit_velocity = unyt.km / unyt.s
+    unit_starFormationRate = unyt.Solar_Mass / (unyt.year * unyt.Mpc ** 3)
 
 
     pprint(f"[+] Find groups information...")
@@ -194,7 +196,7 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
     subfind_tab_data['Subhalo']['CentreOfMass'] = np.empty(0, dtype=np.float32)
     subfind_tab_data['Subhalo']['CentreOfPotential'] = np.empty(0, dtype=np.float32)
     subfind_tab_data['Subhalo']['GasSpin'] = np.empty(0, dtype=np.float32)
-    subfind_tab_data['Subhalo']['GroupNumber'] = np.empty(0, dtype=np.float32)
+    subfind_tab_data['Subhalo']['GroupNumber'] = np.empty(0, dtype=np.int)
     subfind_tab_data['Subhalo']['HalfMassProjRad'] = np.empty(0, dtype=np.float32)
     subfind_tab_data['Subhalo']['HalfMassRad'] = np.empty(0, dtype=np.float32)
     subfind_tab_data['Subhalo']['IDMostBound'] = np.empty(0, dtype=np.int)
@@ -305,12 +307,12 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
     subfind_tab_data['Subhalo']['VmaxRadius'] = commune(subfind_tab_data['Subhalo']['VmaxRadius']) * conv_length * unit_length
     subfind_tab_data['Subhalo']['StarsMass'] = commune(subfind_tab_data['Subhalo']['StarsMass']) * conv_mass * unit_mass
     subfind_tab_data['Subhalo']['StarsSpin'] = commune(subfind_tab_data['Subhalo']['StarsSpin'].reshape(-1, 1)).reshape(-1, 3)
-    subfind_tab_data['Subhalo']['StarFormationRate'] = commune(subfind_tab_data['Subhalo']['StarFormationRate'])
+    subfind_tab_data['Subhalo']['StarFormationRate'] = commune(subfind_tab_data['Subhalo']['StarFormationRate']) * conv_starFormationRate * unit_starFormationRate
     subfind_tab_data['Subhalo']['StellarVelDisp'] = commune(subfind_tab_data['Subhalo']['StellarVelDisp']) * conv_velocity * unit_velocity
     group_tab_data['FOF']['CentreOfMass'] = commune(group_tab_data['FOF']['CentreOfMass'].reshape(-1, 1)).reshape(-1, 3) * conv_length * unit_length
     group_tab_data['FOF']['GroupLength'] = commune(group_tab_data['FOF']['GroupLength'])
     group_tab_data['FOF']['GroupLengthType'] = commune(group_tab_data['FOF']['GroupLengthType'].reshape(-1, 1)).reshape(-1, 6)
-    group_tab_data['FOF']['GroupMassType'] = commune(group_tab_data['FOF']['GroupMassType'].reshape(-1, 1)).reshape(-1, 6)
+    group_tab_data['FOF']['GroupMassType'] = commune(group_tab_data['FOF']['GroupMassType'].reshape(-1, 1)).reshape(-1, 6) * conv_mass * unit_mass
     group_tab_data['FOF']['GroupOffset'] = commune(group_tab_data['FOF']['GroupOffset'])
     group_tab_data['FOF']['GroupOffsetType'] = commune(group_tab_data['FOF']['GroupOffsetType'].reshape(-1, 1)).reshape(-1, 6)
     group_tab_data['FOF']['Mass'] = commune(group_tab_data['FOF']['Mass']) * conv_mass * unit_mass
@@ -358,9 +360,10 @@ def fof_particles(fofgroup: AttrDict) -> AttrDict:
                 end += offset
 
                 groupnumber = h5file[f'/PartType{pt}/GroupNumber'][start:end]
-                print(start, end, groupnumber)
-                # groupnumber = commune(groupnumber)
-                # coords = h5file[f'/PartType{pt}/Coordinates'][start:end]
+                groupnumber = commune(groupnumber)
+                pprint(f"GroupNumber{pt}", start, end, groupnumber)
+                coords = h5file[f'/PartType{pt}/Coordinates'][start:end]
+                print(f"Coordinates{pt}", start, end, coords)
                 # coords = commune(coords.reshape(-1, 1)).reshape(-1, 3)
                 # pprint(groupnumber, coords)
 
