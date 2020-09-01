@@ -400,74 +400,75 @@ def fof_particles(fofgroup: AttrDict) -> AttrDict:
             pd_idx4 = np.arange(start4, end4)
 
             # Initialise empty arrays on all cores
-            subfind_particle_data['PartType0']['Coordinates'] = np.empty(0)
-            subfind_particle_data['PartType0']['Density'] = np.empty(0)
-            subfind_particle_data['PartType0']['GroupNumber'] = np.empty(0)
-            subfind_particle_data['PartType0']['HostHalo_TVir_Mass'] = np.empty(0)
-            subfind_particle_data['PartType0']['InternalEnergy'] = np.empty(0)
-            subfind_particle_data['PartType0']['Mass'] = np.empty(0)
-            subfind_particle_data['PartType0']['Metallicity'] = np.empty(0)
-            subfind_particle_data['PartType0']['OnEquationOfState'] = np.empty(0)
-            subfind_particle_data['PartType0']['ParticleIDs'] = np.empty(0)
-            subfind_particle_data['PartType0']['SmoothedMetallicity'] = np.empty(0)
-            subfind_particle_data['PartType0']['SmoothingLength'] = np.empty(0)
-            subfind_particle_data['PartType0']['StarFormationRate'] = np.empty(0)
-            subfind_particle_data['PartType0']['SubGroupNumber'] = np.empty(0)
-            subfind_particle_data['PartType0']['Temperature'] = np.empty(0)
-            subfind_particle_data['PartType0']['Velocity'] = np.empty(0)
-            subfind_particle_data['PartType1']['Coordinates'] = np.empty(0)
-            subfind_particle_data['PartType1']['GroupNumber'] = np.empty(0)
-            subfind_particle_data['PartType1']['ParticleIDs'] = np.empty(0)
-            subfind_particle_data['PartType1']['SubGroupNumber'] = np.empty(0)
-            subfind_particle_data['PartType1']['Velocity'] = np.empty(0)
-            subfind_particle_data['PartType4']['Coordinates'] = np.empty(0)
-            subfind_particle_data['PartType4']['Density'] = np.empty(0)
-            subfind_particle_data['PartType4']['GroupNumber'] = np.empty(0)
-            subfind_particle_data['PartType4']['HostHalo_TVir'] = np.empty(0)
-            subfind_particle_data['PartType4']['HostHalo_TVir_Mass'] = np.empty(0)
-            subfind_particle_data['PartType4']['InitialMass'] = np.empty(0)
-            subfind_particle_data['PartType4']['Mass'] = np.empty(0)
-            subfind_particle_data['PartType4']['Metallicity'] = np.empty(0)
-            subfind_particle_data['PartType4']['ParticleIDs'] = np.empty(0)
-            subfind_particle_data['PartType4']['SmoothingLength'] = np.empty(0)
-            subfind_particle_data['PartType4']['StellarFormationTime'] = np.empty(0)
-            subfind_particle_data['PartType4']['SubGroupNumber'] = np.empty(0)
-            subfind_particle_data['PartType4']['Velocity'] = np.empty(0)
+            subfind_particle_data['PartType0']['Coordinates'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType0']['Density'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType0']['GroupNumber'] = np.empty(0, dtype=np.int)
+            subfind_particle_data['PartType0']['HostHalo_TVir_Mass'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType0']['InternalEnergy'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType0']['Mass'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType0']['Metallicity'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType0']['OnEquationOfState'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType0']['ParticleIDs'] = np.empty(0, dtype=np.int)
+            subfind_particle_data['PartType0']['SmoothedMetallicity'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType0']['SmoothingLength'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType0']['StarFormationRate'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType0']['SubGroupNumber'] = np.empty(0, dtype=np.int)
+            subfind_particle_data['PartType0']['Temperature'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType0']['Velocity'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType1']['Coordinates'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType1']['GroupNumber'] = np.empty(0, dtype=np.int)
+            subfind_particle_data['PartType1']['ParticleIDs'] = np.empty(0, dtype=np.int)
+            subfind_particle_data['PartType1']['SubGroupNumber'] = np.empty(0, dtype=np.int)
+            subfind_particle_data['PartType1']['Velocity'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType4']['Coordinates'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType4']['Density'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType4']['GroupNumber'] = np.empty(0, dtype=np.int)
+            subfind_particle_data['PartType4']['HostHalo_TVir'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType4']['HostHalo_TVir_Mass'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType4']['InitialMass'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType4']['Mass'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType4']['Metallicity'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType4']['ParticleIDs'] = np.empty(0, dtype=np.int)
+            subfind_particle_data['PartType4']['SmoothingLength'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType4']['StellarFormationTime'] = np.empty(0, dtype=np.float)
+            subfind_particle_data['PartType4']['SubGroupNumber'] = np.empty(0, dtype=np.int)
+            subfind_particle_data['PartType4']['Velocity'] = np.empty(0, dtype=np.float)
 
             # Fill arrays in every core with a chunk of the data
-            subfind_particle_data['PartType0']['Coordinates'] = h5file['PartType0/Coordinates'][pd_idx0]
-            subfind_particle_data['PartType0']['Density'] = h5file['PartType0/Density'][pd_idx0]
-            subfind_particle_data['PartType0']['GroupNumber'] = h5file['PartType0/GroupNumber'][pd_idx0]
-            subfind_particle_data['PartType0']['HostHalo_TVir_Mass'] = h5file['PartType0/HostHalo_TVir_Mass'][pd_idx0]
-            subfind_particle_data['PartType0']['InternalEnergy'] = h5file['PartType0/InternalEnergy'][pd_idx0]
-            subfind_particle_data['PartType0']['Mass'] = h5file['PartType0/Mass'][pd_idx0]
-            subfind_particle_data['PartType0']['Metallicity'] = h5file['PartType0/Metallicity'][pd_idx0]
-            subfind_particle_data['PartType0']['OnEquationOfState'] = h5file['PartType0/OnEquationOfState'][pd_idx0]
-            subfind_particle_data['PartType0']['ParticleIDs'] = h5file['PartType0/ParticleIDs'][pd_idx0]
-            subfind_particle_data['PartType0']['SmoothedMetallicity'] = h5file['PartType0/SmoothedMetallicity'][pd_idx0]
-            subfind_particle_data['PartType0']['SmoothingLength'] = h5file['PartType0/SmoothingLength'][pd_idx0]
-            subfind_particle_data['PartType0']['StarFormationRate'] = h5file['PartType0/StarFormationRate'][pd_idx0]
-            subfind_particle_data['PartType0']['SubGroupNumber'] = h5file['PartType0/SubGroupNumber'][pd_idx0]
-            subfind_particle_data['PartType0']['Temperature'] = h5file['PartType0/Temperature'][pd_idx0]
-            subfind_particle_data['PartType0']['Velocity'] = h5file['PartType0/Velocity'][pd_idx0]
-            subfind_particle_data['PartType1']['Coordinates'] = h5file['PartType1/Coordinates'][pd_idx1]
-            subfind_particle_data['PartType1']['GroupNumber'] = h5file['PartType1/GroupNumber'][pd_idx1]
-            subfind_particle_data['PartType1']['ParticleIDs'] = h5file['PartType1/ParticleIDs'][pd_idx1]
-            subfind_particle_data['PartType1']['SubGroupNumber'] = h5file['PartType1/SubGroupNumber'][pd_idx1]
-            subfind_particle_data['PartType1']['Velocity'] = h5file['PartType1/Velocity'][pd_idx1]
-            subfind_particle_data['PartType4']['Coordinates'] = h5file['PartType4/Coordinates'][pd_idx4]
-            subfind_particle_data['PartType4']['Density'] = h5file['PartType4/Density'][pd_idx4]
-            subfind_particle_data['PartType4']['GroupNumber'] = h5file['PartType4/GroupNumber'][pd_idx4]
-            subfind_particle_data['PartType4']['HostHalo_TVir'] = h5file['PartType4/HostHalo_TVir'][pd_idx4]
-            subfind_particle_data['PartType4']['HostHalo_TVir_Mass'] = h5file['PartType4/HostHalo_TVir_Mass'][pd_idx4]
-            subfind_particle_data['PartType4']['InitialMass'] = h5file['PartType4/InitialMass'][pd_idx4]
-            subfind_particle_data['PartType4']['Mass'] = h5file['PartType4/Mass'][pd_idx4]
-            subfind_particle_data['PartType4']['Metallicity'] = h5file['PartType4/Metallicity'][pd_idx4]
-            subfind_particle_data['PartType4']['ParticleIDs'] = h5file['PartType4/ParticleIDs'][pd_idx4]
-            subfind_particle_data['PartType4']['SmoothingLength'] = h5file['PartType4/SmoothingLength'][pd_idx4]
-            subfind_particle_data['PartType4']['StellarFormationTime'] = h5file['PartType4/StellarFormationTime'][pd_idx4]
-            subfind_particle_data['PartType4']['SubGroupNumber'] = h5file['PartType4/SubGroupNumber'][pd_idx4]
-            subfind_particle_data['PartType4']['Velocity'] = h5file['PartType4/Velocity'][pd_idx4]
+            # Do np.append()
+            subfind_particle_data['PartType0']['Coordinates'] = np.append(subfind_particle_data['PartType0']['Coordinates'], h5file['PartType0/Coordinates'][pd_idx0])
+            subfind_particle_data['PartType0']['Density'] = np.append(subfind_particle_data['PartType0']['Density'], h5file['PartType0/Density'][pd_idx0])
+            subfind_particle_data['PartType0']['GroupNumber'] = np.append(subfind_particle_data['PartType0']['GroupNumber'], h5file['PartType0/GroupNumber'][pd_idx0])
+            subfind_particle_data['PartType0']['HostHalo_TVir_Mass'] = np.append(subfind_particle_data['PartType0']['HostHalo_TVir_Mass'], h5file['PartType0/HostHalo_TVir_Mass'][pd_idx0])
+            subfind_particle_data['PartType0']['InternalEnergy'] = np.append(subfind_particle_data['PartType0']['InternalEnergy'], h5file['PartType0/InternalEnergy'][pd_idx0])
+            subfind_particle_data['PartType0']['Mass'] = np.append(subfind_particle_data['PartType0']['Mass'], h5file['PartType0/Mass'][pd_idx0])
+            subfind_particle_data['PartType0']['Metallicity'] = np.append(subfind_particle_data['PartType0']['Metallicity'], h5file['PartType0/Metallicity'][pd_idx0])
+            subfind_particle_data['PartType0']['OnEquationOfState'] = np.append(subfind_particle_data['PartType0']['OnEquationOfState'], h5file['PartType0/OnEquationOfState'][pd_idx0])
+            subfind_particle_data['PartType0']['ParticleIDs'] = np.append(subfind_particle_data['PartType0']['ParticleIDs'], h5file['PartType0/ParticleIDs'][pd_idx0])
+            subfind_particle_data['PartType0']['SmoothedMetallicity'] = np.append(subfind_particle_data['PartType0']['SmoothedMetallicity'], h5file['PartType0/SmoothedMetallicity'][pd_idx0])
+            subfind_particle_data['PartType0']['SmoothingLength'] = np.append(subfind_particle_data['PartType0']['SmoothingLength'], h5file['PartType0/SmoothingLength'][pd_idx0])
+            subfind_particle_data['PartType0']['StarFormationRate'] = np.append(subfind_particle_data['PartType0']['StarFormationRate'], h5file['PartType0/StarFormationRate'][pd_idx0])
+            subfind_particle_data['PartType0']['SubGroupNumber'] = np.append(subfind_particle_data['PartType0']['SubGroupNumber'], h5file['PartType0/SubGroupNumber'][pd_idx0])
+            subfind_particle_data['PartType0']['Temperature'] = np.append(subfind_particle_data['PartType0']['Temperature'], h5file['PartType0/Temperature'][pd_idx0])
+            subfind_particle_data['PartType0']['Velocity'] = np.append(subfind_particle_data['PartType0']['Velocity'], h5file['PartType0/Velocity'][pd_idx0])
+            subfind_particle_data['PartType1']['Coordinates'] = np.append(subfind_particle_data['PartType1']['Coordinates'], h5file['PartType1/Coordinates'][pd_idx1])
+            subfind_particle_data['PartType1']['GroupNumber'] = np.append(subfind_particle_data['PartType1']['GroupNumber'], h5file['PartType1/GroupNumber'][pd_idx1])
+            subfind_particle_data['PartType1']['ParticleIDs'] = np.append(subfind_particle_data['PartType1']['ParticleIDs'], h5file['PartType1/ParticleIDs'][pd_idx1])
+            subfind_particle_data['PartType1']['SubGroupNumber'] = np.append(subfind_particle_data['PartType1']['SubGroupNumber'], h5file['PartType1/SubGroupNumber'][pd_idx1])
+            subfind_particle_data['PartType1']['Velocity'] = np.append(subfind_particle_data['PartType1']['Velocity'], h5file['PartType1/Velocity'][pd_idx1])
+            subfind_particle_data['PartType4']['Coordinates'] = np.append(subfind_particle_data['PartType4']['Coordinates'], h5file['PartType4/Coordinates'][pd_idx4])
+            subfind_particle_data['PartType4']['Density'] = np.append(subfind_particle_data['PartType4']['Density'], h5file['PartType4/Density'][pd_idx4])
+            subfind_particle_data['PartType4']['GroupNumber'] = np.append(subfind_particle_data['PartType4']['GroupNumber'], h5file['PartType4/GroupNumber'][pd_idx4])
+            subfind_particle_data['PartType4']['HostHalo_TVir'] = np.append(subfind_particle_data['PartType4']['HostHalo_TVir'], h5file['PartType4/HostHalo_TVir'][pd_idx4])
+            subfind_particle_data['PartType4']['HostHalo_TVir_Mass'] = np.append(subfind_particle_data['PartType4']['HostHalo_TVir_Mass'], h5file['PartType4/HostHalo_TVir_Mass'][pd_idx4])
+            subfind_particle_data['PartType4']['InitialMass'] = np.append(subfind_particle_data['PartType4']['InitialMass'], h5file['PartType4/InitialMass'][pd_idx4])
+            subfind_particle_data['PartType4']['Mass'] = np.append(subfind_particle_data['PartType4']['Mass'], h5file['PartType4/Mass'][pd_idx4])
+            subfind_particle_data['PartType4']['Metallicity'] = np.append(subfind_particle_data['PartType4']['Metallicity'], h5file['PartType4/Metallicity'][pd_idx4])
+            subfind_particle_data['PartType4']['ParticleIDs'] = np.append(subfind_particle_data['PartType4']['ParticleIDs'], h5file['PartType4/ParticleIDs'][pd_idx4])
+            subfind_particle_data['PartType4']['SmoothingLength'] = np.append(subfind_particle_data['PartType4']['SmoothingLength'], h5file['PartType4/SmoothingLength'][pd_idx4])
+            subfind_particle_data['PartType4']['StellarFormationTime'] = np.append(subfind_particle_data['PartType4']['StellarFormationTime'], h5file['PartType4/StellarFormationTime'][pd_idx4])
+            subfind_particle_data['PartType4']['SubGroupNumber'] = np.append(subfind_particle_data['PartType4']['SubGroupNumber'], h5file['PartType4/SubGroupNumber'][pd_idx4])
+            subfind_particle_data['PartType4']['Velocity'] = np.append(subfind_particle_data['PartType4']['Velocity'], h5file['PartType4/Velocity'][pd_idx4])
 
             # Gather all data from cores into the same array and assign units
             subfind_particle_data['PartType0']['Coordinates'] = commune(subfind_particle_data['PartType0']['Coordinates'].reshape(-1, 1)).reshape(-1, 3) * conv_length * unit_length
