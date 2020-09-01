@@ -347,7 +347,10 @@ def fof_particles(fofgroup: AttrDict) -> AttrDict:
         for pt in ['0', '1', '4']:
             offset = int(fofgroup.data.group_tab.FOF.GroupOffsetType[int(pt)])
             length = int(fofgroup.data.group_tab.FOF.GroupLengthType[int(pt)])
-            start, end = split(length) + offset
+            start, end = split(length)
+            start += offset
+            end += offset
+
             groupnumber = h5file[f'/PartType{pt}/GroupNumber'][start:end]
             groupnumber = commune(groupnumber)
             pprint(groupnumber)
