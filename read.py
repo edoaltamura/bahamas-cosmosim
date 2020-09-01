@@ -353,17 +353,19 @@ def fof_particles(fofgroup: AttrDict) -> AttrDict:
 
         if is_hydro:
             for pt in ['0', '1', '4']:
+                n_particles = int(fofgroup.data.header.subfind_particles.NumPart_ThisFile[int(pt)])
                 offset = int(fofgroup.data.group_tab.FOF.GroupOffsetType[int(pt)])
                 length = int(fofgroup.data.group_tab.FOF.GroupLengthType[int(pt)])
                 start, end = split(length)
-                start += offset
-                end += offset
+                start = n_particles - (end + offset)
+                end = n_particles - (start + offset)
+
 
                 groupnumber = h5file[f'/PartType{pt}/SubGroupNumber'][start:end]
                 groupnumber = commune(groupnumber)
                 pprint(f"GroupNumber{pt}", offset, length, groupnumber)
-                coords = h5file[f'/PartType{pt}/Coordinates'][start:end]
-                coords = commune(coords.reshape(-1, 1)).reshape(-1, 3)
+                coords = h5file[f'/PartType{pt}/Coordinates'][start:end].reshape(-1, 1)
+                coords = commune(coords).reshape(-1, 3)
                 pprint(f"Coordinates{pt}", offset, length, coords)
 
         else:
