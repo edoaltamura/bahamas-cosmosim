@@ -345,10 +345,12 @@ def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
 def fof_particles(fofgroup: AttrDict) -> AttrDict:
     with h5.File(fofgroup.data.files[2], 'r') as h5file:
         for pt in ['0', '1', '4']:
-            start = fofgroup.data.group_tab.FOF.GroupOffsetType[int(pt)]
-            end = start + fofgroup.data.group_tab.FOF.GroupLengthType[int(pt)]
+            offset = int(fofgroup.data.group_tab.FOF.GroupOffsetType[int(pt)])
+            length = int(fofgroup.data.group_tab.FOF.GroupLengthType[int(pt)])
+            start, end = split(length) + offset
             groupnumber = h5file[f'/PartType{pt}/GroupNumber'][start:end]
-            pprint(groupnumber.size)
+            groupnumber = commune(groupnumber)
+            pprint(groupnumber)
 
 
 
