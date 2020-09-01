@@ -344,13 +344,14 @@ def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
     return fofgroups
 
 def particle_index(fofgroup: AttrDict, particle_type: int) -> tuple:
+
     # Find bound particles using index metadata
     n_particles = int(fofgroup.data.header.subfind_particles.NumPart_ThisFile[particle_type])
     offset = int(fofgroup.data.group_tab.FOF.GroupOffsetType[particle_type])
     length = int(fofgroup.data.group_tab.FOF.GroupLengthType[particle_type])
-    start, end = split(length)
-    start = n_particles - (end + offset)
-    end = n_particles - (start + offset)
+    _start, _end = split(length)
+    start = n_particles - offset - _end
+    end = n_particles - offset - _start
     return start, end
 
 
