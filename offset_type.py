@@ -77,6 +77,9 @@ with h5.File(files[2], 'r') as h5file:
             return_counts=True
         )
         idx_repeat = master_unique_indices[np.where(master_unique_counts > 1)[0]]
+        pprint(master_unique)
+        pprint(master_unique_indices)
+        pprint(master_unique_counts)
         pprint(idx_repeat)
         for idx in idx_repeat:
             metadata[f'PartType{part_type}']['length'][idx] += metadata[f'PartType{part_type}']['length'][idx+1]
