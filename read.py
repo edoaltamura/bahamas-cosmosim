@@ -334,17 +334,14 @@ def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
         fofgroups.data.subfind_tab.FOF.Group_M_Crit500 > 1e13
     )[0][clusterID]
 
-    # Create an AttrDict object and push the filtered data
-    new_data = fofgroups
+    # Edit the AttrDict object and push the filtered data
     for category in ['FOF', 'Subhalo']:
         for dataset in fofgroups.data['subfind_tab'][category]:
-            new_data.data['subfind_tab'][category][dataset] = None
-            new_data.data['subfind_tab'][category][dataset] = fofgroups.data['subfind_tab'][category][dataset][filter_idx]
+            fofgroups.data['subfind_tab'][category][dataset] = fofgroups.data['subfind_tab'][category][dataset][filter_idx]
     for dataset in fofgroups.data['group_tab']['FOF']:
-        new_data.data['group_tab']['FOF'][dataset] = None
-        new_data.data['group_tab']['FOF'][dataset] = fofgroups.data['group_tab']['FOF'][dataset][filter_idx]
+        fofgroups.data['group_tab']['FOF'][dataset] = fofgroups.data['group_tab']['FOF'][dataset][filter_idx]
 
-    return new_data
+    return fofgroups
 
 def fof_particles(fofgroups: AttrDict) -> AttrDict:
     with h5.File(fofgroups.data.files[2], 'r') as h5file:
