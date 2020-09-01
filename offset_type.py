@@ -93,29 +93,30 @@ with h5.File(files[2], 'r') as h5file:
         # pprint(f'PartType{part_type} length', len(metadata[f'PartType{part_type}']['length']), metadata[f'PartType{part_type}']['length'])
         # pprint(f'PartType{part_type} offset', len(metadata[f'PartType{part_type}']['offset']), metadata[f'PartType{part_type}']['offset'])
 
+comm.Barrier()
+if rank == 0:
+    # Convert into arrays similar to the Subfind ones
+    null_array = np.zeros_like(metadata[f'PartType{part_type}']['offset'], dtype=np.int)
 
-# Convert into arrays similar to the Subfind ones
-null_array = np.zeros_like(metadata[f'PartType{part_type}']['offset'], dtype=np.int)
+    GroupLengthType = np.vstack((
+        metadata['PartType0']['length'],
+        metadata['PartType1']['length'],
+        null_array,
+        null_array,
+        metadata['PartType4']['length'],
+        null_array
+    )).T
 
-GroupLengthType = np.vstack((
-    metadata['PartType0']['length'],
-    metadata['PartType1']['length'],
-    null_array,
-    null_array,
-    metadata['PartType4']['length'],
-    null_array
-)).T
+    GroupOffsetType = np.vstack((
+        metadata['PartType0']['offset'],
+        metadata['PartType1']['offset'],
+        null_array,
+        null_array,
+        metadata['PartType4']['offset'],
+        null_array
+    )).T
 
-GroupOffsetType = np.vstack((
-    metadata['PartType0']['offset'],
-    metadata['PartType1']['offset'],
-    null_array,
-    null_array,
-    metadata['PartType4']['offset'],
-    null_array
-)).T
-
-# Write output to hdf5 file
-with h5.File(f'{output_directory}/{simulation_type}_{redshift}.hdf5', 'w') as h5file:
-    h5file.create_dataset('GroupLengthType', dtype=np.int, shape=(len(GroupLengthType), 6), data=GroupLengthType)
-    h5file.create_dataset('GroupOffsetType', dtype=np.int, shape=(len(GroupOffsetType), 6), data=GroupOffsetType)
+    # Write output to hdf5 file
+    with h5.File(f'{output_directory}/{simulation_type}_{redshift}.hdf5', 'w') as h5file:
+        h5file.create_dataset('GroupLengthType', dtype=np.int, shape=(len(GroupLengthType), 6), data=GroupLengthType)
+        h5file.create_dataset('GroupOffsetType', dtype=np.int, shape=(len(GroupOffsetType), 6), data=GroupOffsetType)
