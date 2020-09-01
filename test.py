@@ -23,3 +23,5 @@ for key in foff.data.subfind_tab.Subhalo:
 
 for key in foff.data.group_tab.FOF:
     read.pprint(f"{key:<30s}", foff.data.group_tab.FOF[key])
+
+particles = read.fof_particles(foff)
