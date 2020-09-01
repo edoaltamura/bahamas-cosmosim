@@ -50,16 +50,6 @@ def commune(data):
     return rslt
 
 
-def compute_M(data):
-    cols = np.arange(data.size)
-    return csr_matrix((cols, (data.ravel(), cols)), shape=(data.max() + 1, data.size))
-
-
-def get_indices_sparse(data):
-    M = compute_M(data)
-    return [np.unravel_index(row.data, data.shape) for row in M]
-
-
 def find_files(simulation_type: str, redshift: str):
     # Import the Metadata preloaded class
     paths = Metadata.data.PATHS
