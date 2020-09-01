@@ -97,23 +97,23 @@ with h5.File(files[2], 'r') as h5file:
 # Convert into arrays similar to the Subfind ones
 null_array = np.zeros_like(metadata[f'PartType{part_type}']['offset'], dtype=np.int)
 
-GroupLengthType = np.vstack(
+GroupLengthType = np.vstack((
     metadata['PartType0']['length'],
     metadata['PartType1']['length'],
     null_array,
     null_array,
     metadata['PartType4']['length'],
     null_array
-).T
+)).T
 
-GroupOffsetType = np.vstack(
+GroupOffsetType = np.vstack((
     metadata['PartType0']['offset'],
     metadata['PartType1']['offset'],
     null_array,
     null_array,
     metadata['PartType4']['offset'],
     null_array
-).T
+)).T
 
 # Write output to hdf5 file
 with h5.File(f'{output_directory}/{simulation_type}_{redshift}.hdf5', 'w') as h5file:
