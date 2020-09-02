@@ -12,7 +12,7 @@ nproc = comm.Get_size()
 from read import find_files, split, commune, get_header, pprint
 from metadata import Metadata
 
-simulation_type = 'hydro'
+simulation_type = 'dmo'
 output_directory = '/local/scratch/altamura/bahamas_metadata'
 # redshift = 'z003p000'
 
@@ -103,20 +103,20 @@ for redshift in Metadata.data.REDSHIFTS:
         null_array = np.zeros_like(metadata[f'PartType{part_type}']['offset'], dtype=np.int)
 
         GroupLengthType = np.vstack((
-            metadata['PartType0']['length'],
+            null_array,#metadata['PartType0']['length'],
             metadata['PartType1']['length'],
             null_array,
             null_array,
-            metadata['PartType4']['length'],
+            null_array,#metadata['PartType4']['length'],
             null_array
         )).T
 
         GroupOffsetType = np.vstack((
-            metadata['PartType0']['offset'],
+            null_array,#metadata['PartType0']['offset'],
             metadata['PartType1']['offset'],
             null_array,
             null_array,
-            metadata['PartType4']['offset'],
+            null_array,#metadata['PartType4']['offset'],
             null_array
         )).T
 
