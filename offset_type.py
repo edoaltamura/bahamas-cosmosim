@@ -97,6 +97,11 @@ for redshift in Metadata.data.REDSHIFTS:
             metadata[f'PartType{part_type}']['offset'] = metadata[f'PartType{part_type}']['offset'][sort_key]
             metadata[f'PartType{part_type}']['unique'] = metadata[f'PartType{part_type}']['unique'][sort_key]
 
+            # Truncate out halos with index larger than 0.5e6
+            metadata[f'PartType{part_type}']['length'] = metadata[f'PartType{part_type}']['length'][:500000]
+            metadata[f'PartType{part_type}']['offset'] = metadata[f'PartType{part_type}']['offset'][:500000]
+            metadata[f'PartType{part_type}']['unique'] = metadata[f'PartType{part_type}']['unique'][:500000]
+
             pprint(f'PartType{part_type} unique', len(metadata[f'PartType{part_type}']['unique']), metadata[f'PartType{part_type}']['unique'])
             pprint(f'PartType{part_type} length', len(metadata[f'PartType{part_type}']['length']), metadata[f'PartType{part_type}']['length'])
             pprint(f'PartType{part_type} offset', len(metadata[f'PartType{part_type}']['offset']), metadata[f'PartType{part_type}']['offset'])
