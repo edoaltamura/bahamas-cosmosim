@@ -56,35 +56,27 @@ for redshift in Metadata.data.REDSHIFTS:
             )
 
             # Generate the metadata in parallel through MPI
-            pprint(f"\t Computing CSR indexing matrix...")
-            groupnumber_csrm = get_indices_sparse(GroupNumber[f'PartType{part_type}'])
-            pprint(groupnumber_csrm)
-
-            gn_cores = groupNumbers[partTypes.index(part_type)][fofgroup['idx']][0] + st
-            gn_comm = commune(gn_cores)
-
-            # Initialise and allocate metadata entries in each rank
+            pprint(f"Computing CSR indexing matrix...")
             metadata[f'PartType{part_type}'] = {}
-            metadata[f'PartType{part_type}']['csrmatrix'] = np.empty(0, dtype=np.int)
-
-            metadata[f'PartType{part_type}']['csrmatrix'] = np.append(
-                metadata[f'PartType{part_type}']['csrmatrix'],
-                unique
-            )
+            metadata[f'PartType{part_type}']['csrmatrix'] = get_indices_sparse(GroupNumber[f'PartType{part_type}']) + start
 
             # Merge data across cores handling interface
             metadata[f'PartType{part_type}']['csrmatrix'] = commune(metadata[f'PartType{part_type}']['csrmatrix'])
+            pprint(metadata[f'PartType{part_type}']['csrmatrix'], metadata[f'PartType{part_type}']['csrmatrix'].shape)
+            pprint(metadata[f'PartType{part_type}']['csrmatrix'][0], len(metadata[f'PartType{part_type}']['csrmatrix'][0]))
 
-            # Sort the elements in the array from cluster 0 upwards
-            sort_key = np.argsort(metadata[f'PartType{part_type}']['csrmatrix'])
-            metadata[f'PartType{part_type}']['length'] = metadata[f'PartType{part_type}']['length'][sort_key]
 
     comm.Barrier()
     if rank == 0:
 
         # Write output to hdf5 file
-        with h5.File(f'{output_directory}/{simulation_type}_{redshift_idx}.hdf5', 'w') as h5file:
+        with h5.File(f'{output_directory}/{simulation_type}_{redshift_idx}.hdf5', 'a') as h5file:
             CSRMatrix = h5file.create_group('CSRMatrix')
             # Loop over particle types (hydro/dmo sensitive)
             for part_type in part_types:
-                CSRMatrix.create_dataset(f'PartType{part_type}', dtype=np.int, shape=(len(GroupLengthType), 6), data=GroupLengthType)
+                CSRMatrix.create_dataset(
+                    f'PartType{part_type}',
+                    dtype=np.int,
+                    shape=metadata[f'PartType{part_type}']['csrmatrix'].shape,
+                    data=metadata[f'PartType{part_type}']['csrmatrix']
+                )
