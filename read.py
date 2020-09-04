@@ -16,7 +16,7 @@ def pprint(*args, **kwargs):
 
 
 from metadata import Metadata, AttrDict
-from index_matrix import particle_index_from_csrm
+
 
 def split(nfiles):
     nfiles = int(nfiles)
@@ -328,6 +328,7 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
     data_obj.data = data_dict
     return data_obj
 
+
 def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
     # pprint(f"[+] Find group information for cluster {clusterID}")
     fofgroups.data['clusterID'] = clusterID
@@ -345,6 +346,65 @@ def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
         fofgroups.data['group_tab']['FOF'][dataset] = fofgroups.data['group_tab']['FOF'][dataset][filter_idx]
 
     return fofgroups
+
+
+def compute_M(data):
+    cols = np.arange(data.size)
+    return csr_matrix((cols, (data.ravel(), cols)), shape=(data.max() + 1, data.size))
+
+
+def get_indices_sparse(data) -> AttrDict:
+    M = compute_M(data)
+    return [np.unravel_index(row.data, data.shape) for row in M]
+
+
+def csr_index_matrix(files: tuple):
+    header = get_header(files)
+
+    GroupNumber = {}    # Input data structure
+    metadata = {}       # Output data structure
+
+    with h5.File(files[2], 'r') as h5file:
+
+        # Create a HYDRO/DMO switch
+        if "/PartType0" in h5file:
+            part_types = [0, 1, 4]
+        else:
+            part_types = [1]
+
+        # Loop over particle types (hydro/dmo sensitive)
+        for part_type in part_types:
+
+            # Read in GroupNumber info
+            N_particles = header.data.subfind_particles.NumPart_ThisFile[part_type]
+            start, end = split(N_particles)
+            GroupNumber[f'PartType{part_type}'] = np.empty(0, dtype=np.int)
+            GroupNumber[f'PartType{part_type}'] = np.append(
+                GroupNumber[f'PartType{part_type}'],
+                np.abs(h5file[f'PartType{part_type}/GroupNumber'][start:end])
+            )
+
+            # Generate the metadata in parallel through MPI
+            pprint(f"[+] Computing CSR indexing matrix...")
+            metadata[f'PartType{part_type}'] = {}
+            metadata[f'PartType{part_type}']['csrmatrix'] = get_indices_sparse(GroupNumber[f'PartType{part_type}'])
+            pprint(metadata[f'PartType{part_type}']['csrmatrix'][0], len(metadata[f'PartType{part_type}']['csrmatrix'][0]))
+
+    # Construct the nested AttrDict instance
+    csrm = AttrDict()
+    csrm.data = metadata
+    return csrm
+
+
+def particle_index_from_csrm(fofgroup: AttrDict, particle_type: int, csrm: AttrDict) -> np.ndarray:
+
+    N_particles = fofgroup.data.header.subfind_particles.NumPart_ThisFile[particle_type]
+    start, end = split(N_particles)
+    idx = fofgroup.data.clusterID
+    particle_index = np.empty(0, dtype=np.int)
+    particle_index = np.append(particle_index, csrm.data[f'PartType{particle_type}']['csrmatrix'][idx][0] + start)
+    particle_index = commune(particle_index)
+    return particle_index
 
 
 def fof_particles(fofgroup: AttrDict, csrm: AttrDict) -> AttrDict:
