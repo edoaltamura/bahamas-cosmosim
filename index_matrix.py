@@ -10,26 +10,20 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 nproc = comm.Get_size()
 
-from read import find_files, split, commune, get_header, pprint
-from metadata import Metadata
+from read import split, commune, get_header, pprint
+from metadata import AttrDict
 
-simulation_type = 'dmo'
-output_directory = '/local/scratch/altamura/bahamas_metadata'
-# redshift = 'z003p000'
 
 def compute_M(data):
     cols = np.arange(data.size)
     return csr_matrix((cols, (data.ravel(), cols)), shape=(data.max() + 1, data.size))
 
 
-def get_indices_sparse(data):
+def get_indices_sparse(data) -> AttrDict:
     M = compute_M(data)
     return [np.unravel_index(row.data, data.shape) for row in M]
 
-for redshift in Metadata.data.REDSHIFTS:
-
-    redshift_idx = Metadata.data.REDSHIFTS[redshift]
-    files = find_files(simulation_type, redshift)
+def csr_index_matrix(files: tuple):
     header = get_header(files)
 
     GroupNumber = {}    # Input data structure
@@ -56,27 +50,22 @@ for redshift in Metadata.data.REDSHIFTS:
             )
 
             # Generate the metadata in parallel through MPI
-            pprint(f"Computing CSR indexing matrix...")
+            pprint(f"[+] Computing CSR indexing matrix...")
             metadata[f'PartType{part_type}'] = {}
-            metadata[f'PartType{part_type}']['csrmatrix'] = get_indices_sparse(GroupNumber[f'PartType{part_type}']) + start
-
-            # Merge data across cores handling interface
-            metadata[f'PartType{part_type}']['csrmatrix'] = commune(metadata[f'PartType{part_type}']['csrmatrix'])
-            pprint(metadata[f'PartType{part_type}']['csrmatrix'], metadata[f'PartType{part_type}']['csrmatrix'].shape)
+            metadata[f'PartType{part_type}']['csrmatrix'] = get_indices_sparse(GroupNumber[f'PartType{part_type}'])
             pprint(metadata[f'PartType{part_type}']['csrmatrix'][0], len(metadata[f'PartType{part_type}']['csrmatrix'][0]))
 
+    # Construct the nested AttrDict instance
+    csrm = AttrDict()
+    csrm.data = metadata
+    return csrm
 
-    comm.Barrier()
-    if rank == 0:
+def particle_index_from_csrm(fofgroup: AttrDict, particle_type: int, csrm: AttrDict) -> np.ndarray:
 
-        # Write output to hdf5 file
-        with h5.File(f'{output_directory}/{simulation_type}_{redshift_idx}.hdf5', 'a') as h5file:
-            CSRMatrix = h5file.create_group('CSRMatrix')
-            # Loop over particle types (hydro/dmo sensitive)
-            for part_type in part_types:
-                CSRMatrix.create_dataset(
-                    f'PartType{part_type}',
-                    dtype=np.int,
-                    shape=metadata[f'PartType{part_type}']['csrmatrix'].shape,
-                    data=metadata[f'PartType{part_type}']['csrmatrix']
-                )
+    N_particles = fofgroup.data.header.subfind_particles.NumPart_ThisFile[particle_type]
+    start, end = split(N_particles)
+    idx = fofgroup.data.clusterID
+    particle_index = np.empty(0, dtype=np.int)
+    particle_index = np.append(particle_index, csrm.data[f'PartType{particle_type}']['csrmatrix'][idx][0] + start)
+    particle_index = commune(particle_index)
+    return particle_index
