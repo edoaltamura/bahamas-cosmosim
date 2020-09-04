@@ -1,5 +1,9 @@
 # Generates the equivalent of the /FOF/GroupLengthType and /FOF/GroupOffsetType
-# arrays, but in the correct way. The Subfind results are not usable.
+# arrays. The original Subfind results are not usable.
+# This code assumes that the all group numbers of the particles within the same cluster
+# are perfectly continuous, i.e. they're all clustered together in the large particledata
+# array. If there are jumps, these arrays will not be useful and a sparse indexing matrix
+# must be used.
 
 import numpy as np
 import h5py as h5
@@ -12,7 +16,7 @@ nproc = comm.Get_size()
 from read import find_files, split, commune, get_header, pprint
 from metadata import Metadata
 
-simulation_type = 'dmo'
+simulation_type = 'hydro'
 output_directory = '/local/scratch/altamura/bahamas_metadata'
 # redshift = 'z003p000'
 
@@ -41,8 +45,8 @@ for redshift in Metadata.data.REDSHIFTS:
             start, end = split(N_particles)
             GroupNumber[f'PartType{part_type}'] = np.empty(0, dtype=np.int)
             GroupNumber[f'PartType{part_type}'] = np.append(
-                GroupNumber['PartType0'],
-                np.abs(h5file['PartType0/GroupNumber'][start:end])
+                GroupNumber[f'PartType{part_type}'],
+                np.abs(h5file[f'PartType{part_type}/GroupNumber'][start:end])
             )
 
             # Generate the metadata in parallel through MPI
@@ -103,20 +107,20 @@ for redshift in Metadata.data.REDSHIFTS:
         null_array = np.zeros_like(metadata[f'PartType{part_type}']['offset'], dtype=np.int)
 
         GroupLengthType = np.vstack((
-            null_array,#metadata['PartType0']['length'],
+            metadata['PartType0']['length'],#null_array,
             metadata['PartType1']['length'],
             null_array,
             null_array,
-            null_array,#metadata['PartType4']['length'],
+            metadata['PartType4']['length'],#null_array,
             null_array
         )).T
 
         GroupOffsetType = np.vstack((
-            null_array,#metadata['PartType0']['offset'],
+            metadata['PartType0']['offset'],#null_array,
             metadata['PartType1']['offset'],
             null_array,
             null_array,
-            null_array,#metadata['PartType4']['offset'],
+            metadata['PartType4']['offset'],#null_array,
             null_array
         )).T
 
