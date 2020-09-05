@@ -381,7 +381,7 @@ def csr_index_matrix(files: tuple, fofgroups: AttrDict) -> AttrDict:
         for part_type in part_types:
 
             # Read in GroupNumber info
-            N_particles = header.data.subfind_particles.NumPart_ThisFile[part_type]
+            N_particles = header.subfind_particles.NumPart_ThisFile[part_type]
             start, end = split(N_particles)
             GroupNumber[f'PartType{part_type}'] = np.empty(0, dtype=np.int)
             GroupNumber[f'PartType{part_type}'] = np.append(
