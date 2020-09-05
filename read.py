@@ -568,6 +568,27 @@ def fof_particles(fofgroup: AttrDict, csrm: AttrDict) -> AttrDict:
             subfind_particle_data['PartType1']['SubGroupNumber'] = commune(subfind_particle_data['PartType1']['SubGroupNumber'])
             subfind_particle_data['PartType1']['Velocity'] = commune(subfind_particle_data['PartType1']['Velocity'].reshape(-1, 1)).reshape(-1,3) * conv_velocity * unit_velocity
 
+        for pt in subfind_particle_data:
+
+            if pt.startswith('PartType'):
+
+                # Periodic boundary wrapping of particle coordinates
+                coords = subfind_particle_data[pt]['Coordinates']
+                boxsize = header_info.BoxSize * conv_length * unit_length
+                cop = fofgroup.data.subfind_tab_data.FOF.GroupCentreOfPotential
+                r200 = fofgroup.data.subfind_tab_data.FOF.Group_R_Crit200
+                for coord_axis in range(3):
+                    # Right boundary
+                    if cop[coord_axis] + 10 * r200 > boxsize:
+                        beyond_index = np.where(coords[:, coord_axis] < boxsize / 2)[0]
+                        coords[beyond_index, coord_axis] += boxsize
+                    # Left boundary
+                    elif cop[coord_axis] - 10 * r200 < 0.:
+                        beyond_index = np.where(coords[:, coord_axis] > boxsize / 2)[0]
+                        coords[beyond_index, coord_axis] -= boxsize
+
+                subfind_particle_data[pt]['Coordinates'] = coords
+
         # Gather all data into a large dictionary
         data_dict = {}
         data_dict['files'] = fofgroup.data.files
