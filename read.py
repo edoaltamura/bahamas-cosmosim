@@ -381,7 +381,7 @@ def csr_index_matrix(files: tuple):
             pprint(f"[+] Computing CSR indexing matrix...")
             metadata[f'PartType{part_type}'] = {}
             metadata[f'PartType{part_type}']['csrmatrix'] = get_indices_sparse(GroupNumber[f'PartType{part_type}'])
-            pprint(metadata[f'PartType{part_type}']['csrmatrix'][0], len(metadata[f'PartType{part_type}']['csrmatrix'][0]))
+            pprint(metadata[f'PartType{part_type}']['csrmatrix'], len(metadata[f'PartType{part_type}']['csrmatrix'][1]))
 
     # Construct the nested AttrDict instance
     csrm = AttrDict()
@@ -395,7 +395,7 @@ def particle_index_from_csrm(fofgroup: AttrDict, particle_type: int, csrm: AttrD
     start, end = split(N_particles)
     idx = fofgroup.data.clusterID
     particle_index = np.empty(0, dtype=np.int)
-    particle_index = np.append(particle_index, csrm.data[f'PartType{particle_type}']['csrmatrix'][idx][0] + start)
+    particle_index = np.append(particle_index, csrm.data[f'PartType{particle_type}']['csrmatrix'][idx+1][0] + start)
     particle_index = commune(particle_index)
     return particle_index
 
