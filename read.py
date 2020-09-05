@@ -263,8 +263,8 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
             group_tab_data['FOF']['GroupMassType'] = np.append(group_tab_data['FOF']['GroupMassType'], f['FOF/GroupMassType'][:])
             group_tab_data['FOF']['GroupOffset'] = np.append(group_tab_data['FOF']['GroupOffset'], f['FOF/GroupOffset'][:])
             group_tab_data['FOF']['Mass'] = np.append(group_tab_data['FOF']['Mass'], f['FOF/Mass'][:])
-            group_tab_data['FOF']['GroupLengthType'] = np.append(group_tab_data['FOF']['GroupLengthType'], f['GroupLengthType'][:])
-            group_tab_data['FOF']['GroupOffsetType'] = np.append(group_tab_data['FOF']['GroupOffsetType'], f['GroupOffsetType'][:])
+            group_tab_data['FOF']['GroupLengthType'] = np.append(group_tab_data['FOF']['GroupLengthType'], f['FOF/GroupLengthType'][:])
+            group_tab_data['FOF']['GroupOffsetType'] = np.append(group_tab_data['FOF']['GroupOffsetType'], f['FOF/GroupOffsetType'][:])
 
     subfind_tab_data['FOF']['FirstSubhaloID'] = commune(subfind_tab_data['FOF']['FirstSubhaloID'])
     subfind_tab_data['FOF']['GroupCentreOfPotential'] = commune(subfind_tab_data['FOF']['GroupCentreOfPotential'].reshape(-1, 1)).reshape(-1, 3) * conv_length * unit_length
