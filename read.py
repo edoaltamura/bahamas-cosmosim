@@ -575,8 +575,8 @@ def fof_particles(fofgroup: AttrDict, csrm: AttrDict) -> AttrDict:
                 # Periodic boundary wrapping of particle coordinates
                 coords = subfind_particle_data[pt]['Coordinates']
                 boxsize = header_info.BoxSize * conv_length * unit_length
-                cop = fofgroup.data.subfind_tab_data.FOF.GroupCentreOfPotential
-                r200 = fofgroup.data.subfind_tab_data.FOF.Group_R_Crit200
+                cop = fofgroup.data.subfind_tab.FOF.GroupCentreOfPotential
+                r200 = fofgroup.data.subfind_tab.FOF.Group_R_Crit200
                 for coord_axis in range(3):
                     # Right boundary
                     if cop[coord_axis] + 10 * r200 > boxsize:
