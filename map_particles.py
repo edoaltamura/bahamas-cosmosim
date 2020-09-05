@@ -32,8 +32,9 @@ files = read.find_files(simulation_type,redshift)
 header = read.get_header(files)
 fofs = read.fof_groups(files, header)
 csrm = read.csr_index_matrix(files, fofs)
+
 group_data = read.fof_group(cluster_id, fofs).data
-particle_data = read.fof_particles(group_data, csrm, header).data.subfind_particles
+particle_data = read.fof_particles(group_data, csrm).data.subfind_particles
 
 CoP = group_data.subfind_tab.FOF.GroupCentreOfPotential
 M200c = group_data.subfind_tab.FOF.Group_M_Crit200

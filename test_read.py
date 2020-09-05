@@ -30,7 +30,7 @@ for key in group_data.subfind_tab.Subhalo:
 for key in group_data.group_tab.FOF:
     read.pprint(f"group_tab.FOF.{key:<30s}", group_data.group_tab.FOF[key])
 
-particle_data = read.fof_particles(group_data, csrm, header).data.subfind_particles
+particle_data = read.fof_particles(group_data, csrm).data.subfind_particles
 for pt in ['0', '1', '4']:
     for key in particle_data[f'PartType{pt}']:
         read.pprint(f"PartType{pt:s}.{key:<30s}", particle_data[f'PartType{pt}'][key])
