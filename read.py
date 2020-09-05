@@ -460,15 +460,12 @@ def fof_particles(fofgroup: AttrDict, csrm: AttrDict) -> AttrDict:
 
     pprint(f"[+] Find particle information...")
 
-    # Construct a handle for the header
-    header_info = fofgroup.data.header.subfind_particles
-
     # Conversion factors
-    conv_mass = 1e10 / header_info.HubbleParam
-    conv_length = header_info.ExpansionFactor / header_info.HubbleParam
-    conv_density = 1e10 * header_info.HubbleParam ** 2 / header_info.ExpansionFactor ** 3
-    conv_velocity = np.sqrt(header_info.ExpansionFactor)
-    conv_starFormationRate = 1e10 * header_info.HubbleParam ** 2 / header_info.ExpansionFactor ** 3
+    conv_mass = 1e10 / fofgroup.data.header.subfind_particles.HubbleParam
+    conv_length = fofgroup.data.header.subfind_particles.ExpansionFactor / fofgroup.data.header.subfind_particles.HubbleParam
+    conv_density = 1e10 * fofgroup.data.header.subfind_particles.HubbleParam ** 2 / fofgroup.data.header.subfind_particles.ExpansionFactor ** 3
+    conv_velocity = np.sqrt(fofgroup.data.header.subfind_particles.ExpansionFactor)
+    conv_starFormationRate = 1e10 * fofgroup.data.header.subfind_particles.HubbleParam ** 2 / fofgroup.data.header.subfind_particles.ExpansionFactor ** 3
     conv_time = 3.08568e+19
 
     # Units
@@ -631,7 +628,7 @@ def fof_particles(fofgroup: AttrDict, csrm: AttrDict) -> AttrDict:
 
                 # Periodic boundary wrapping of particle coordinates
                 coords = subfind_particle_data[pt]['Coordinates']
-                boxsize = header_info.BoxSize * conv_length * unit_length
+                boxsize = fofgroup.data.header.subfind_particles.BoxSize * conv_length * unit_length
                 cop = fofgroup.data.subfind_tab.FOF.GroupCentreOfPotential
                 r200 = fofgroup.data.subfind_tab.FOF.Group_R_Crit200
                 for coord_axis in range(3):
