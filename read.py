@@ -159,7 +159,6 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
     unit_velocity = unyt.km / unyt.s
     unit_starFormationRate = unyt.Solar_Mass / (unyt.year * unyt.Mpc ** 3)
 
-
     pprint(f"[+] Find groups information...")
 
     # Find eagle subfind tab hdf5 internal paths
@@ -264,14 +263,8 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
             group_tab_data['FOF']['GroupMassType'] = np.append(group_tab_data['FOF']['GroupMassType'], f['FOF/GroupMassType'][:])
             group_tab_data['FOF']['GroupOffset'] = np.append(group_tab_data['FOF']['GroupOffset'], f['FOF/GroupOffset'][:])
             group_tab_data['FOF']['Mass'] = np.append(group_tab_data['FOF']['Mass'], f['FOF/Mass'][:])
-
-    # Read custom metadata from separate files
-    with h5.File(files[4], 'r') as f:
-        N_halos = f['GroupLengthType'].shape[0]
-        st, fh = split(N_halos)
-        group_tab_data['FOF']['GroupLengthType'] = np.append(group_tab_data['FOF']['GroupLengthType'], f['GroupLengthType'][st:fh])
-        group_tab_data['FOF']['GroupOffsetType'] = np.append(group_tab_data['FOF']['GroupOffsetType'], f['GroupOffsetType'][st:fh])
-
+            group_tab_data['FOF']['GroupLengthType'] = np.append(group_tab_data['FOF']['GroupLengthType'], f['GroupLengthType'][:])
+            group_tab_data['FOF']['GroupOffsetType'] = np.append(group_tab_data['FOF']['GroupOffsetType'], f['GroupOffsetType'][:])
 
     subfind_tab_data['FOF']['FirstSubhaloID'] = commune(subfind_tab_data['FOF']['FirstSubhaloID'])
     subfind_tab_data['FOF']['GroupCentreOfPotential'] = commune(subfind_tab_data['FOF']['GroupCentreOfPotential'].reshape(-1, 1)).reshape(-1, 3) * conv_length * unit_length
@@ -408,6 +401,7 @@ def particle_index_from_csrm(fofgroup: AttrDict, particle_type: int, csrm: AttrD
 
 
 def fof_particles(fofgroup: AttrDict, csrm: AttrDict) -> AttrDict:
+
     pprint(f"[+] Find particle information...")
 
     # Construct a handle for the header
