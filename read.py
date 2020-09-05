@@ -9,13 +9,12 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 nproc = comm.Get_size()
 
+from metadata import Metadata, AttrDict
+
 
 def pprint(*args, **kwargs):
     if rank == 0:
         print(*args, **kwargs)
-
-
-from metadata import Metadata, AttrDict
 
 
 def split(nfiles):
@@ -310,6 +309,17 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
     group_tab_data['FOF']['GroupOffsetType'] = commune(group_tab_data['FOF']['GroupOffsetType'].reshape(-1, 1)).reshape(-1, 6)
     group_tab_data['FOF']['Mass'] = commune(group_tab_data['FOF']['Mass']) * conv_mass * unit_mass
 
+    # Edit the AttrDict object and push the filtered data
+    filter_idx = np.where(
+        subfind_tab_data['FOF']['Group_M_Mean200'] > 1e13
+    )[0]
+
+    for category in ['FOF', 'Subhalo']:
+        for dataset in subfind_tab_data[category]:
+            subfind_tab_data[category][dataset] = subfind_tab_data[category][dataset][filter_idx]
+    for dataset in group_tab_data['FOF']:
+        group_tab_data['FOF'][dataset] = group_tab_data['FOF'][dataset][filter_idx]
+
     # Gather all data into a large dictionary
     data_dict = {}
     data_dict['files'] = files
@@ -351,8 +361,9 @@ def get_indices_sparse(data) -> AttrDict:
     return [np.unravel_index(row.data, data.shape) for row in M]
 
 
-def csr_index_matrix(files: tuple):
-    header = get_header(files)
+def csr_index_matrix(files: tuple, fofgroups: AttrDict) -> AttrDict:
+    header = fofgroups.data.header
+    max_group_id = len(fofgroups.data.subfind_tab.FOF.Group_M_Crit200)
 
     GroupNumber = {}    # Input data structure
     metadata = {}       # Output data structure
@@ -377,11 +388,13 @@ def csr_index_matrix(files: tuple):
                 GroupNumber[f'PartType{part_type}'],
                 np.abs(h5file[f'PartType{part_type}/GroupNumber'][start:end])
             )
+            GroupNumber[f'PartType{part_type}'] = np.clip(GroupNumber[f'PartType{part_type}'], 0, max_group_id + 1)
 
             # Generate the metadata in parallel through MPI
             pprint(f"[+] ({counter}/{len(part_types)}) Computing CSR indexing matrix...")
             metadata[f'PartType{part_type}'] = {}
             metadata[f'PartType{part_type}']['csrmatrix'] = get_indices_sparse(GroupNumber[f'PartType{part_type}'])
+            del metadata[f'PartType{part_type}']['csrmatrix'][0], metadata[f'PartType{part_type}']['csrmatrix'][-1]
             counter += 1
 
     # Construct the nested AttrDict instance
@@ -395,7 +408,7 @@ def particle_index_from_csrm(fofgroup: AttrDict, particle_type: int, csrm: AttrD
     N_particles = fofgroup.data.header.subfind_particles.NumPart_ThisFile[particle_type]
     start, _ = split(N_particles)
     idx = fofgroup.data.clusterID
-    particle_index = csrm.data[f'PartType{particle_type}']['csrmatrix'][idx+1][0] + start
+    particle_index = csrm.data[f'PartType{particle_type}']['csrmatrix'][idx][0] + start
     # particle_index = commune(particle_index)
     return particle_index
 
