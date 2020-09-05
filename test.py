@@ -5,6 +5,13 @@ redshift = 'z003p000'
 cluster_id = 0
 
 # -------------------------------------------------------------------- #
+# Examples:
+# fofs.data.subfind_tab.FOF.Group_M_Crit500
+# fofs.data.group_tab.FOF.CentreOfMass
+# fofs.data.mass_DMpart
+# group_data.data.subfind_tab.FOF.Group_M_Crit500
+# particle_data.data.subfind_particles.PartType0.Coordinates
+# -------------------------------------------------------------------- #
 
 files = read.find_files(simulation_type,redshift)
 header = read.get_header(files)
