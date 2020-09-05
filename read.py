@@ -413,12 +413,12 @@ def particle_index_from_csrm(fofgroup: AttrDict, particle_type: int, csrm: AttrD
     return particle_index
 
 
-def fof_particles(fofgroup: AttrDict, csrm: AttrDict) -> AttrDict:
+def fof_particles(fofgroup: AttrDict, csrm: AttrDict, header: AttrDict) -> AttrDict:
 
     pprint(f"[+] Find particle information...")
 
     # Construct a handle for the header
-    header_info = fofgroup.data.header.subfind_particles
+    header_info = header.data.subfind_particles
 
     # Conversion factors
     conv_mass = 1e10 / header_info.HubbleParam
