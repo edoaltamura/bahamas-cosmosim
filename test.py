@@ -6,6 +6,8 @@ fofs = read.fof_groups(files, header)
 read.pprint("Dark matter particle mass:", fofs.data.mass_DMpart)
 csrm = read.csr_index_matrix(files)
 
+read.pprint(csrm.data.PartType0.csrmatrix[:20])
+
 # for key in fofs.data.subfind_tab.FOF:
 #     read.pprint(f"subfind_tab.FOF.{key:<30s} {len(fofs.data.subfind_tab.FOF[key])}", fofs.data.subfind_tab.FOF[key][:2])
 #

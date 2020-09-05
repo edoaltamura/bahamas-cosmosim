@@ -381,7 +381,6 @@ def csr_index_matrix(files: tuple):
             pprint(f"[+] Computing CSR indexing matrix...")
             metadata[f'PartType{part_type}'] = {}
             metadata[f'PartType{part_type}']['csrmatrix'] = get_indices_sparse(GroupNumber[f'PartType{part_type}'])
-            pprint(metadata[f'PartType{part_type}']['csrmatrix'], len(metadata[f'PartType{part_type}']['csrmatrix'][1]))
 
     # Construct the nested AttrDict instance
     csrm = AttrDict()
