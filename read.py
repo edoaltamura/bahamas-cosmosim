@@ -391,11 +391,10 @@ def csr_index_matrix(files: tuple):
 def particle_index_from_csrm(fofgroup: AttrDict, particle_type: int, csrm: AttrDict) -> np.ndarray:
 
     N_particles = fofgroup.data.header.subfind_particles.NumPart_ThisFile[particle_type]
-    start, end = split(N_particles)
+    start, _ = split(N_particles)
     idx = fofgroup.data.clusterID
-    particle_index = np.empty(0, dtype=np.int)
-    particle_index = np.append(particle_index, csrm.data[f'PartType{particle_type}']['csrmatrix'][idx+1][0] + start)
-    particle_index = commune(particle_index)
+    particle_index = csrm.data[f'PartType{particle_type}']['csrmatrix'][idx+1][0] + start
+    # particle_index = commune(particle_index)
     return particle_index
 
 
