@@ -16,7 +16,7 @@ cluster_id = 0
 files = read.find_files(simulation_type,redshift)
 header = read.get_header(files)
 fofs = read.fof_groups(files, header)
-csrm = read.csr_index_matrix(files)
+csrm = read.csr_index_matrix(files, fofs)
 group_data = read.fof_group(cluster_id, fofs).data
 
 read.pprint("Dark matter particle mass:", fofs.data.mass_DMpart)
