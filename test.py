@@ -10,30 +10,20 @@ files = read.find_files(simulation_type,redshift)
 header = read.get_header(files)
 fofs = read.fof_groups(files, header)
 csrm = read.csr_index_matrix(files)
-fof = read.fof_group(cluster_id, fofs)
+group_data = read.fof_group(cluster_id, fofs).data
 
 read.pprint("Dark matter particle mass:", fofs.data.mass_DMpart)
-# read.pprint(csrm.data.PartType0.csrmatrix[:4])
 
-# for key in fofs.data.subfind_tab.FOF:
-#     read.pprint(f"subfind_tab.FOF.{key:<30s} {len(fofs.data.subfind_tab.FOF[key])}", fofs.data.subfind_tab.FOF[key][:2])
-#
-# for key in fofs.data.subfind_tab.Subhalo:
-#     read.pprint(f"subfind_tab.Subhalo.{key:<30s} {len(fofs.data.subfind_tab.Subhalo[key])}", fofs.data.subfind_tab.Subhalo[key][:2])
-#
-# for key in fofs.data.group_tab.FOF:
-#     read.pprint(f"group_tab.FOF.{key:<30s} {len(fofs.data.group_tab.FOF[key])}", fofs.data.group_tab.FOF[key][:2])
+for key in group_data.subfind_tab.FOF:
+    read.pprint(f"subfind_tab.FOF.{key:<30s}", group_data.subfind_tab.FOF[key])
 
-for key in fof.data.subfind_tab.FOF:
-    read.pprint(f"subfind_tab.FOF.{key:<30s}", fof.data.subfind_tab.FOF[key])
+for key in group_data.subfind_tab.Subhalo:
+    read.pprint(f"subfind_tab.Subhalo.{key:<30s}", group_data.subfind_tab.Subhalo[key])
 
-for key in fof.data.subfind_tab.Subhalo:
-    read.pprint(f"subfind_tab.Subhalo.{key:<30s}", fof.data.subfind_tab.Subhalo[key])
+for key in group_data.group_tab.FOF:
+    read.pprint(f"group_tab.FOF.{key:<30s}", group_data.group_tab.FOF[key])
 
-for key in fof.data.group_tab.FOF:
-    read.pprint(f"group_tab.FOF.{key:<30s}", fof.data.group_tab.FOF[key])
-
-particles = read.fof_particles(fof, csrm)
+particle_data = read.fof_particles(group_data, csrm).data.subfind_particles
 for pt in ['0', '1', '4']:
-    for key in particles.data.subfind_particles[f'PartType{pt}']:
-        read.pprint(f"PartType{pt:s}.{key:<30s}", particles.data.subfind_particles[f'PartType{pt}'][key])
+    for key in particle_data[f'PartType{pt}']:
+        read.pprint(f"PartType{pt:s}.{key:<30s}", particle_data[f'PartType{pt}'][key])
