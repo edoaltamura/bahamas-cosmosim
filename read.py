@@ -378,7 +378,7 @@ def csr_index_matrix(files: tuple):
             )
 
             # Generate the metadata in parallel through MPI
-            pprint(f"[+] Computing CSR indexing matrix...")
+            pprint(f"[+] ({part_type}/{len(part_types)}) Computing CSR indexing matrix...")
             metadata[f'PartType{part_type}'] = {}
             metadata[f'PartType{part_type}']['csrmatrix'] = get_indices_sparse(GroupNumber[f'PartType{part_type}'])
 
