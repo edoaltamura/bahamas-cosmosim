@@ -652,6 +652,8 @@ def fof_particles(fofgroup: AttrDict, csrm: AttrDict) -> AttrDict:
         data_dict['header'] = fofgroup.data.header
         data_dict['clusterID'] = fofgroup.data.clusterID
         data_dict['subfind_particles'] = subfind_particle_data
+        data_dict['mass_DMpart'] = fofgroup.data.mass_DMpart
+
         data_obj = AttrDict()
         data_obj.data = data_dict
         return data_obj
