@@ -26,6 +26,8 @@ def particle_map_type(particle_type: int, cluster_data) -> None:
     CoP = cluster_data.subfind_tab.FOF.GroupCentreOfPotential
     M200c = cluster_data.subfind_tab.FOF.Group_M_Crit200
     R200c = cluster_data.subfind_tab.FOF.Group_R_Crit200
+    R500c = cluster_data.subfind_tab.FOF.Group_R_Crit500
+    M500c = cluster_data.subfind_tab.FOF.Group_M_Crit500
     size = R200c * size_R200c
 
     coord = cluster_data.subfind_particles[f'PartType{particle_type}']['Coordinates']
@@ -37,7 +39,7 @@ def particle_map_type(particle_type: int, cluster_data) -> None:
     # Make figure
     fig, ax = plt.subplots(figsize=(6, 6), dpi=1024 // 6)
     ax.set_aspect('equal')
-    ax.plot(coord_x, coord_y, ',', c="C0", alpha=0.1)
+    ax.plot(coord_x, coord_y, ',', c="C0", alpha=0.8)
     ax.set_xlim([-size.value, size.value])
     ax.set_ylim([-size.value, size.value])
     ax.set_ylabel(r"$y$ [Mpc]")
@@ -50,7 +52,9 @@ def particle_map_type(particle_type: int, cluster_data) -> None:
             f"Halo {cluster_id:d} {simulation_type}\n"
             f"$z={redshift:3.3f}$\n"
             f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
+            f"$M_{{500c}}={latex_float(M500c.value)}$ M$_\odot$\n"
             f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
+            f"$R_{{500c}}={latex_float(R500c.value)}$ Mpc\n"
         ),
         color="black",
         ha="left",
@@ -68,16 +72,16 @@ def particle_map_type(particle_type: int, cluster_data) -> None:
     )
     ax.text(
         0,
-        0 + 1.002 * 5 * R200c,
-        r"$5 \times R_{200c}$",
+        0 + 1.05 * R500c,
+        r"$5 \times R_{500c}$",
         color="grey",
         ha="center",
         va="bottom"
     )
     circle_r200 = plt.Circle((0, 0), R200c, color="black", fill=False, linestyle='-')
-    circle_5r200 = plt.Circle((0, 0), 5 * R200c, color="grey", fill=False, linestyle='--')
+    circle_r500 = plt.Circle((0, 0), R500c, color="grey", fill=False, linestyle='--')
     ax.add_artist(circle_r200)
-    ax.add_artist(circle_5r200)
+    ax.add_artist(circle_r500)
     fig.savefig(f"{output_directory}/halo{cluster_id}_particlemap_type{particle_type}_{size_R200c}r200.png")
     plt.close(fig)
 
