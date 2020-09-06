@@ -653,6 +653,3 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
         data_dict['mass_DMpart'] = fofgroup['mass_DMpart']
 
         return data_dict
-
-
-
