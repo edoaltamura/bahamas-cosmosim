@@ -27,7 +27,28 @@ def latex_float(f):
         base, exponent = float_str.split("e")
         return r"{0} \times 10^{{{1}}}".format(base, int(exponent))
     else:
-        return float_str
+        return
+
+
+def rescale(X, x_min, x_max):
+    """
+    Rescaled the array of input to the range [x_min, x_max] linearly.
+    This method is often used in the context of making maps with matplotlib.pyplot.inshow.
+    The matrix to be accepted must contain arrays in the [0,1] range.
+
+    :param X: numpy.ndarray
+        This is the input array to be rescaled.
+    :param x_min: float or int
+        The lower boundary for the array to have.
+    :param x_max: float or int
+        The upper boundary for the new array to have.
+
+    :return: numpy.ndarray
+        The array, linearly rescaled to the range [x_min, x_max].
+    """
+    nom = (X - X.min(axis=0)) * (x_max - x_min)
+    denom = X.max(axis=0) - X.min(axis=0)
+    return x_min + nom / denom
 
 
 def dm_render(coordinates, masses, boxsize, resolution: int = 1024):
@@ -66,11 +87,17 @@ def gas_density_map(cluster_data) -> None:
     coord[:, 2] -= - CoP[2]
     masses = cluster_data.subfind_particles['PartType0']['Mass']
     smoothing_lengths = cluster_data.subfind_particles['PartType0']['SmoothingLength']
+
+    map_input_x = np.asarray(rescale(coord[:, 0].value, 0, 1), dtype=np.float64)
+    map_input_y = np.asarray(rescale(coord[:, 1].value, 0, 1), dtype=np.float64)
+    map_input_z = np.asarray(rescale(coord[:, 2].value, 0, 1), dtype=np.float64)
+    map_input_m = np.asarray(masses.value, dtype=np.float32)
+    map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
     gas_mass = scatter(
-        coord[:, 0].value,
-        coord[:, 1].value,
-        masses.value,
-        smoothing_lengths.value,
+        map_input_x,
+        map_input_y,
+        map_input_m,
+        map_input_h,
         1024
     )
 
@@ -210,11 +237,17 @@ def stars_density_map(cluster_data) -> None:
     coord[:, 2] -= - CoP[2]
     masses = cluster_data.subfind_particles['PartType4']['Mass']
     smoothing_lengths = cluster_data.subfind_particles['PartType4']['SmoothingLength']
-    gas_mass = scatter(
-        coord[:, 0].value,
-        coord[:, 1].value,
-        masses.value,
-        smoothing_lengths.value,
+
+    map_input_x = np.asarray(rescale(coord[:, 0].value, 0, 1), dtype=np.float64)
+    map_input_y = np.asarray(rescale(coord[:, 1].value, 0, 1), dtype=np.float64)
+    map_input_z = np.asarray(rescale(coord[:, 2].value, 0, 1), dtype=np.float64)
+    map_input_m = np.asarray(masses.value, dtype=np.float32)
+    map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
+    stars_mass = scatter(
+        map_input_x,
+        map_input_y,
+        map_input_m,
+        map_input_h,
         1024
     )
 
@@ -223,7 +256,7 @@ def stars_density_map(cluster_data) -> None:
     ax.set_aspect('equal')
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
-    ax.imshow(gas_mass.T, norm=LogNorm(), cmap="inferno", origin="lower", extent=([-size.value, size.value] + [-size.value, size.value]))
+    ax.imshow(stars_mass.T, norm=LogNorm(), cmap="inferno", origin="lower", extent=([-size.value, size.value] + [-size.value, size.value]))
     ax.set_ylabel(r"$y$ [Mpc]")
     ax.set_xlabel(r"$x$ [Mpc]")
 
