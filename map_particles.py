@@ -19,29 +19,14 @@ def latex_float(f):
     else:
         return float_str
 
-# -------------------------------------------------------------------- #
-# Edit these parameters
-simulation_type = 'hydro'
-redshift = 'z003p000'
-cluster_id = 0
-size_R200c = 10
-output_directory = '/local/scratch/altamura/bahamas/maps'
-# -------------------------------------------------------------------- #
-# Boot up the BAHAMAS data
-files = read.find_files(simulation_type, redshift)
-fofs = read.fof_groups(files)
-csrm = read.csr_index_matrix(fofs)
-fof = read.fof_group(cluster_id, fofs)
-cluster_data = read.class_wrap(read.fof_particles(fof, csrm)).data
 
-redshift = cluster_data.header.subfind_particles.Redshift
-CoP = cluster_data.subfind_tab.FOF.GroupCentreOfPotential
-M200c = cluster_data.subfind_tab.FOF.Group_M_Crit200
-R200c = cluster_data.subfind_tab.FOF.Group_R_Crit200
-size = R200c * size_R200c
-# -------------------------------------------------------------------- #
+def particle_map_type(particle_type: int, cluster_data) -> None:
 
-def particle_map_type(particle_type: int) -> None:
+    redshift = cluster_data.header.subfind_particles.Redshift
+    CoP = cluster_data.subfind_tab.FOF.GroupCentreOfPotential
+    M200c = cluster_data.subfind_tab.FOF.Group_M_Crit200
+    R200c = cluster_data.subfind_tab.FOF.Group_R_Crit200
+    size = R200c * size_R200c
 
     coord = cluster_data.subfind_particles[f'PartType{particle_type}']['Coordinates']
     coord_x = coord[:, 0] - CoP[0]
@@ -50,7 +35,7 @@ def particle_map_type(particle_type: int) -> None:
     del coord
 
     # Make figure
-    fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
+    fig, ax = plt.subplots(figsize=(6, 6), dpi=1024 // 6)
     ax.set_aspect('equal')
     ax.plot(coord_x, coord_y, ',', c="C0", alpha=0.1)
     ax.set_xlim([-size.value, size.value])
@@ -96,16 +81,35 @@ def particle_map_type(particle_type: int) -> None:
     fig.savefig(f"{output_directory}/halo{cluster_id}_particlemap_type{particle_type}_{size_R200c}r200.png")
     plt.close(fig)
 
+
 if __name__ == '__main__':
+
+    # Parse particle type flags
     parser = argparse.ArgumentParser()
     parser.add_argument('--gas', default=False, action='store_true')
     parser.add_argument('--dark_matter', default=False, action='store_true')
     parser.add_argument('--stars', default=False, action='store_true')
     args = parser.parse_args()
 
+    # -------------------------------------------------------------------- #
+    # Edit these parameters
+    simulation_type = 'hydro'
+    redshift = 'z003p000'
+    cluster_id = 0
+    size_R200c = 1
+    output_directory = '/local/scratch/altamura/bahamas/maps'
+    # -------------------------------------------------------------------- #
+    # Boot up the BAHAMAS data
+    files = read.find_files(simulation_type, redshift)
+    fofs = read.fof_groups(files)
+    csrm = read.csr_index_matrix(fofs)
+    fof = read.fof_group(cluster_id, fofs)
+    cluster_data = read.class_wrap(read.fof_particles(fof, csrm)).data
+
+    # Execute tasks
     if args.gas:
-        particle_map_type(0)
+        particle_map_type(0, cluster_data)
     if args.dark_matter:
-        particle_map_type(1)
+        particle_map_type(1, cluster_data)
     if args.stars:
-        particle_map_type(4)
+        particle_map_type(4, cluster_data)
