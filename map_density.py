@@ -4,7 +4,7 @@ matplotlib.use('Agg')
 import argparse
 import numpy as np
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
-from swiftsimio.visualisation.projection_backends import backends, backends_parallel
+from swiftsimio.visualisation.projection_backends.renormalised import scatter, scatter_parallel
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import read
@@ -13,19 +13,6 @@ try:
     plt.style.use("mnras.mplstyle")
 except:
     pass
-
-scatter = backends["subsampled"]
-scatter_parallel = backends_parallel["subsampled_parallel"]
-# Reference Swiftsimio backends
-# backends = {
-#     "histogram": histogram,
-#     "fast": fast,
-#     "renormalised": renormalised,
-#     "subsampled": subsampled,
-#     "subsampled_extreme": subsampled_extreme,
-#     "reference": reference,
-# }
-
 
 partType_atlas = {
     '0': 'gas',
