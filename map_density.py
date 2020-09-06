@@ -42,10 +42,10 @@ def dm_render(coordinates, masses, boxsize, resolution: int = 1024):
     )
     # Project the dark matter mass
     dm_map = scatter_parallel(
-        coordinates[:, 0],
-        coordinates[:, 1],
-        masses,
-        smoothing_lengths,
+        coordinates[:, 0].value,
+        coordinates[:, 1].value,
+        masses.value,
+        smoothing_lengths.value,
         resolution
     )
     return dm_map
@@ -141,7 +141,7 @@ def dm_density_map(cluster_data) -> None:
     coord[:, 1] -= - CoP[1]
     coord[:, 2] -= - CoP[2]
     masses = np.ones_like(coord[:, 0], dtype=np.float32) * DM_part_mass
-    dm_mass = dm_render(coord.value, masses.value, boxsize.value)
+    dm_mass = dm_render(coord, masses, boxsize)
 
     # Make figure
     fig, ax = plt.subplots(figsize=(6, 6), dpi=1024 // 6)
