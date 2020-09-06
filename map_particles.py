@@ -115,10 +115,7 @@ if __name__ == '__main__':
     parser.add_argument('--dark-matter', default=False, action='store_true')
     parser.add_argument('--stars', default=False, action='store_true')
     args = parser.parse_args()
-    plot_gas = args[0]
-    plot_dm = args[1]
-    plot_stars = args[2]
-    print(plot_gas, plot_dm, plot_stars)
+    print(args)
 
     # if plot_gas:
     #     particle_map_type(0)
