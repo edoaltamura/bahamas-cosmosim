@@ -28,23 +28,22 @@ size_R200c = 10
 output_directory = '/local/scratch/altamura/bahamas/maps'
 # -------------------------------------------------------------------- #
 # Boot up the BAHAMAS data
-files = read.find_files(simulation_type,redshift)
-header = read.get_header(files)
-fofs = read.fof_groups(files, header)
-csrm = read.csr_index_matrix(files, fofs)
+files = read.find_files(simulation_type, redshift)
+fofs = read.fof_groups(files)
+csrm = read.csr_index_matrix(fofs)
+fof = read.fof_group(cluster_id, fofs)
+cluster_data = read.class_wrap(read.fof_particles(fof, csrm)).data
 
-group_data = read.fof_group(cluster_id, fofs).data
-particle_data = read.fof_particles(group_data, csrm).data.subfind_particles
-
-CoP = group_data.subfind_tab.FOF.GroupCentreOfPotential
-M200c = group_data.subfind_tab.FOF.Group_M_Crit200
-R200c = group_data.subfind_tab.FOF.Group_R_Crit200
+redshift = cluster_data.header.subfind_particles.Redshift
+CoP = cluster_data.subfind_tab.FOF.GroupCentreOfPotential
+M200c = cluster_data.subfind_tab.FOF.Group_M_Crit200
+R200c = cluster_data.subfind_tab.FOF.Group_R_Crit200
 size = R200c * size_R200c
 # -------------------------------------------------------------------- #
 
 def particle_map_type(particle_type: int) -> None:
 
-    coord = particle_data[f'PartType{particle_type}']['Coordinates']
+    coord = cluster_data.subfind_particles[f'PartType{particle_type}']['Coordinates']
     coord_x = coord[:, 0] - CoP[0]
     coord_y = coord[:, 1] - CoP[1]
     coord_z = coord[:, 2] - CoP[2]
@@ -70,7 +69,7 @@ def particle_map_type(particle_type: int) -> None:
     ax.text(
         0.975,
         0.975,
-        f"$z={header.data.subfind_particles.Redshift:3.3f}$",
+        f"$z={redshift:3.3f}$",
         color="black",
         ha="right",
         va="top",

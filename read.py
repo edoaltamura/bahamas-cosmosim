@@ -17,6 +17,12 @@ def pprint(*args, **kwargs):
         print(*args, **kwargs)
 
 
+def class_wrap(input: dict) -> AttrDict:
+    data_obj = AttrDict()
+    data_obj.data = input
+    return data_obj
+
+
 def split(nfiles):
     nfiles = int(nfiles)
     nf = int(nfiles / nproc)
@@ -107,7 +113,7 @@ def find_files(simulation_type: str, redshift: str):
     return subfind_st, subfind_gt, subfind_pd, gadget_sn, custom_metadata
 
 
-def get_header(files: list) -> AttrDict:
+def get_header(files: list) -> dict:
     """
     Gathers the header information from the files into
     an instance of the AttrDict class, which allows the access
@@ -135,21 +141,21 @@ def get_header(files: list) -> AttrDict:
     master_header['subfind_groups'] = st_header
     master_header['subfind_particles'] = sp_header
     master_header['gadget_snaps'] = sn_header
-
-    # Construct the nested AttrDict instance
-    header = AttrDict()
-    header.data = master_header
-    return header
+    return master_header
 
 
-def fof_groups(files: list, header: AttrDict) -> AttrDict:
+def fof_groups(files: list) -> dict:
+
+    # Introduce header handle
+    master_header = get_header(files)
+    header = master_header['subfind_particles']
 
     # Conversion factors
-    conv_mass = 1e10 / header.data.subfind_particles.HubbleParam
-    conv_length = header.data.subfind_particles.ExpansionFactor / header.data.subfind_particles.HubbleParam
-    conv_density = 1e10 * header.data.subfind_particles.HubbleParam ** 2 / header.data.subfind_particles.ExpansionFactor ** 3
-    conv_velocity = np.sqrt(header.data.subfind_particles.ExpansionFactor)
-    conv_starFormationRate = 1e10 * header.data.subfind_particles.HubbleParam ** 2 / header.data.subfind_particles.ExpansionFactor ** 3
+    conv_mass = 1e10 / header['HubbleParam']
+    conv_length = header['ExpansionFactor'] / header['HubbleParam']
+    conv_density = 1e10 * header['HubbleParam'] ** 2 / header['ExpansionFactor'] ** 3
+    conv_velocity = np.sqrt(header['ExpansionFactor'])
+    conv_starFormationRate = 1e10 * header['HubbleParam'] ** 2 / header['ExpansionFactor'] ** 3
 
     # Units
     unit_mass = unyt.Solar_Mass
@@ -323,75 +329,72 @@ def fof_groups(files: list, header: AttrDict) -> AttrDict:
     # Gather all data into a large dictionary
     data_dict = {}
     data_dict['files'] = files
-    data_dict['header'] = header.data
+    data_dict['header'] = master_header
     data_dict['subfind_tab'] = subfind_tab_data
     data_dict['group_tab'] = group_tab_data
-    data_dict['mass_DMpart'] = header.data.subfind_particles.MassTable[1] * conv_mass * unit_mass
-    data_obj = AttrDict()
-    data_obj.data = data_dict
-    return data_obj
+    data_dict['mass_DMpart'] = header['MassTable'][1] * conv_mass * unit_mass
+
+    return data_dict
 
 
-def fof_group(clusterID: int, fofgroups: AttrDict) -> AttrDict:
+def fof_group(clusterID: int, fofgroups: dict) -> dict:
     # pprint(f"[+] Find group information for cluster {clusterID}")
 
-    fofgroups = fofgroups.data
     # Filter groups
-    fofgroups.subfind_tab['FOF']['FirstSubhaloID'] = fofgroups.subfind_tab['FOF']['FirstSubhaloID'][clusterID]
-    fofgroups.subfind_tab['FOF']['GroupCentreOfPotential'] = fofgroups.subfind_tab['FOF']['GroupCentreOfPotential'][clusterID]
-    fofgroups.subfind_tab['FOF']['GroupLength'] = fofgroups.subfind_tab['FOF']['GroupLength'][clusterID]
-    fofgroups.subfind_tab['FOF']['GroupMass'] = fofgroups.subfind_tab['FOF']['GroupMass'][clusterID]
-    fofgroups.subfind_tab['FOF']['GroupOffset'] = fofgroups.subfind_tab['FOF']['GroupOffset'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_M_Crit200'] = fofgroups.subfind_tab['FOF']['Group_M_Crit200'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_M_Crit2500'] = fofgroups.subfind_tab['FOF']['Group_M_Crit2500'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_M_Crit500'] = fofgroups.subfind_tab['FOF']['Group_M_Crit500'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_M_Mean200'] = fofgroups.subfind_tab['FOF']['Group_M_Mean200'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_M_Mean2500'] = fofgroups.subfind_tab['FOF']['Group_M_Mean2500'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_M_Mean500'] = fofgroups.subfind_tab['FOF']['Group_M_Mean500'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_M_TopHat200'] = fofgroups.subfind_tab['FOF']['Group_M_TopHat200'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_R_Crit200'] = fofgroups.subfind_tab['FOF']['Group_R_Crit200'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_R_Crit2500'] = fofgroups.subfind_tab['FOF']['Group_R_Crit2500'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_R_Crit500'] = fofgroups.subfind_tab['FOF']['Group_R_Crit500'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_R_Mean200'] = fofgroups.subfind_tab['FOF']['Group_R_Mean200'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_R_Mean2500'] = fofgroups.subfind_tab['FOF']['Group_R_Mean2500'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_R_Mean500'] = fofgroups.subfind_tab['FOF']['Group_R_Mean500'][clusterID]
-    fofgroups.subfind_tab['FOF']['Group_R_TopHat200'] = fofgroups.subfind_tab['FOF']['Group_R_TopHat200'][clusterID]
-    fofgroups.subfind_tab['FOF']['NumOfSubhalos'] = fofgroups.subfind_tab['FOF']['NumOfSubhalos'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['CentreOfMass'] = fofgroups.subfind_tab['Subhalo']['CentreOfMass'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['CentreOfPotential'] = fofgroups.subfind_tab['Subhalo']['CentreOfPotential'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['GasSpin'] = fofgroups.subfind_tab['Subhalo']['GasSpin'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['GroupNumber'] = fofgroups.subfind_tab['Subhalo']['GroupNumber'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['HalfMassProjRad'] = fofgroups.subfind_tab['Subhalo']['HalfMassProjRad'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['HalfMassRad'] = fofgroups.subfind_tab['Subhalo']['HalfMassRad'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['IDMostBound'] = fofgroups.subfind_tab['Subhalo']['IDMostBound'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['SubLength'] = fofgroups.subfind_tab['Subhalo']['SubLength'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['SubOffset'] = fofgroups.subfind_tab['Subhalo']['SubOffset'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['Velocity'] = fofgroups.subfind_tab['Subhalo']['Velocity'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['Vmax'] = fofgroups.subfind_tab['Subhalo']['Vmax'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['VmaxRadius'] = fofgroups.subfind_tab['Subhalo']['VmaxRadius'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['StarsMass'] = fofgroups.subfind_tab['Subhalo']['StarsMass'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['StarsSpin'] = fofgroups.subfind_tab['Subhalo']['StarsSpin'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['StarFormationRate'] = fofgroups.subfind_tab['Subhalo']['StarFormationRate'][clusterID]
-    fofgroups.subfind_tab['Subhalo']['StellarVelDisp'] = fofgroups.subfind_tab['Subhalo']['StellarVelDisp'][clusterID]
-    fofgroups.group_tab['FOF']['CentreOfMass'] = fofgroups.group_tab['FOF']['CentreOfMass'][clusterID]
-    fofgroups.group_tab['FOF']['GroupLength'] = fofgroups.group_tab['FOF']['GroupLength'][clusterID]
-    fofgroups.group_tab['FOF']['GroupLengthType'] = fofgroups.group_tab['FOF']['GroupLengthType'][clusterID]
-    fofgroups.group_tab['FOF']['GroupMassType'] = fofgroups.group_tab['FOF']['GroupMassType'][clusterID]
-    fofgroups.group_tab['FOF']['GroupOffset'] = fofgroups.group_tab['FOF']['GroupOffset'][clusterID]
-    fofgroups.group_tab['FOF']['GroupOffsetType'] = fofgroups.group_tab['FOF']['GroupOffsetType'][clusterID]
-    fofgroups.group_tab['FOF']['Mass'] = fofgroups.group_tab['FOF']['Mass'][clusterID]
+    fofgroups['subfind_tab']['FOF']['FirstSubhaloID'] = fofgroups['subfind_tab']['FOF']['FirstSubhaloID'][clusterID]
+    fofgroups['subfind_tab']['FOF']['GroupCentreOfPotential'] = fofgroups['subfind_tab']['FOF']['GroupCentreOfPotential'][clusterID]
+    fofgroups['subfind_tab']['FOF']['GroupLength'] = fofgroups['subfind_tab']['FOF']['GroupLength'][clusterID]
+    fofgroups['subfind_tab']['FOF']['GroupMass'] = fofgroups['subfind_tab']['FOF']['GroupMass'][clusterID]
+    fofgroups['subfind_tab']['FOF']['GroupOffset'] = fofgroups['subfind_tab']['FOF']['GroupOffset'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_M_Crit200'] = fofgroups['subfind_tab']['FOF']['Group_M_Crit200'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_M_Crit2500'] = fofgroups['subfind_tab']['FOF']['Group_M_Crit2500'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_M_Crit500'] = fofgroups['subfind_tab']['FOF']['Group_M_Crit500'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_M_Mean200'] = fofgroups['subfind_tab']['FOF']['Group_M_Mean200'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_M_Mean2500'] = fofgroups['subfind_tab']['FOF']['Group_M_Mean2500'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_M_Mean500'] = fofgroups['subfind_tab']['FOF']['Group_M_Mean500'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_M_TopHat200'] = fofgroups['subfind_tab']['FOF']['Group_M_TopHat200'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_R_Crit200'] = fofgroups['subfind_tab']['FOF']['Group_R_Crit200'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_R_Crit2500'] = fofgroups['subfind_tab']['FOF']['Group_R_Crit2500'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_R_Crit500'] = fofgroups['subfind_tab']['FOF']['Group_R_Crit500'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_R_Mean200'] = fofgroups['subfind_tab']['FOF']['Group_R_Mean200'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_R_Mean2500'] = fofgroups['subfind_tab']['FOF']['Group_R_Mean2500'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_R_Mean500'] = fofgroups['subfind_tab']['FOF']['Group_R_Mean500'][clusterID]
+    fofgroups['subfind_tab']['FOF']['Group_R_TopHat200'] = fofgroups['subfind_tab']['FOF']['Group_R_TopHat200'][clusterID]
+    fofgroups['subfind_tab']['FOF']['NumOfSubhalos'] = fofgroups['subfind_tab']['FOF']['NumOfSubhalos'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['CentreOfMass'] = fofgroups['subfind_tab']['Subhalo']['CentreOfMass'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['CentreOfPotential'] = fofgroups['subfind_tab']['Subhalo']['CentreOfPotential'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['GasSpin'] = fofgroups['subfind_tab']['Subhalo']['GasSpin'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['GroupNumber'] = fofgroups['subfind_tab']['Subhalo']['GroupNumber'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['HalfMassProjRad'] = fofgroups['subfind_tab']['Subhalo']['HalfMassProjRad'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['HalfMassRad'] = fofgroups['subfind_tab']['Subhalo']['HalfMassRad'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['IDMostBound'] = fofgroups['subfind_tab']['Subhalo']['IDMostBound'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['SubLength'] = fofgroups['subfind_tab']['Subhalo']['SubLength'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['SubOffset'] = fofgroups['subfind_tab']['Subhalo']['SubOffset'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['Velocity'] = fofgroups['subfind_tab']['Subhalo']['Velocity'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['Vmax'] = fofgroups['subfind_tab']['Subhalo']['Vmax'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['VmaxRadius'] = fofgroups['subfind_tab']['Subhalo']['VmaxRadius'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['StarsMass'] = fofgroups['subfind_tab']['Subhalo']['StarsMass'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['StarsSpin'] = fofgroups['subfind_tab']['Subhalo']['StarsSpin'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['StarFormationRate'] = fofgroups['subfind_tab']['Subhalo']['StarFormationRate'][clusterID]
+    fofgroups['subfind_tab']['Subhalo']['StellarVelDisp'] = fofgroups['subfind_tab']['Subhalo']['StellarVelDisp'][clusterID]
+    fofgroups['group_tab']['FOF']['CentreOfMass'] = fofgroups['group_tab']['FOF']['CentreOfMass'][clusterID]
+    fofgroups['group_tab']['FOF']['GroupLength'] = fofgroups['group_tab']['FOF']['GroupLength'][clusterID]
+    fofgroups['group_tab']['FOF']['GroupLengthType'] = fofgroups['group_tab']['FOF']['GroupLengthType'][clusterID]
+    fofgroups['group_tab']['FOF']['GroupMassType'] = fofgroups['group_tab']['FOF']['GroupMassType'][clusterID]
+    fofgroups['group_tab']['FOF']['GroupOffset'] = fofgroups['group_tab']['FOF']['GroupOffset'][clusterID]
+    fofgroups['group_tab']['FOF']['GroupOffsetType'] = fofgroups['group_tab']['FOF']['GroupOffsetType'][clusterID]
+    fofgroups['group_tab']['FOF']['Mass'] = fofgroups['group_tab']['FOF']['Mass'][clusterID]
 
     # Gather all data into a large dictionary
     data_dict = {}
     data_dict['clusterID'] = clusterID
-    data_dict['files'] = fofgroups.files
-    data_dict['header'] = fofgroups.header
-    data_dict['subfind_tab'] = fofgroups.subfind_tab
-    data_dict['group_tab'] = fofgroups.group_tab
-    data_dict['mass_DMpart'] = fofgroups.mass_DMpart
-    data_obj = AttrDict()
-    data_obj.data = data_dict
-    return data_obj
+    data_dict['files'] = fofgroups['files']
+    data_dict['header'] = fofgroups['header']
+    data_dict['subfind_tab'] = fofgroups['subfind_tab']
+    data_dict['group_tab'] = fofgroups['group_tab']
+    data_dict['mass_DMpart'] = fofgroups['mass_DMpart']
+
+    return data_dict
 
 
 def compute_M(data):
@@ -399,19 +402,19 @@ def compute_M(data):
     return csr_matrix((cols, (data.ravel(), cols)), shape=(data.max() + 1, data.size))
 
 
-def get_indices_sparse(data) -> AttrDict:
+def get_indices_sparse(data):
     M = compute_M(data)
     return [np.unravel_index(row.data, data.shape) for row in M]
 
 
-def csr_index_matrix(files: tuple, fofgroups: AttrDict) -> AttrDict:
-    header = fofgroups.data.header
-    max_group_id = len(fofgroups.data.subfind_tab.FOF.Group_M_Crit200)
+def csr_index_matrix(fofgroups: dict) -> dict:
+
+    max_group_id = len(fofgroups['subfind_tab']['FOF']['Group_M_Crit200'])
 
     GroupNumber = {}    # Input data structure
-    metadata = {}       # Output data structure
+    csrmatrix = {}       # Output data structure
 
-    with h5.File(files[2], 'r') as h5file:
+    with h5.File(fofgroups['files'][2], 'r') as h5file:
 
         # Create a HYDRO/DMO switch
         if "/PartType0" in h5file:
@@ -424,7 +427,7 @@ def csr_index_matrix(files: tuple, fofgroups: AttrDict) -> AttrDict:
         for part_type in part_types:
 
             # Read in GroupNumber info
-            N_particles = header.subfind_particles.NumPart_ThisFile[part_type]
+            N_particles = fofgroups['header']['subfind_particles']['NumPart_ThisFile'][part_type]
             start, end = split(N_particles)
             GroupNumber[f'PartType{part_type}'] = np.empty(0, dtype=np.int)
             GroupNumber[f'PartType{part_type}'] = np.append(
@@ -435,37 +438,33 @@ def csr_index_matrix(files: tuple, fofgroups: AttrDict) -> AttrDict:
 
             # Generate the metadata in parallel through MPI
             pprint(f"[+] ({counter}/{len(part_types)}) Computing CSR indexing matrix...")
-            metadata[f'PartType{part_type}'] = {}
-            metadata[f'PartType{part_type}']['csrmatrix'] = get_indices_sparse(GroupNumber[f'PartType{part_type}'])
-            del metadata[f'PartType{part_type}']['csrmatrix'][0], metadata[f'PartType{part_type}']['csrmatrix'][-1]
+            csrmatrix[f'PartType{part_type}'] = get_indices_sparse(GroupNumber[f'PartType{part_type}'])
+            del csrmatrix[f'PartType{part_type}'][0]
+            del csrmatrix[f'PartType{part_type}'][-1]
             counter += 1
 
-    # Construct the nested AttrDict instance
-    csrm = AttrDict()
-    csrm.data = metadata
-    return csrm
+    return csrmatrix
 
 
-def particle_index_from_csrm(fofgroup: AttrDict, particle_type: int, csrm: AttrDict) -> np.ndarray:
+def particle_index_from_csrm(fofgroup: dict, particle_type: int, csrm: dict) -> np.ndarray:
 
-    N_particles = fofgroup.data.header.subfind_particles.NumPart_ThisFile[particle_type]
+    N_particles = fofgroup['header']['subfind_particles']['NumPart_ThisFile'][particle_type]
     start, _ = split(N_particles)
-    idx = fofgroup.data.clusterID
-    particle_index = csrm.data[f'PartType{particle_type}']['csrmatrix'][idx][0] + start
+    idx = fofgroup['clusterID']
+    particle_index = csrm[f'PartType{particle_type}'][idx][0] + start
     # particle_index = commune(particle_index)
     return particle_index
 
 
-def fof_particles(fofgroup: AttrDict, csrm: AttrDict) -> AttrDict:
-
-    pprint(f"[+] Find particle information...")
+def fof_particles(fofgroup: dict, csrm: dict) -> dict:
+    # pprint(f"[+] Find particle information...")
 
     # Conversion factors
-    conv_mass = 1e10 / fofgroup.data.header.subfind_particles.HubbleParam
-    conv_length = fofgroup.data.header.subfind_particles.ExpansionFactor / fofgroup.data.header.subfind_particles.HubbleParam
-    conv_density = 1e10 * fofgroup.data.header.subfind_particles.HubbleParam ** 2 / fofgroup.data.header.subfind_particles.ExpansionFactor ** 3
-    conv_velocity = np.sqrt(fofgroup.data.header.subfind_particles.ExpansionFactor)
-    conv_starFormationRate = 1e10 * fofgroup.data.header.subfind_particles.HubbleParam ** 2 / fofgroup.data.header.subfind_particles.ExpansionFactor ** 3
+    conv_mass = 1e10 / fofgroup['header']['subfind_particles']['HubbleParam']
+    conv_length = fofgroup['header']['subfind_particles']['ExpansionFactor'] / fofgroup['header']['subfind_particles']['HubbleParam']
+    conv_density = 1e10 * fofgroup['header']['subfind_particles']['HubbleParam'] ** 2 / fofgroup['header']['subfind_particles']['ExpansionFactor'] ** 3
+    conv_velocity = np.sqrt(fofgroup['header']['subfind_particles']['ExpansionFactor'])
+    conv_starFormationRate = 1e10 * fofgroup['header']['subfind_particles']['HubbleParam'] ** 2 / fofgroup['header']['subfind_particles']['ExpansionFactor'] ** 3
     conv_time = 3.08568e+19
 
     # Units
@@ -477,7 +476,7 @@ def fof_particles(fofgroup: AttrDict, csrm: AttrDict) -> AttrDict:
 
     subfind_particle_data = {}
 
-    with h5.File(fofgroup.data.files[2], 'r') as h5file:
+    with h5.File(fofgroup['files'][2], 'r') as h5file:
 
         # Create a HYDRO/DMO switch
         is_hydro = "/PartType0" in h5file
@@ -628,9 +627,9 @@ def fof_particles(fofgroup: AttrDict, csrm: AttrDict) -> AttrDict:
 
                 # Periodic boundary wrapping of particle coordinates
                 coords = subfind_particle_data[pt]['Coordinates']
-                boxsize = fofgroup.data.header.subfind_particles.BoxSize * conv_length * unit_length
-                cop = fofgroup.data.subfind_tab.FOF.GroupCentreOfPotential
-                r200 = fofgroup.data.subfind_tab.FOF.Group_R_Crit200
+                boxsize = fofgroup['header']['subfind_particles']['BoxSize'] * conv_length * unit_length
+                cop = fofgroup['subfind_tab']['FOF']['GroupCentreOfPotential']
+                r200 = fofgroup['subfind_tab']['FOF']['Group_R_Crit200']
                 for coord_axis in range(3):
                     # Right boundary
                     if cop[coord_axis] + 10 * r200 > boxsize:
@@ -645,15 +644,15 @@ def fof_particles(fofgroup: AttrDict, csrm: AttrDict) -> AttrDict:
 
         # Gather all data into a large dictionary
         data_dict = {}
-        data_dict['files'] = fofgroup.data.files
-        data_dict['header'] = fofgroup.data.header
-        data_dict['clusterID'] = fofgroup.data.clusterID
+        data_dict['files'] = fofgroup['files']
+        data_dict['header'] = fofgroup['header']
+        data_dict['clusterID'] = fofgroup['clusterID']
+        data_dict['subfind_tab'] = fofgroup['subfind_tab']
+        data_dict['group_tab'] = fofgroup['group_tab']
         data_dict['subfind_particles'] = subfind_particle_data
-        data_dict['mass_DMpart'] = fofgroup.data.mass_DMpart
+        data_dict['mass_DMpart'] = fofgroup['mass_DMpart']
 
-        data_obj = AttrDict()
-        data_obj.data = data_dict
-        return data_obj
+        return data_dict
 
 
 
