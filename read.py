@@ -651,5 +651,6 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
         data_dict['group_tab'] = fofgroup['group_tab']
         data_dict['subfind_particles'] = subfind_particle_data
         data_dict['mass_DMpart'] = fofgroup['mass_DMpart']
+        data_dict['boxsize'] = boxsize
 
         return data_dict
