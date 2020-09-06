@@ -67,10 +67,10 @@ def gas_density_map(cluster_data) -> None:
     masses = cluster_data.subfind_particles['PartType0']['Mass']
     smoothing_lengths = cluster_data.subfind_particles['PartType0']['SmoothingLength']
     gas_mass = scatter_parallel(
-        coord[:, 0],
-        coord[:, 1],
-        masses,
-        smoothing_lengths,
+        coord[:, 0].value,
+        coord[:, 1].value,
+        masses.value,
+        smoothing_lengths.value,
         1024
     )
 
@@ -141,7 +141,7 @@ def dm_density_map(cluster_data) -> None:
     coord[:, 1] -= - CoP[1]
     coord[:, 2] -= - CoP[2]
     masses = np.ones_like(coord[:, 0], dtype=np.float32) * DM_part_mass
-    dm_mass = dm_render(coord, masses, boxsize)
+    dm_mass = dm_render(coord.value, masses.value, boxsize.value)
 
     # Make figure
     fig, ax = plt.subplots(figsize=(6, 6), dpi=1024 // 6)
@@ -211,10 +211,11 @@ def stars_density_map(cluster_data) -> None:
     masses = cluster_data.subfind_particles['PartType4']['Mass']
     smoothing_lengths = cluster_data.subfind_particles['PartType4']['SmoothingLength']
     gas_mass = scatter_parallel(
-        coord[:, 0],
-        coord[:, 1],
-        masses,
-        smoothing_lengths
+        coord[:, 0].value,
+        coord[:, 1].value,
+        masses.value,
+        smoothing_lengths.value,
+        1024
     )
 
     # Make figure
