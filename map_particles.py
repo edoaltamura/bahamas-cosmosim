@@ -11,6 +11,13 @@ except:
     pass
 
 
+partType_atlas = {
+    '0': 'gas',
+    '1': 'dark matter',
+    '4': 'stars'
+}
+
+
 def latex_float(f):
     float_str = "{0:.2g}".format(f)
     if "e" in float_str:
@@ -22,7 +29,7 @@ def latex_float(f):
 
 def particle_map_type(particle_type: int, cluster_data) -> None:
 
-    redshift = cluster_data.header.subfind_particles.Redshift
+    z = cluster_data.header.subfind_particles.Redshift
     CoP = cluster_data.subfind_tab.FOF.GroupCentreOfPotential
     M200c = cluster_data.subfind_tab.FOF.Group_M_Crit200
     R200c = cluster_data.subfind_tab.FOF.Group_R_Crit200
@@ -39,7 +46,7 @@ def particle_map_type(particle_type: int, cluster_data) -> None:
     # Make figure
     fig, ax = plt.subplots(figsize=(6, 6), dpi=1024 // 6)
     ax.set_aspect('equal')
-    ax.plot(coord_x, coord_y, ',', c="C0", alpha=0.8)
+    ax.plot(coord_x, coord_y, ',', c="C0", alpha=1)
     ax.set_xlim([-size.value, size.value])
     ax.set_ylim([-size.value, size.value])
     ax.set_ylabel(r"$y$ [Mpc]")
@@ -50,11 +57,12 @@ def particle_map_type(particle_type: int, cluster_data) -> None:
         0.025,
         (
             f"Halo {cluster_id:d} {simulation_type}\n"
-            f"$z={redshift:3.3f}$\n"
-            f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
+            f"Particles: {partType_atlas[str(particle_type)]}\n"
+            f"$z={z:3.3f}$\n"
             f"$M_{{500c}}={latex_float(M500c.value)}$ M$_\odot$\n"
-            f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
             f"$R_{{500c}}={latex_float(R500c.value)}$ Mpc\n"
+            f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
+            f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc"
         ),
         color="black",
         ha="left",
@@ -73,16 +81,16 @@ def particle_map_type(particle_type: int, cluster_data) -> None:
     ax.text(
         0,
         0 + 1.05 * R500c,
-        r"$5 \times R_{500c}$",
+        r"$R_{500c}$",
         color="grey",
         ha="center",
         va="bottom"
     )
-    circle_r200 = plt.Circle((0, 0), R200c, color="black", fill=False, linestyle='-')
-    circle_r500 = plt.Circle((0, 0), R500c, color="grey", fill=False, linestyle='--')
+    circle_r200 = plt.Circle((0, 0), R200c, color="grey", fill=False, linestyle='--')
+    circle_r500 = plt.Circle((0, 0), R500c, color="grey", fill=False, linestyle='-')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_r500)
-    fig.savefig(f"{output_directory}/halo{cluster_id}_particlemap_type{particle_type}_{size_R200c}r200.png")
+    fig.savefig(f"{output_directory}/halo{cluster_id}_{redshift}_particlemap_type{particle_type}_{size_R200c}r200.png")
     plt.close(fig)
 
 
