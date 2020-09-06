@@ -66,7 +66,7 @@ def gas_density_map(cluster_data) -> None:
     coord[:, 2] -= - CoP[2]
     masses = cluster_data.subfind_particles['PartType0']['Mass']
     smoothing_lengths = cluster_data.subfind_particles['PartType0']['SmoothingLength']
-    gas_mass = scatter_parallel(
+    gas_mass = scatter(
         coord[:, 0].value,
         coord[:, 1].value,
         masses.value,
@@ -210,7 +210,7 @@ def stars_density_map(cluster_data) -> None:
     coord[:, 2] -= - CoP[2]
     masses = cluster_data.subfind_particles['PartType4']['Mass']
     smoothing_lengths = cluster_data.subfind_particles['PartType4']['SmoothingLength']
-    gas_mass = scatter_parallel(
+    gas_mass = scatter(
         coord[:, 0].value,
         coord[:, 1].value,
         masses.value,
