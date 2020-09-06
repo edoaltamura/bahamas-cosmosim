@@ -28,17 +28,17 @@ size_R200c = 10
 output_directory = '/local/scratch/altamura/bahamas/maps'
 # -------------------------------------------------------------------- #
 # Boot up the BAHAMAS data
-# files = read.find_files(simulation_type, redshift)
-# fofs = read.fof_groups(files)
-# csrm = read.csr_index_matrix(fofs)
-# fof = read.fof_group(cluster_id, fofs)
-# cluster_data = read.class_wrap(read.fof_particles(fof, csrm)).data
-#
-# redshift = cluster_data.header.subfind_particles.Redshift
-# CoP = cluster_data.subfind_tab.FOF.GroupCentreOfPotential
-# M200c = cluster_data.subfind_tab.FOF.Group_M_Crit200
-# R200c = cluster_data.subfind_tab.FOF.Group_R_Crit200
-# size = R200c * size_R200c
+files = read.find_files(simulation_type, redshift)
+fofs = read.fof_groups(files)
+csrm = read.csr_index_matrix(fofs)
+fof = read.fof_group(cluster_id, fofs)
+cluster_data = read.class_wrap(read.fof_particles(fof, csrm)).data
+
+redshift = cluster_data.header.subfind_particles.Redshift
+CoP = cluster_data.subfind_tab.FOF.GroupCentreOfPotential
+M200c = cluster_data.subfind_tab.FOF.Group_M_Crit200
+R200c = cluster_data.subfind_tab.FOF.Group_R_Crit200
+size = R200c * size_R200c
 # -------------------------------------------------------------------- #
 
 def particle_map_type(particle_type: int) -> None:
@@ -112,14 +112,13 @@ def particle_map_type(particle_type: int) -> None:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--gas', default=False, action='store_true')
-    parser.add_argument('--dark-matter', default=False, action='store_true')
+    parser.add_argument('--dark_matter', default=False, action='store_true')
     parser.add_argument('--stars', default=False, action='store_true')
     args = parser.parse_args()
-    print(args.gas)
 
-    # if plot_gas:
-    #     particle_map_type(0)
-    # if plot_dm:
-    #     particle_map_type(1)
-    # if plot_stars:
-    #     particle_map_type(4)
+    if args.gas:
+        particle_map_type(0)
+    if args.dark_matter:
+        particle_map_type(1)
+    if args.stars:
+        particle_map_type(4)
