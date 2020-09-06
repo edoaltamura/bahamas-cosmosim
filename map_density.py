@@ -246,7 +246,7 @@ def stars_density_map(cluster_data) -> None:
 
     ax.text(
         0,
-        0 + 1.05 * R200c,
+        1.02 * R200c,
         r"$R_{200c}$",
         color="grey",
         ha="center",
@@ -254,7 +254,7 @@ def stars_density_map(cluster_data) -> None:
     )
     ax.text(
         0,
-        0 + 1.05 * R500c,
+        1.02 * R500c,
         r"$R_{500c}$",
         color="grey",
         ha="center",
