@@ -57,35 +57,22 @@ def particle_map_type(particle_type: int) -> None:
     ax.set_ylim([-size.value, size.value])
     ax.set_ylabel(r"$y$ [Mpc]")
     ax.set_xlabel(r"$x$ [Mpc]")
+
     ax.text(
         0.025,
-        0.975,
-        f"Halo {cluster_id:d} High\n",
-        color="black",
-        ha="left",
-        va="top",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0.975,
-        0.975,
-        f"$z={redshift:3.3f}$",
-        color="black",
-        ha="right",
-        va="top",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0.975,
         0.025,
         (
-            f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$"
+            f"Halo {cluster_id:d} {simulation_type}\n"
+            f"$z={redshift:3.3f}$\n"
+            f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
+            f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
         ),
         color="black",
-        ha="right",
+        ha="left",
         va="bottom",
         transform=ax.transAxes,
     )
+
     ax.text(
         0,
         0 + 1.05 * R200c,
