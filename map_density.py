@@ -70,7 +70,8 @@ def gas_density_map(cluster_data) -> None:
         coord[:, 0],
         coord[:, 1],
         masses,
-        smoothing_lengths
+        smoothing_lengths,
+        1024
     )
 
     # Make figure
