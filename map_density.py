@@ -58,27 +58,6 @@ def rescale(coord: np.ndarray) -> np.ndarray:
     return np.asarray(rescaled_coords, dtype=np.float64)
 
 
-
-def dm_render(coordinates, masses, boxsize, resolution: int = map_resolution):
-    # Generate smoothing lengths for the dark matter
-    smoothing_lengths = generate_smoothing_lengths(
-        coordinates,
-        boxsize,
-        kernel_gamma=1.8,
-        neighbours=57,
-        speedup_fac=2,
-        dimension=3,
-    )
-    # Project the dark matter mass
-    dm_map = scatter(
-        coordinates[:, 0].value,
-        coordinates[:, 1].value,
-        masses.value,
-        smoothing_lengths.value,
-        resolution
-    )
-    return dm_map
-
 def gas_density_map(cluster_data) -> None:
 
     z = cluster_data.header.subfind_particles.Redshift
@@ -174,11 +153,27 @@ def dm_density_map(cluster_data) -> None:
     coord[:, 0] -= - CoP[0]
     coord[:, 1] -= - CoP[1]
     coord[:, 2] -= - CoP[2]
-    masses = np.ones_like(coord[:, 0], dtype=np.float32) * DM_part_mass
-    dm_mass = dm_render(coord, masses, boxsize)
+    smoothing_lengths = generate_smoothing_lengths(
+        coord,
+        boxsize,
+        kernel_gamma=1.8,
+        neighbours=57,
+        speedup_fac=3,
+        dimension=3,
+    )
+    coord_map = rescale(coord.value)
+    map_input_m = np.ones_like(dtype=np.float32) * DM_part_mass
+    map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
+    dm_mass = scatter(
+        x=coord_map[:, 0],
+        y=coord_map[:, 1],
+        m=map_input_m,
+        h=map_input_h,
+        res=map_resolution
+    )
 
     # Make figure
-    fig, ax = plt.subplots(figsize=(6, 6), dpi=1024 // 6)
+    fig, ax = plt.subplots(figsize=(6, 6), dpi=map_resolution // 6)
     ax.set_aspect('equal')
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
@@ -244,7 +239,6 @@ def stars_density_map(cluster_data) -> None:
     coord[:, 2] -= - CoP[2]
     masses = cluster_data.subfind_particles['PartType4']['Mass']
     smoothing_lengths = cluster_data.subfind_particles['PartType4']['SmoothingLength']
-
     coord_map = rescale(coord.value)
     map_input_m = np.asarray(masses.value, dtype=np.float32)
     map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
