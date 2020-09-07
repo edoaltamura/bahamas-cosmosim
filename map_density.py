@@ -4,10 +4,10 @@ matplotlib.use('Agg')
 import argparse
 import numpy as np
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
-from swiftsimio.visualisation.projection_backends.renormalised import scatter, scatter_parallel
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import read
+from sphmap import scatter
 
 try:
     plt.style.use("mnras.mplstyle")
@@ -30,25 +30,32 @@ def latex_float(f):
         return
 
 
-def rescale(X, x_min, x_max):
+def rescale(coord: np.ndarray) -> np.ndarray:
     """
     Rescaled the array of input to the range [x_min, x_max] linearly.
     This method is often used in the context of making maps with matplotlib.pyplot.inshow.
     The matrix to be accepted must contain arrays in the [0,1] range.
-
-    :param X: numpy.ndarray
-        This is the input array to be rescaled.
-    :param x_min: float or int
-        The lower boundary for the array to have.
-    :param x_max: float or int
-        The upper boundary for the new array to have.
-
-    :return: numpy.ndarray
-        The array, linearly rescaled to the range [x_min, x_max].
     """
-    nom = (X - X.min(axis=0)) * (x_max - x_min)
-    denom = X.max(axis=0) - X.min(axis=0)
-    return x_min + nom / denom
+    x_max = np.max(coord[:, 0])
+    x_min = np.min(coord[:, 0])
+    y_max = np.max(coord[:, 1])
+    y_min = np.min(coord[:, 1])
+    z_max = np.max(coord[:, 2])
+    z_min = np.min(coord[:, 2])
+    coord_max = np.max([x_max, y_max, z_max])
+    coord_min = np.min([x_min, y_min, z_min])
+    coord_range = coord_max - coord_min
+    rescaled_coords = np.copy(coord)
+    rescaled_coords[:, 0] -= x_min
+    rescaled_coords[:, 1] -= y_min
+    rescaled_coords[:, 2] -= z_min
+    rescaled_coords[:, 0] /= coord_range
+    rescaled_coords[:, 1] /= coord_range
+    rescaled_coords[:, 2] /= coord_range
+    assert np.max(rescaled_coords) <= 1.
+    assert np.min(rescaled_coords) >= 0.
+    return np.asarray(rescaled_coords, dtype=np.float64)
+
 
 
 def dm_render(coordinates, masses, boxsize, resolution: int = 1024):
@@ -62,7 +69,7 @@ def dm_render(coordinates, masses, boxsize, resolution: int = 1024):
         dimension=3,
     )
     # Project the dark matter mass
-    dm_map = scatter_parallel(
+    dm_map = scatter(
         coordinates[:, 0].value,
         coordinates[:, 1].value,
         masses.value,
@@ -88,14 +95,12 @@ def gas_density_map(cluster_data) -> None:
     masses = cluster_data.subfind_particles['PartType0']['Mass']
     smoothing_lengths = cluster_data.subfind_particles['PartType0']['SmoothingLength']
 
-    map_input_x = np.asarray(rescale(coord[:, 0].value, 0, 1), dtype=np.float64)
-    map_input_y = np.asarray(rescale(coord[:, 1].value, 0, 1), dtype=np.float64)
-    map_input_z = np.asarray(rescale(coord[:, 2].value, 0, 1), dtype=np.float64)
+    coord_map = rescale(coord.value)
     map_input_m = np.asarray(masses.value, dtype=np.float32)
     map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
     gas_mass = scatter(
-        map_input_x,
-        map_input_y,
+        coord_map[:, 0],
+        coord_map[:, 1],
         map_input_m,
         map_input_h,
         1024
@@ -238,14 +243,12 @@ def stars_density_map(cluster_data) -> None:
     masses = cluster_data.subfind_particles['PartType4']['Mass']
     smoothing_lengths = cluster_data.subfind_particles['PartType4']['SmoothingLength']
 
-    map_input_x = np.asarray(rescale(coord[:, 0].value, 0, 1), dtype=np.float64)
-    map_input_y = np.asarray(rescale(coord[:, 1].value, 0, 1), dtype=np.float64)
-    map_input_z = np.asarray(rescale(coord[:, 2].value, 0, 1), dtype=np.float64)
+    coord_map = rescale(coord.value)
     map_input_m = np.asarray(masses.value, dtype=np.float32)
     map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
     stars_mass = scatter(
-        map_input_x,
-        map_input_y,
+        coord_map[:, 0],
+        coord_map[:, 1],
         map_input_m,
         map_input_h,
         1024
