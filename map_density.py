@@ -332,3 +332,5 @@ if __name__ == '__main__':
         dm_density_map(cluster_data)
     if args.stars:
         stars_density_map(cluster_data)
+
+    read.pprint("Job done.")
