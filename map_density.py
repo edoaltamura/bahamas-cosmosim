@@ -4,10 +4,10 @@ matplotlib.use('Agg')
 import argparse
 import numpy as np
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
+from swiftsimio.visualisation.projection import scatter_parallel as scatter
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import read
-from sphmap import scatter
 
 try:
     plt.style.use("mnras.mplstyle")
@@ -19,6 +19,7 @@ partType_atlas = {
     '1': 'dark matter',
     '4': 'stars'
 }
+map_resolution = 1024
 
 
 def latex_float(f):
@@ -58,7 +59,7 @@ def rescale(coord: np.ndarray) -> np.ndarray:
 
 
 
-def dm_render(coordinates, masses, boxsize, resolution: int = 1024):
+def dm_render(coordinates, masses, boxsize, resolution: int = map_resolution):
     # Generate smoothing lengths for the dark matter
     smoothing_lengths = generate_smoothing_lengths(
         coordinates,
@@ -99,15 +100,15 @@ def gas_density_map(cluster_data) -> None:
     map_input_m = np.asarray(masses.value, dtype=np.float32)
     map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
     gas_mass = scatter(
-        coord_map[:, 0],
-        coord_map[:, 1],
-        map_input_m,
-        map_input_h,
-        1024
+        x=coord_map[:, 0],
+        y=coord_map[:, 1],
+        m=map_input_m,
+        h=map_input_h,
+        res=map_resolution
     )
 
     # Make figure
-    fig, ax = plt.subplots(figsize=(6, 6), dpi=1024 // 6)
+    fig, ax = plt.subplots(figsize=(6, 6), dpi=map_resolution // 6)
     ax.set_aspect('equal')
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
@@ -115,7 +116,7 @@ def gas_density_map(cluster_data) -> None:
     ax.set_ylabel(r"$y$ [Mpc]")
     ax.set_xlabel(r"$x$ [Mpc]")
 
-    ax.text(
+    t = ax.text(
         0.025,
         0.025,
         (
@@ -132,6 +133,7 @@ def gas_density_map(cluster_data) -> None:
         va="bottom",
         transform=ax.transAxes,
     )
+    t.set_bbox(dict(facecolor='black', alpha=0.6, edgecolor='none'))
 
     ax.text(
         0,
@@ -247,15 +249,15 @@ def stars_density_map(cluster_data) -> None:
     map_input_m = np.asarray(masses.value, dtype=np.float32)
     map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
     stars_mass = scatter(
-        coord_map[:, 0],
-        coord_map[:, 1],
-        map_input_m,
-        map_input_h,
-        1024
+        x=coord_map[:, 0],
+        y=coord_map[:, 1],
+        m=map_input_m,
+        h=map_input_h,
+        res=map_resolution
     )
 
     # Make figure
-    fig, ax = plt.subplots(figsize=(6, 6), dpi=1024 // 6)
+    fig, ax = plt.subplots(figsize=(6, 6), dpi=map_resolution // 6)
     ax.set_aspect('equal')
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")

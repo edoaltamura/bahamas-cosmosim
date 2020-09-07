@@ -52,7 +52,7 @@ def particle_map_type(particle_type: int, cluster_data) -> None:
     ax.set_ylabel(r"$y$ [Mpc]")
     ax.set_xlabel(r"$x$ [Mpc]")
 
-    ax.text(
+    t = ax.text(
         0.025,
         0.025,
         (
@@ -69,7 +69,7 @@ def particle_map_type(particle_type: int, cluster_data) -> None:
         va="bottom",
         transform=ax.transAxes,
     )
-
+    t.set_bbox(dict(facecolor='white', alpha=0.6, edgecolor='none'))
     ax.text(
         0,
         0 + 1.05 * R200c,

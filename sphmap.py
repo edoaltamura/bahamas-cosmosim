@@ -10,6 +10,29 @@ of the kernel on each call.
 from math import sqrt
 from numpy import float64, float32, int32, zeros, ndarray
 
+try:
+    from numba import jit, prange
+    from numba.core.config import NUMBA_NUM_THREADS as NUM_THREADS
+except (ImportError, ModuleNotFoundError):
+    try:
+        from numba import jit, prange
+        from numba.config import NUMBA_NUM_THREADS as NUM_THREADS
+    except (ImportError, ModuleNotFoundError):
+        print(
+            "You do not have numba installed. Please consider installing "
+            "if you are going to be doing visualisation or indexing large arrays "
+            "(pip install numba)"
+        )
+
+        def jit(*args, **kwargs):
+            def x(func):
+                return func
+
+            return x
+
+        prange = range
+        NUM_THREADS = 1
+
 # Taken from Dehnen & Aly 2012
 kernel_gamma = float32(1.897367)
 kernel_constant = float32(7.0 / 3.14159)
