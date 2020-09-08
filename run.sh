@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
 
-#Activate the virtual environment with Swiftsimio
-venv_path=$(pip -V)
-if [[ ! $venv_path == *"rksz"* ]]; then
-  echo "Activating project-specific Python virtual environment.."
-  source /local/scratch/altamura/rksz-venv/bin/activate.csh
-fi
+#Activate the virtual environment with Swiftsimio. Run:
+# source /local/scratch/altamura/rksz-venv/bin/activate.csh
 
 OMP_NUM_THREADS=12
 NUMBA_NUM_THREADS=12

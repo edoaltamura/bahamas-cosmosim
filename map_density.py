@@ -85,7 +85,7 @@ def gas_density_map(cluster_data) -> None:
         h=map_input_h,
         res=map_resolution
     )
-
+    read.pprint(gas_mass[gas_mass <= 0])
     # Make figure
     fig, ax = plt.subplots(figsize=(6, 6), dpi=map_resolution // 6)
     ax.set_aspect('equal')
