@@ -327,10 +327,13 @@ if __name__ == '__main__':
 
     # Execute tasks
     if args.gas:
+        read.pprint("Generating gas density map")
         gas_density_map(cluster_data)
     if args.dark_matter:
+        read.pprint("Generating dark_matter density map")
         dm_density_map(cluster_data)
     if args.stars:
+        read.pprint("Generating stars density map")
         stars_density_map(cluster_data)
 
     read.pprint("Job done.")
