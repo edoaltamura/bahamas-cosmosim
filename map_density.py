@@ -85,10 +85,12 @@ def gas_density_map(cluster_data) -> None:
         h=map_input_h,
         res=map_resolution
     )
-    gas_mass[np.where(gas_mass <= 0)[0]] = np.nan
-    read.pprint(gas_mass[gas_mass < 0.])
-    read.pprint(gas_mass[gas_mass == 0.])
-    read.pprint(gas_mass[gas_mass == np.nan])
+    read.pprint(gas_mass)
+    gas_mass[gas_mass <= 0.] = np.nan
+    read.pprint("<0", gas_mass[gas_mass < 0.])
+    read.pprint("=0", gas_mass[gas_mass == 0.])
+    read.pprint("nan", gas_mass[gas_mass == np.nan])
+    read.pprint(gas_mass)
 
     # Make figure
     fig, ax = plt.subplots(figsize=(6, 6), dpi=map_resolution // 6)
