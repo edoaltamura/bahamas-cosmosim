@@ -55,7 +55,7 @@ def rescale(coord: np.ndarray) -> np.ndarray:
     return np.asarray(rescaled_coords, dtype=np.float64)
 
 
-def gas_density_map(cluster_data) -> None:
+def density_map(particle_type: int, cluster_data) -> None:
 
     z = cluster_data.header.subfind_particles.Redshift
     CoP = cluster_data.subfind_tab.FOF.GroupCentreOfPotential
@@ -65,41 +65,55 @@ def gas_density_map(cluster_data) -> None:
     M500c = cluster_data.subfind_tab.FOF.Group_M_Crit500
     size = R200c * size_R200c
 
-    coord = cluster_data.subfind_particles['PartType0']['Coordinates']
+    coord = cluster_data.subfind_particles[f'PartType{particle_type}']['Coordinates']
     coord[:, 0] -= - CoP[0]
     coord[:, 1] -= - CoP[1]
     coord[:, 2] -= - CoP[2]
-    masses = cluster_data.subfind_particles['PartType0']['Mass']
-    smoothing_lengths = cluster_data.subfind_particles['PartType0']['SmoothingLength']
+
+    if particle_type == 1:
+
+        # Generate DM particle smoothing lengths
+        boxsize = cluster_data.boxsize
+        smoothing_lengths = generate_smoothing_lengths(
+            coord,
+            boxsize,
+            kernel_gamma=1.8,
+            neighbours=57,
+            speedup_fac=3,
+            dimension=3,
+        )
+        DM_part_mass = cluster_data.mass_DMpart
+        masses = np.ones_like(dtype=np.float32) * DM_part_mass
+        smoothing_lengths = np.asarray(smoothing_lengths.value, dtype=np.float32)
+    else:
+        masses = cluster_data.subfind_particles[f'PartType{particle_type}']['Mass']
+        smoothing_lengths = cluster_data.subfind_particles[f'PartType{particle_type}']['SmoothingLength']
 
     coord_map = rescale(coord.value)
     map_input_m = np.asarray(masses.value, dtype=np.float32)
     map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
-    gas_mass = scatter(
+    mass_map = scatter(
         x=coord_map[:, 0],
         y=coord_map[:, 1],
         m=map_input_m,
         h=map_input_h,
         res=map_resolution
     )
-    read.pprint(gas_mass)
-    gas_mass = np.log10(gas_mass)
+    read.pprint(mass_map)
 
     # Make figure
     fig, ax = plt.subplots(figsize=(6, 6), dpi=map_resolution // 6)
     ax.set_aspect('equal')
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
-    ax.imshow(gas_mass.T, cmap="inferno", origin="lower", extent=([-size.value, size.value] + [-size.value, size.value]))
-    ax.set_ylabel(r"$y$ [Mpc]")
-    ax.set_xlabel(r"$x$ [Mpc]")
+    ax.imshow(mass_map.T, norm=LogNorm(), cmap="inferno", origin="lower", extent=([-size.value, size.value] + [-size.value, size.value]))
 
     t = ax.text(
         0.025,
         0.025,
         (
             f"Halo {cluster_id:d} {simulation_type}\n"
-            f"Particles: gas\n"
+            f"Particles:{partType_atlas[str(particle_type)]}\n"
             f"$z={z:3.3f}$\n"
             f"$M_{{500c}}={latex_float(M500c.value)}$ M$_\odot$\n"
             f"$R_{{500c}}={latex_float(R500c.value)}$ Mpc\n"
@@ -111,8 +125,7 @@ def gas_density_map(cluster_data) -> None:
         va="bottom",
         transform=ax.transAxes,
     )
-    t.set_bbox(dict(facecolor='black', alpha=0.6, edgecolor='none'))
-
+    t.set_bbox(dict(facecolor='black', alpha=0.1, edgecolor='none'))
     ax.text(
         0,
         0 + 1.05 * R200c,
@@ -133,170 +146,7 @@ def gas_density_map(cluster_data) -> None:
     circle_r500 = plt.Circle((0, 0), R500c, color="grey", fill=False, linestyle='-')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_r500)
-    fig.savefig(f"{output_directory}/halo{cluster_id}_{redshift}_densitymap_type0_{size_R200c}r200.png")
-    plt.close(fig)
-
-def dm_density_map(cluster_data) -> None:
-
-    z = cluster_data.header.subfind_particles.Redshift
-    CoP = cluster_data.subfind_tab.FOF.GroupCentreOfPotential
-    M200c = cluster_data.subfind_tab.FOF.Group_M_Crit200
-    R200c = cluster_data.subfind_tab.FOF.Group_R_Crit200
-    R500c = cluster_data.subfind_tab.FOF.Group_R_Crit500
-    M500c = cluster_data.subfind_tab.FOF.Group_M_Crit500
-    size = R200c * size_R200c
-    DM_part_mass = cluster_data.mass_DMpart
-    boxsize = cluster_data.boxsize
-
-    coord = cluster_data.subfind_particles['PartType1']['Coordinates']
-    coord[:, 0] -= - CoP[0]
-    coord[:, 1] -= - CoP[1]
-    coord[:, 2] -= - CoP[2]
-    smoothing_lengths = generate_smoothing_lengths(
-        coord,
-        boxsize,
-        kernel_gamma=1.8,
-        neighbours=57,
-        speedup_fac=3,
-        dimension=3,
-    )
-    coord_map = rescale(coord.value)
-    map_input_m = np.ones_like(dtype=np.float32) * DM_part_mass
-    map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
-    dm_mass = scatter(
-        x=coord_map[:, 0],
-        y=coord_map[:, 1],
-        m=map_input_m,
-        h=map_input_h,
-        res=map_resolution
-    )
-
-    # Make figure
-    fig, ax = plt.subplots(figsize=(6, 6), dpi=map_resolution // 6)
-    ax.set_aspect('equal')
-    fig.subplots_adjust(0, 0, 1, 1)
-    ax.axis("off")
-    ax.imshow(dm_mass.T, norm=LogNorm(), cmap="inferno", origin="lower", extent=([-size.value, size.value] + [-size.value, size.value]))
-    ax.set_ylabel(r"$y$ [Mpc]")
-    ax.set_xlabel(r"$x$ [Mpc]")
-
-    ax.text(
-        0.025,
-        0.025,
-        (
-            f"Halo {cluster_id:d} {simulation_type}\n"
-            f"Particles: dark matter\n"
-            f"$z={z:3.3f}$\n"
-            f"$M_{{500c}}={latex_float(M500c.value)}$ M$_\odot$\n"
-            f"$R_{{500c}}={latex_float(R500c.value)}$ Mpc\n"
-            f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
-            f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc"
-        ),
-        color="white",
-        ha="left",
-        va="bottom",
-        transform=ax.transAxes,
-    )
-
-    ax.text(
-        0,
-        0 + 1.05 * R200c,
-        r"$R_{200c}$",
-        color="grey",
-        ha="center",
-        va="bottom"
-    )
-    ax.text(
-        0,
-        0 + 1.05 * R500c,
-        r"$R_{500c}$",
-        color="grey",
-        ha="center",
-        va="bottom"
-    )
-    circle_r200 = plt.Circle((0, 0), R200c, color="grey", fill=False, linestyle='--')
-    circle_r500 = plt.Circle((0, 0), R500c, color="grey", fill=False, linestyle='-')
-    ax.add_artist(circle_r200)
-    ax.add_artist(circle_r500)
-    fig.savefig(f"{output_directory}/halo{cluster_id}_{redshift}_densitymap_type1_{size_R200c}r200.png")
-    plt.close(fig)
-
-
-def stars_density_map(cluster_data) -> None:
-
-    z = cluster_data.header.subfind_particles.Redshift
-    CoP = cluster_data.subfind_tab.FOF.GroupCentreOfPotential
-    M200c = cluster_data.subfind_tab.FOF.Group_M_Crit200
-    R200c = cluster_data.subfind_tab.FOF.Group_R_Crit200
-    R500c = cluster_data.subfind_tab.FOF.Group_R_Crit500
-    M500c = cluster_data.subfind_tab.FOF.Group_M_Crit500
-    size = R200c * size_R200c
-
-    coord = cluster_data.subfind_particles['PartType4']['Coordinates']
-    coord[:, 0] -= - CoP[0]
-    coord[:, 1] -= - CoP[1]
-    coord[:, 2] -= - CoP[2]
-    masses = cluster_data.subfind_particles['PartType4']['Mass']
-    smoothing_lengths = cluster_data.subfind_particles['PartType4']['SmoothingLength']
-    coord_map = rescale(coord.value)
-    map_input_m = np.asarray(masses.value, dtype=np.float32)
-    map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
-    stars_mass = scatter(
-        x=coord_map[:, 0],
-        y=coord_map[:, 1],
-        m=map_input_m,
-        h=map_input_h,
-        res=map_resolution
-    )
-
-    # Make figure
-    fig, ax = plt.subplots(figsize=(6, 6), dpi=map_resolution // 6)
-    ax.set_aspect('equal')
-    fig.subplots_adjust(0, 0, 1, 1)
-    ax.axis("off")
-    ax.imshow(stars_mass.T, norm=LogNorm(), cmap="inferno", origin="lower", extent=([-size.value, size.value] + [-size.value, size.value]))
-    ax.set_ylabel(r"$y$ [Mpc]")
-    ax.set_xlabel(r"$x$ [Mpc]")
-
-    ax.text(
-        0.025,
-        0.025,
-        (
-            f"Halo {cluster_id:d} {simulation_type}\n"
-            f"Particles: stars\n"
-            f"$z={z:3.3f}$\n"
-            f"$M_{{500c}}={latex_float(M500c.value)}$ M$_\odot$\n"
-            f"$R_{{500c}}={latex_float(R500c.value)}$ Mpc\n"
-            f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
-            f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc"
-        ),
-        color="white",
-        ha="left",
-        va="bottom",
-        transform=ax.transAxes,
-    )
-
-    ax.text(
-        0,
-        1.02 * R200c,
-        r"$R_{200c}$",
-        color="grey",
-        ha="center",
-        va="bottom"
-    )
-    ax.text(
-        0,
-        1.02 * R500c,
-        r"$R_{500c}$",
-        color="grey",
-        ha="center",
-        va="bottom"
-    )
-    circle_r200 = plt.Circle((0, 0), R200c, color="grey", fill=False, linestyle='--')
-    circle_r500 = plt.Circle((0, 0), R500c, color="grey", fill=False, linestyle='-')
-    ax.add_artist(circle_r200)
-    ax.add_artist(circle_r500)
-    fig.savefig(f"{output_directory}/halo{cluster_id}_{redshift}_densitymap_type4_{size_R200c}r200.png")
+    fig.savefig(f"{output_directory}/halo{cluster_id}_{redshift}_densitymap_type{particle_type}_{size_R200c}r200.png")
     plt.close(fig)
 
 
@@ -327,12 +177,12 @@ if __name__ == '__main__':
     # Execute tasks
     if args.gas:
         read.pprint("Generating gas density map")
-        gas_density_map(cluster_data)
+        density_map(0, cluster_data)
     if args.dark_matter:
         read.pprint("Generating dark_matter density map")
-        dm_density_map(cluster_data)
+        density_map(1, cluster_data)
     if args.stars:
         read.pprint("Generating stars density map")
-        stars_density_map(cluster_data)
+        density_map(4, cluster_data)
 
     read.pprint("Job done.")
