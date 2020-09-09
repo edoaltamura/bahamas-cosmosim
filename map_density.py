@@ -64,11 +64,7 @@ def density_map(particle_type: int, cluster_data) -> None:
     R500c = cluster_data.subfind_tab.FOF.Group_R_Crit500
     M500c = cluster_data.subfind_tab.FOF.Group_M_Crit500
     size = R200c * size_R200c
-
     coord = cluster_data.subfind_particles[f'PartType{particle_type}']['Coordinates']
-    coord[:, 0] -= - CoP[0]
-    coord[:, 1] -= - CoP[1]
-    coord[:, 2] -= - CoP[2]
 
     if particle_type == 1:
 
@@ -89,6 +85,11 @@ def density_map(particle_type: int, cluster_data) -> None:
         masses = cluster_data.subfind_particles[f'PartType{particle_type}']['Mass']
         smoothing_lengths = cluster_data.subfind_particles[f'PartType{particle_type}']['SmoothingLength']
 
+    # Centre the halo in the centre of potential
+    coord[:, 0] -= - CoP[0]
+    coord[:, 1] -= - CoP[1]
+    coord[:, 2] -= - CoP[2]
+
     coord_map = rescale(coord.value)
     map_input_m = np.asarray(masses.value, dtype=np.float32)
     map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
@@ -99,7 +100,9 @@ def density_map(particle_type: int, cluster_data) -> None:
         h=map_input_h,
         res=map_resolution
     )
-    read.pprint(mass_map)
+    # Mask zero values in the map with black
+    mass_map = np.ma.masked_where(mass_map < 0.05, mass_map)
+    read.pprint(mass_map[mass_map < 0.05])
 
     # Make figure
     fig, ax = plt.subplots(figsize=(6, 6), dpi=map_resolution // 6)
@@ -108,13 +111,12 @@ def density_map(particle_type: int, cluster_data) -> None:
     ax.axis("off")
 
     cmap = plt.cm.inferno
-    cmap.set_under(color='black')
+    cmap.set_bad(color='black')
     ax.imshow(
         mass_map.T,
         norm=LogNorm(),
         cmap=cmap,
         origin="lower",
-        vmin=0.1,
         extent=([-size.value, size.value, -size.value, size.value])
     )
 
