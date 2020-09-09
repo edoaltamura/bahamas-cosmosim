@@ -128,15 +128,14 @@ def density_map(particle_type: int, cluster_data) -> None:
     mass_map_units = masses.units / coord.units ** 2
 
     # Mask zero values in the map with black
-    mass_map = np.ma.masked_where(mass_map < 0.01, mass_map)
-    read.pprint(mass_map * mass_map_units)
+    # mass_map = np.ma.masked_where(mass_map < 0.05, mass_map)
+    read.pprint(mass_map)
 
     # Make figure
     fig, ax = plt.subplots(figsize=(6, 6), dpi=map_resolution // 6)
     ax.set_aspect('equal')
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
-
     ax.imshow(
         mass_map.T,
         norm=LogNorm(),
@@ -183,7 +182,7 @@ def density_map(particle_type: int, cluster_data) -> None:
     ax.add_artist(circle_r500)
     ax.set_xlim([-map_lims.value, map_lims.value])
     ax.set_ylim([-map_lims.value, map_lims.value])
-    fig.savefig(f"{output_directory}/halo{cluster_id}_{redshift}_densitymap_type{particle_type}_{size_R200c}r200.png")
+    fig.savefig(f"{output_directory}/halo{cluster_id}_{redshift}_densitymap_type{particle_type}.png")
     plt.close(fig)
 
 
