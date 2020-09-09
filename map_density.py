@@ -5,6 +5,7 @@ import argparse
 import copy
 import numpy as np
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
+from swiftsimio.visualisation.rotation import rotation_matrix_from_vector
 from swiftsimio.visualisation.projection import scatter_parallel as scatter
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
@@ -55,6 +56,20 @@ def rescale(coord: np.ndarray) -> np.ndarray:
     assert np.min(rescaled_coords) >= 0.
     return np.asarray(rescaled_coords, dtype=np.float64)
 
+def rotation_align_with_vector(coordinates: np.ndarray, rotation_center: np.ndarray, vector: np.ndarray) -> np.ndarray:
+    vector /= np.linalg.norm(vector)
+    face_on_rotation_matrix = rotation_matrix_from_vector(vector, axis='z')
+    rotation_matrix = face_on_rotation_matrix
+
+    if rotation_center is not None:
+        # Rotate co-ordinates as required
+        x, y, _ = np.matmul(rotation_matrix, (coordinates - rotation_center).T)
+        x += rotation_center[0]
+        y += rotation_center[1]
+
+    else:
+        x, y, _ = coordinates.T
+
 
 def density_map(particle_type: int, cluster_data) -> None:
 
@@ -101,7 +116,7 @@ def density_map(particle_type: int, cluster_data) -> None:
         res=map_resolution
     )
     # Mask zero values in the map with black
-    mass_map = np.ma.masked_where(mass_map < 0.001, mass_map)
+    mass_map = np.ma.masked_where(mass_map < 0.01, mass_map)
 
     # Make figure
     fig, ax = plt.subplots(figsize=(6, 6), dpi=map_resolution // 6)
@@ -109,19 +124,19 @@ def density_map(particle_type: int, cluster_data) -> None:
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
 
-    cmap = copy.copy(matplotlib.cm.get_cmap("inferno"))
-    cmap.set_bad(color='black')
+    cmap = plt.cm.get_cmap("inferno")
+    cmap.set_under('black')
     ax.imshow(
         mass_map.T,
         norm=LogNorm(),
         cmap=cmap,
         origin="lower",
-        extent=([
+        extent=(
             np.min(coord[:, 0].value),
             np.max(coord[:, 0].value),
             np.min(coord[:, 1].value),
             np.max(coord[:, 1].value)
-        ])
+        )
     )
 
     t = ax.text(
