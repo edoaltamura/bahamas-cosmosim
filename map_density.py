@@ -64,7 +64,7 @@ def density_map(particle_type: int, cluster_data) -> None:
     R200c = cluster_data.subfind_tab.FOF.Group_R_Crit200
     R500c = cluster_data.subfind_tab.FOF.Group_R_Crit500
     M500c = cluster_data.subfind_tab.FOF.Group_M_Crit500
-    size = R200c * size_R200c
+    map_lims = R200c * size_R200c
     coord = cluster_data.subfind_particles[f'PartType{particle_type}']['Coordinates']
 
     if particle_type == 1:
@@ -160,6 +160,8 @@ def density_map(particle_type: int, cluster_data) -> None:
     circle_r500 = plt.Circle((0, 0), R500c, color="white", fill=False, linestyle='-')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_r500)
+    ax.set_xlim([-map_lims.value, map_lims.value])
+    ax.set_ylim([-map_lims.value, map_lims.value])
     fig.savefig(f"{output_directory}/halo{cluster_id}_{redshift}_densitymap_type{particle_type}_{size_R200c}r200.png")
     plt.close(fig)
 
