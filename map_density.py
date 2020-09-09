@@ -86,9 +86,9 @@ def density_map(particle_type: int, cluster_data) -> None:
         smoothing_lengths = cluster_data.subfind_particles[f'PartType{particle_type}']['SmoothingLength']
 
     # Run aperture filter
-    read.pprint('[Check] Particle max x: ', np.max(np.abs(coord[:, 0] - CoP[0])), '5 x R500c: ', 5 * R500c)
-    read.pprint('[Check] Particle max y: ', np.max(np.abs(coord[:, 1] - CoP[1])), '5 x R500c: ', 5 * R500c)
-    read.pprint('[Check] Particle max z: ', np.max(np.abs(coord[:, 2] - CoP[2])), '5 x R500c: ', 5 * R500c)
+    read.pprint('[Check] Particle max x: ', np.max(np.abs(coord[:, 0] - CoP[0])), '6 x R500c: ', 6 * R500c)
+    read.pprint('[Check] Particle max y: ', np.max(np.abs(coord[:, 1] - CoP[1])), '6 x R500c: ', 6 * R500c)
+    read.pprint('[Check] Particle max z: ', np.max(np.abs(coord[:, 2] - CoP[2])), '6 x R500c: ', 6 * R500c)
 
     # Rotate particles
     # coord_rot = rotation_align_with_vector(coord.value, CoP, np.array([0, 0, 1]))
@@ -97,9 +97,9 @@ def density_map(particle_type: int, cluster_data) -> None:
     # After derotation create a cubic aperture filter inscribed within a sphere of radius 5xR500c and
     # Centred in the CoP. Each semi-side of the aperture has length sqrt(3) / 2 * 5 * R500c.
     mask = np.where(
-        (np.abs(coord_rot[:, 0] - CoP[0])) <= np.sqrt(3) / 2 * 5 * R500c &
-        (np.abs(coord_rot[:, 1] - CoP[1])) <= np.sqrt(3) / 2 * 5 * R500c &
-        (np.abs(coord_rot[:, 2] - CoP[2])) <= np.sqrt(3) / 2 * 5 * R500c
+        (np.abs(coord_rot[:, 0] - CoP[0]) <= np.sqrt(3) / 2 * 5 * R500c) &
+        (np.abs(coord_rot[:, 1] - CoP[1]) <= np.sqrt(3) / 2 * 5 * R500c) &
+        (np.abs(coord_rot[:, 2] - CoP[2]) <= np.sqrt(3) / 2 * 5 * R500c)
     )[0]
 
     # Gather and handle coordinates to be plotted
