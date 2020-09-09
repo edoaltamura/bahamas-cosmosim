@@ -93,7 +93,7 @@ def density_map(particle_type: int, cluster_data) -> None:
 
     # Rotate particles
     # coord_rot = rotation_align_with_vector(coord.value, CoP, np.array([0, 0, 1]))
-    coord_rot = coord.value
+    coord_rot = coord
 
     # After derotation create a cubic aperture filter inscribed within a sphere of radius 5xR500c and
     # Centred in the CoP. Each semi-side of the aperture has length sqrt(3) / 2 * 5 * R500c.
@@ -104,8 +104,8 @@ def density_map(particle_type: int, cluster_data) -> None:
     )[0]
 
     # Gather and handle coordinates to be plotted
-    x = coord_rot[mask, 0]
-    y = coord_rot[mask, 1]
+    x = coord_rot[mask, 0].value
+    y = coord_rot[mask, 1].value
     x_max = np.max(x)
     x_min = np.min(x)
     y_max = np.max(y)
