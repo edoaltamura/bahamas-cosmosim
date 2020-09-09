@@ -33,42 +33,27 @@ def latex_float(f):
         return float_str
 
 
-def rescale(coord: np.ndarray) -> np.ndarray:
-    """
-    Rescaled the array of input to the range [x_min, x_max] linearly.
-    This method is often used in the context of making maps with matplotlib.pyplot.inshow.
-    The matrix to be accepted must contain arrays in the [0,1] range.
-    """
-    x_max = np.max(coord[:, 0])
-    x_min = np.min(coord[:, 0])
-    y_max = np.max(coord[:, 1])
-    y_min = np.min(coord[:, 1])
-    z_max = np.max(coord[:, 2])
-    z_min = np.min(coord[:, 2])
-    rescaled_coords = np.copy(coord)
-    rescaled_coords[:, 0] -= x_min
-    rescaled_coords[:, 1] -= y_min
-    rescaled_coords[:, 2] -= z_min
-    rescaled_coords[:, 0] /= (x_max - x_min)
-    rescaled_coords[:, 1] /= (y_max - y_min)
-    rescaled_coords[:, 2] /= (z_max - z_min)
-    assert np.max(rescaled_coords) <= 1.
-    assert np.min(rescaled_coords) >= 0.
-    return np.asarray(rescaled_coords, dtype=np.float64)
-
 def rotation_align_with_vector(coordinates: np.ndarray, rotation_center: np.ndarray, vector: np.ndarray) -> np.ndarray:
+
+    # Normalise vector for more reliable handling
     vector /= np.linalg.norm(vector)
-    face_on_rotation_matrix = rotation_matrix_from_vector(vector, axis='z')
-    rotation_matrix = face_on_rotation_matrix
+
+    # Get the derotation matrix:
+    # axis='z' is the default and corresponds to face-on (looking down z-axis)
+    # axis='y' corresponds to edge-on (maximum rotational signal)
+    rotation_matrix = rotation_matrix_from_vector(vector, axis='y')
 
     if rotation_center is not None:
         # Rotate co-ordinates as required
-        x, y, _ = np.matmul(rotation_matrix, (coordinates - rotation_center).T)
+        x, y, z = np.matmul(rotation_matrix, (coordinates - rotation_center).T)
         x += rotation_center[0]
         y += rotation_center[1]
+        z += rotation_center[2]
 
     else:
-        x, y, _ = coordinates.T
+        x, y, z = coordinates.T
+
+    return np.vstack((x, y, z)).T
 
 
 def density_map(particle_type: int, cluster_data) -> None:
@@ -81,10 +66,10 @@ def density_map(particle_type: int, cluster_data) -> None:
     M500c = cluster_data.subfind_tab.FOF.Group_M_Crit500
     map_lims = R200c * size_R200c
     coord = cluster_data.subfind_particles[f'PartType{particle_type}']['Coordinates']
+    boxsize = cluster_data.boxsize
 
     if particle_type == 1:
         # Generate DM particle smoothing lengths
-        boxsize = cluster_data.boxsize
         smoothing_lengths = generate_smoothing_lengths(
             coord,
             boxsize,
@@ -100,21 +85,50 @@ def density_map(particle_type: int, cluster_data) -> None:
         masses = cluster_data.subfind_particles[f'PartType{particle_type}']['Mass']
         smoothing_lengths = cluster_data.subfind_particles[f'PartType{particle_type}']['SmoothingLength']
 
-    # Centre the halo in the centre of potential
-    coord[:, 0] -= - CoP[0]
-    coord[:, 1] -= - CoP[1]
-    coord[:, 2] -= - CoP[2]
+    # Run aperture filter
+    read.pprint('[Check] Particle max x: ', np.max(np.abs(coord[:, 0] - CoP[0])), '5 x R500c: ', 5 * R500c)
+    read.pprint('[Check] Particle max y: ', np.max(np.abs(coord[:, 1] - CoP[1])), '5 x R500c: ', 5 * R500c)
+    read.pprint('[Check] Particle max z: ', np.max(np.abs(coord[:, 2] - CoP[2])), '5 x R500c: ', 5 * R500c)
 
-    coord_map = rescale(coord.value)
+    # Rotate particles
+    # coord_rot = rotation_align_with_vector(coord.value, CoP, np.array([0, 0, 1]))
+    coord_rot = coord
+
+    # After derotation create a cubic aperture filter inscribed within a sphere of radius 5xR500c and
+    # Centred in the CoP. Each semi-side of the aperture has length sqrt(3) / 2 * 5 * R500c.
+    mask = np.where(
+        (np.abs(coord_rot[:, 0] - CoP[0])) <= np.sqrt(3) / 2 * 5 * R500c &
+        (np.abs(coord_rot[:, 1] - CoP[1])) <= np.sqrt(3) / 2 * 5 * R500c &
+        (np.abs(coord_rot[:, 2] - CoP[2])) <= np.sqrt(3) / 2 * 5 * R500c
+    )[0]
+
+    # Gather and handle coordinates to be plotted
+    x = coord_rot[:, 0]
+    y = coord_rot[:, 1]
+    x_max = np.max(x)
+    x_min = np.min(x)
+    y_max = np.max(y)
+    y_min = np.min(y)
+    x_range = x_max - x_min
+    y_range = y_max - y_min
+
+    # Test that we've got a square box
+    if not np.isclose(x_range.value, y_range.value):
+        raise AttributeError(
+            "Projection code is currently not able to handle non-square images"
+        )
+
     map_input_m = np.asarray(masses.value, dtype=np.float32)
     map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
     mass_map = scatter(
-        x=coord_map[:, 0],
-        y=coord_map[:, 1],
-        m=map_input_m,
-        h=map_input_h,
+        x=(x[mask] - x_min) / x_range,
+        y=(y[mask] - y_min) / y_range,
+        m=map_input_m[mask],
+        h=map_input_h[mask] / x_range,
         res=map_resolution
     )
+    mass_map_units = DM_part_mass.units / coord.units ** 2
+
     # Mask zero values in the map with black
     mass_map = np.ma.masked_where(mass_map < 0.01, mass_map)
 
@@ -131,12 +145,7 @@ def density_map(particle_type: int, cluster_data) -> None:
         norm=LogNorm(),
         cmap=cmap,
         origin="lower",
-        extent=(
-            np.min(coord[:, 0].value),
-            np.max(coord[:, 0].value),
-            np.min(coord[:, 1].value),
-            np.max(coord[:, 1].value)
-        )
+        extent=(x_max, x_min, y_max, y_min)
     )
 
     t = ax.text(
