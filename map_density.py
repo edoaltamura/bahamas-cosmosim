@@ -64,7 +64,6 @@ def density_map(particle_type: int, cluster_data) -> None:
     R200c = cluster_data.subfind_tab.FOF.Group_R_Crit200
     R500c = cluster_data.subfind_tab.FOF.Group_R_Crit500
     M500c = cluster_data.subfind_tab.FOF.Group_M_Crit500
-    map_lims = R200c * size_R200c
     coord = cluster_data.subfind_particles[f'PartType{particle_type}']['Coordinates']
     boxsize = cluster_data.boxsize
     DM_part_mass = cluster_data.mass_DMpart
@@ -128,7 +127,7 @@ def density_map(particle_type: int, cluster_data) -> None:
     mass_map_units = masses.units / coord.units ** 2
 
     # Mask zero values in the map with black
-    # mass_map = np.ma.masked_where(mass_map < 0.05, mass_map)
+    mass_map = np.ma.masked_where(mass_map < 0.05, mass_map)
     read.pprint(mass_map)
 
     # Make figure
