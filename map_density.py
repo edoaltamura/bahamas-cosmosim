@@ -113,10 +113,7 @@ def density_map(particle_type: int, cluster_data) -> None:
     y_range = y_max - y_min
 
     # Test that we've got a square box
-    if not np.isclose(x_range.value, y_range.value):
-        raise AttributeError(
-            "Projection code is currently not able to handle non-square images"
-        )
+    read.pprint(x_range, y_range)
 
     map_input_m = np.asarray(masses.value, dtype=np.float32)
     map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
