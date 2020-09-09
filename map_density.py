@@ -67,7 +67,6 @@ def density_map(particle_type: int, cluster_data) -> None:
     coord = cluster_data.subfind_particles[f'PartType{particle_type}']['Coordinates']
 
     if particle_type == 1:
-
         # Generate DM particle smoothing lengths
         boxsize = cluster_data.boxsize
         smoothing_lengths = generate_smoothing_lengths(
@@ -79,8 +78,9 @@ def density_map(particle_type: int, cluster_data) -> None:
             dimension=3,
         )
         DM_part_mass = cluster_data.mass_DMpart
-        masses = np.ones_like(dtype=np.float32) * DM_part_mass
+        masses = np.ones_like(coord[:, 0].value, dtype=np.float32) * DM_part_mass
         smoothing_lengths = np.asarray(smoothing_lengths.value, dtype=np.float32)
+
     else:
         masses = cluster_data.subfind_particles[f'PartType{particle_type}']['Mass']
         smoothing_lengths = cluster_data.subfind_particles[f'PartType{particle_type}']['SmoothingLength']
