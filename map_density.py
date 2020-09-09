@@ -141,7 +141,7 @@ def density_map(particle_type: int, cluster_data) -> None:
         norm=LogNorm(),
         cmap="inferno",
         origin="lower",
-        extent=(x_max, x_min, y_max, y_min)
+        extent=(x_min, x_max, y_min, y_max)
     )
 
     t = ax.text(
@@ -161,7 +161,7 @@ def density_map(particle_type: int, cluster_data) -> None:
         va="bottom",
         transform=ax.transAxes,
     )
-    t.set_bbox(dict(facecolor='black', alpha=0.1, edgecolor='none'))
+    t.set_bbox(dict(facecolor='black', alpha=0.2, edgecolor='none'))
     ax.text(
         0, (1-0.02) * R200c,
         r"$R_{200c}$",
@@ -180,8 +180,6 @@ def density_map(particle_type: int, cluster_data) -> None:
     circle_r500 = plt.Circle((0, 0), R500c, color="white", fill=False, linestyle='-')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_r500)
-    ax.set_xlim([-map_lims.value, map_lims.value])
-    ax.set_ylim([-map_lims.value, map_lims.value])
     fig.savefig(f"{output_directory}/halo{cluster_id}_{redshift}_densitymap_type{particle_type}.png")
     plt.close(fig)
 
