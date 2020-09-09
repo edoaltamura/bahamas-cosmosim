@@ -28,7 +28,7 @@ def latex_float(f):
         base, exponent = float_str.split("e")
         return r"{0} \times 10^{{{1}}}".format(base, int(exponent))
     else:
-        return
+        return float_str
 
 
 def rescale(coord: np.ndarray) -> np.ndarray:
@@ -106,14 +106,24 @@ def density_map(particle_type: int, cluster_data) -> None:
     ax.set_aspect('equal')
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
-    ax.imshow(mass_map.T, norm=LogNorm(), cmap="inferno", origin="lower", extent=([-size.value, size.value] + [-size.value, size.value]))
+
+    cmap = plt.cm.inferno
+    cmap.set_under(color='black')
+    ax.imshow(
+        mass_map.T,
+        norm=LogNorm(),
+        cmap=cmap,
+        origin="lower",
+        vmin=0.1,
+        extent=([-size.value, size.value, -size.value, size.value])
+    )
 
     t = ax.text(
         0.025,
         0.025,
         (
             f"Halo {cluster_id:d} {simulation_type}\n"
-            f"Particles:{partType_atlas[str(particle_type)]}\n"
+            f"Particles: {partType_atlas[str(particle_type)]}\n"
             f"$z={z:3.3f}$\n"
             f"$M_{{500c}}={latex_float(M500c.value)}$ M$_\odot$\n"
             f"$R_{{500c}}={latex_float(R500c.value)}$ Mpc\n"
@@ -127,23 +137,21 @@ def density_map(particle_type: int, cluster_data) -> None:
     )
     t.set_bbox(dict(facecolor='black', alpha=0.1, edgecolor='none'))
     ax.text(
-        0,
-        0 + 1.05 * R200c,
+        0, -1.02 * R200c,
         r"$R_{200c}$",
-        color="grey",
+        color="white",
         ha="center",
         va="bottom"
     )
     ax.text(
-        0,
-        0 + 1.05 * R500c,
+        0, 1.02 * R500c,
         r"$R_{500c}$",
-        color="grey",
+        color="white",
         ha="center",
         va="bottom"
     )
-    circle_r200 = plt.Circle((0, 0), R200c, color="grey", fill=False, linestyle='--')
-    circle_r500 = plt.Circle((0, 0), R500c, color="grey", fill=False, linestyle='-')
+    circle_r200 = plt.Circle((0, 0), R200c, color="white", fill=False, linestyle='--')
+    circle_r500 = plt.Circle((0, 0), R500c, color="white", fill=False, linestyle='-')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_r500)
     fig.savefig(f"{output_directory}/halo{cluster_id}_{redshift}_densitymap_type{particle_type}_{size_R200c}r200.png")
