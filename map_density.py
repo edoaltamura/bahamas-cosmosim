@@ -103,8 +103,8 @@ def density_map(particle_type: int, cluster_data) -> None:
     )[0]
 
     # Gather and handle coordinates to be plotted
-    x = coord_rot[:, 0]
-    y = coord_rot[:, 1]
+    x = coord_rot[mask, 0]
+    y = coord_rot[mask, 1]
     x_max = np.max(x)
     x_min = np.min(x)
     y_max = np.max(y)
@@ -121,8 +121,8 @@ def density_map(particle_type: int, cluster_data) -> None:
     map_input_m = np.asarray(masses.value, dtype=np.float32)
     map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
     mass_map = scatter(
-        x=(x[mask] - x_min) / x_range,
-        y=(y[mask] - y_min) / y_range,
+        x=(x - x_min) / x_range,
+        y=(y - y_min) / y_range,
         m=map_input_m[mask],
         h=map_input_h[mask] / x_range,
         res=map_resolution
