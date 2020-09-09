@@ -141,7 +141,7 @@ def density_map(particle_type: int, cluster_data) -> None:
         norm=LogNorm(),
         cmap="inferno",
         origin="lower",
-        extent=(x_max, x_min, y_max, y_min)
+        extent=(x_max.value, x_min.value, y_max.value, y_min.value)
     )
 
     t = ax.text(
