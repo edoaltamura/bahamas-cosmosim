@@ -67,8 +67,11 @@ def density_map(particle_type: int, cluster_data) -> None:
     map_lims = R200c * size_R200c
     coord = cluster_data.subfind_particles[f'PartType{particle_type}']['Coordinates']
     boxsize = cluster_data.boxsize
+    DM_part_mass = cluster_data.mass_DMpart
 
     if particle_type == 1:
+
+        masses = np.ones_like(coord[:, 0].value, dtype=np.float32) * DM_part_mass
         # Generate DM particle smoothing lengths
         smoothing_lengths = generate_smoothing_lengths(
             coord,
@@ -78,8 +81,6 @@ def density_map(particle_type: int, cluster_data) -> None:
             speedup_fac=3,
             dimension=3,
         )
-        DM_part_mass = cluster_data.mass_DMpart
-        masses = np.ones_like(coord[:, 0].value, dtype=np.float32) * DM_part_mass
 
     else:
         masses = cluster_data.subfind_particles[f'PartType{particle_type}']['Mass']
@@ -92,7 +93,7 @@ def density_map(particle_type: int, cluster_data) -> None:
 
     # Rotate particles
     # coord_rot = rotation_align_with_vector(coord.value, CoP, np.array([0, 0, 1]))
-    coord_rot = coord
+    coord_rot = coord.value
 
     # After derotation create a cubic aperture filter inscribed within a sphere of radius 5xR500c and
     # Centred in the CoP. Each semi-side of the aperture has length sqrt(3) / 2 * 5 * R500c.
@@ -141,7 +142,7 @@ def density_map(particle_type: int, cluster_data) -> None:
         norm=LogNorm(),
         cmap="inferno",
         origin="lower",
-        extent=(x_max.value, x_min.value, y_max.value, y_min.value)
+        extent=(x_max, x_min, y_max, y_min)
     )
 
     t = ax.text(
