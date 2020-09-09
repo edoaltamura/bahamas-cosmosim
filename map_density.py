@@ -124,7 +124,7 @@ def density_map(particle_type: int, cluster_data) -> None:
         h=map_input_h[mask] / x_range,
         res=map_resolution
     )
-    mass_map_units = DM_part_mass.units / coord.units ** 2
+    mass_map_units = masses.units / coord.units ** 2
 
     # Mask zero values in the map with black
     mass_map = np.ma.masked_where(mass_map < 0.01, mass_map)
