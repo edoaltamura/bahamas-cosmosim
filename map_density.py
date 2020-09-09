@@ -2,6 +2,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 import argparse
+import copy
 import numpy as np
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
 from swiftsimio.visualisation.projection import scatter_parallel as scatter
@@ -100,8 +101,7 @@ def density_map(particle_type: int, cluster_data) -> None:
         res=map_resolution
     )
     # Mask zero values in the map with black
-    mass_map = np.ma.masked_where(mass_map < 0.05, mass_map)
-    read.pprint(mass_map[mass_map < 0.05])
+    mass_map = np.ma.masked_where(mass_map < 0.001, mass_map)
 
     # Make figure
     fig, ax = plt.subplots(figsize=(6, 6), dpi=map_resolution // 6)
@@ -109,14 +109,19 @@ def density_map(particle_type: int, cluster_data) -> None:
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
 
-    cmap = plt.cm.inferno
+    cmap = copy.copy(matplotlib.cm.get_cmap("inferno"))
     cmap.set_bad(color='black')
     ax.imshow(
         mass_map.T,
         norm=LogNorm(),
         cmap=cmap,
         origin="lower",
-        extent=([-size.value, size.value, -size.value, size.value])
+        extent=([
+            np.min(coord[:, 0].value),
+            np.max(coord[:, 0].value),
+            np.min(coord[:, 1].value),
+            np.max(coord[:, 1].value)
+        ])
     )
 
     t = ax.text(
@@ -138,11 +143,11 @@ def density_map(particle_type: int, cluster_data) -> None:
     )
     t.set_bbox(dict(facecolor='black', alpha=0.1, edgecolor='none'))
     ax.text(
-        0, -1.02 * R200c,
+        0, (1-0.02) * R200c,
         r"$R_{200c}$",
         color="white",
         ha="center",
-        va="bottom"
+        va="top"
     )
     ax.text(
         0, 1.02 * R500c,
