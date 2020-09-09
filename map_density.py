@@ -128,6 +128,7 @@ def density_map(particle_type: int, cluster_data) -> None:
 
     # Mask zero values in the map with black
     mass_map = np.ma.masked_where(mass_map < 0.01, mass_map)
+    read.pprint(mass_map * mass_map_units)
 
     # Make figure
     fig, ax = plt.subplots(figsize=(6, 6), dpi=map_resolution // 6)
@@ -135,12 +136,10 @@ def density_map(particle_type: int, cluster_data) -> None:
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
 
-    cmap = plt.cm.get_cmap("inferno")
-    cmap.set_under('black')
     ax.imshow(
         mass_map.T,
         norm=LogNorm(),
-        cmap=cmap,
+        cmap="inferno",
         origin="lower",
         extent=(x_max, x_min, y_max, y_min)
     )
