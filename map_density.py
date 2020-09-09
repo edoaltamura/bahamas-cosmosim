@@ -79,7 +79,6 @@ def density_map(particle_type: int, cluster_data) -> None:
         )
         DM_part_mass = cluster_data.mass_DMpart
         masses = np.ones_like(coord[:, 0].value, dtype=np.float32) * DM_part_mass
-        smoothing_lengths = np.asarray(smoothing_lengths.value, dtype=np.float32)
 
     else:
         masses = cluster_data.subfind_particles[f'PartType{particle_type}']['Mass']
