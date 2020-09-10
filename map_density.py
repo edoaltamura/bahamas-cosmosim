@@ -96,38 +96,30 @@ def density_map(particle_type: int, cluster_data) -> None:
 
     # After derotation create a cubic aperture filter inscribed within a sphere of radius 5xR500c and
     # Centred in the CoP. Each semi-side of the aperture has length sqrt(3) / 2 * 5 * R500c.
+    aperture = np.sqrt(3) / 2 * 5 * R500c
     mask = np.where(
-        (np.abs(coord_rot[:, 0] - CoP[0]) <= np.sqrt(3) / 2 * 5 * R500c) &
-        (np.abs(coord_rot[:, 1] - CoP[1]) <= np.sqrt(3) / 2 * 5 * R500c) &
-        (np.abs(coord_rot[:, 2] - CoP[2]) <= np.sqrt(3) / 2 * 5 * R500c)
+        (np.abs(coord_rot[:, 0] - CoP[0]) <= aperture) &
+        (np.abs(coord_rot[:, 1] - CoP[1]) <= aperture) &
+        (np.abs(coord_rot[:, 2] - CoP[2]) <= aperture)
     )[0]
 
     # Gather and handle coordinates to be plotted
     x = coord_rot[mask, 0].value
     y = coord_rot[mask, 1].value
-    x_max = np.max(x)
-    x_min = np.min(x)
-    y_max = np.max(y)
-    y_min = np.min(y)
-    x_range = x_max - x_min
-    y_range = y_max - y_min
-
-    # Test that we've got a square box
-    read.pprint(x_range, y_range)
 
     map_input_m = np.asarray(masses.value, dtype=np.float32)
     map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
     mass_map = scatter(
-        x=(x - x_min) / x_range,
-        y=(y - y_min) / y_range,
+        x=(x - aperture.value) / (2 * aperture.value),
+        y=(y - aperture.value) / (2 * aperture.value),
         m=map_input_m[mask],
-        h=map_input_h[mask] / x_range,
+        h=map_input_h[mask] / (2 * aperture.value),
         res=map_resolution
     )
     mass_map_units = masses.units / coord.units ** 2
 
     # Mask zero values in the map with black
-    mass_map = np.ma.masked_where(mass_map < 0.05, mass_map)
+    mass_map = np.ma.masked_where(mass_map < 1, mass_map)
     read.pprint(mass_map)
 
     # Make figure
@@ -140,7 +132,7 @@ def density_map(particle_type: int, cluster_data) -> None:
         norm=LogNorm(),
         cmap="inferno",
         origin="lower",
-        extent=(x_min, x_max, y_min, y_max)
+        extent=(-aperture.value, aperture.value, -aperture.value, aperture.value)
     )
 
     t = ax.text(
@@ -179,6 +171,7 @@ def density_map(particle_type: int, cluster_data) -> None:
     circle_r500 = plt.Circle((0, 0), R500c, color="white", fill=False, linestyle='-')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_r500)
+    plt.tight_layout()
     fig.savefig(f"{output_directory}/halo{cluster_id}_{redshift}_densitymap_type{particle_type}.png")
     plt.close(fig)
 
