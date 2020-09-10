@@ -197,7 +197,7 @@ if __name__ == '__main__':
     # -------------------------------------------------------------------- #
     # Edit these parameters
     simulation_type = 'hydro'
-    redshift = 'z003p000'
+    redshift = 'z000p000'
     cluster_id = 0
     size_R200c = 1
     output_directory = '/local/scratch/altamura/bahamas/maps'
