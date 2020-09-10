@@ -163,13 +163,13 @@ def density_map(particle_type: int, cluster_data) -> None:
     )
     t.set_bbox(dict(facecolor='black', alpha=0.2, edgecolor='none'))
     ax.text(
-        0, 1.02 * R500c,
+        CoP[0], CoP[1] + 1.02 * R500c,
         r"$R_{500c}$",
         color="white",
         ha="center",
         va="bottom"
     )
-    circle_r500 = plt.Circle((0, 0), R500c, color="white", fill=False, linestyle='-')
+    circle_r500 = plt.Circle((CoP[0], CoP[1]), R500c, color="white", fill=False, linestyle='-')
     ax.add_artist(circle_r500)
     plt.tight_layout()
     fig.savefig(f"{output_directory}/halo{cluster_id}_{redshift}_densitymap_type{particle_type}.png")
