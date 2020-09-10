@@ -95,8 +95,8 @@ def density_map(particle_type: int, cluster_data) -> None:
     coord_rot = coord
 
     # After derotation create a cubic aperture filter inscribed within a sphere of radius 5xR500c and
-    # Centred in the CoP. Each semi-side of the aperture has length sqrt(3) / 2 * 5 * R500c.
-    aperture = np.sqrt(3) / 2 * 5 * R500c
+    # Centred in the CoP. Each semi-side of the aperture has length 5 * R500c / sqrt(3).
+    aperture = 5 * R500c / np.sqrt(3)
     mask = np.where(
         (np.abs(coord_rot[:, 0] - CoP[0]) <= aperture) &
         (np.abs(coord_rot[:, 1] - CoP[1]) <= aperture) &
@@ -106,20 +106,29 @@ def density_map(particle_type: int, cluster_data) -> None:
     # Gather and handle coordinates to be plotted
     x = coord_rot[mask, 0].value
     y = coord_rot[mask, 1].value
+    x_max = np.max(x)
+    x_min = np.min(x)
+    y_max = np.max(y)
+    y_min = np.min(y)
+    x_range = x_max - x_min
+    y_range = y_max - y_min
+
+    # Test that we've got a square box
+    read.pprint(x_range, y_range)
 
     map_input_m = np.asarray(masses.value, dtype=np.float32)
     map_input_h = np.asarray(smoothing_lengths.value, dtype=np.float32)
     mass_map = scatter(
-        x=(x - aperture.value) / (2 * aperture.value),
-        y=(y - aperture.value) / (2 * aperture.value),
+        x=(x - x_min) / x_range,
+        y=(y - y_min) / y_range,
         m=map_input_m[mask],
-        h=map_input_h[mask] / (2 * aperture.value),
+        h=map_input_h[mask] / x_range,
         res=map_resolution
     )
     mass_map_units = masses.units / coord.units ** 2
 
     # Mask zero values in the map with black
-    mass_map = np.ma.masked_where(mass_map < 1, mass_map)
+    mass_map = np.ma.masked_where(mass_map < 0.05, mass_map)
     read.pprint(mass_map)
 
     # Make figure
@@ -132,7 +141,7 @@ def density_map(particle_type: int, cluster_data) -> None:
         norm=LogNorm(),
         cmap="inferno",
         origin="lower",
-        extent=(-aperture.value, aperture.value, -aperture.value, aperture.value)
+        extent=[x_min, x_max, y_min, y_max]
     )
 
     t = ax.text(
