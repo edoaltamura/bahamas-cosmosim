@@ -192,7 +192,7 @@ class Mapping:
         read.pprint(self.peculiar_velocity_hot_gas)
 
         angular_momentum = np.sum(np.cross(coord, vel * masses[:, None]), axis=0)
-        setattr(self, 'angular_momentum_hot_gas', angular_momentum)
+        setattr(self, 'angular_momentum_hot_gas', angular_momentum * coord.units * vel.units * masses.units)
         read.pprint(self.angular_momentum_hot_gas)
 
         return
