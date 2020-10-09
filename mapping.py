@@ -1,7 +1,7 @@
 import numpy as np
 import unyt
 import yaml
-from swiftsimio.visualisation.projection import scatter_parallel as scatter
+from swiftsimio.visualisation.projection import scatter#_parallel as scatter
 from swiftsimio.visualisation.rotation import rotation_matrix_from_vector
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
 
@@ -219,8 +219,8 @@ class Mapping:
         y = np.asarray(y.value, dtype=np.float64)
         m = np.asarray(weights[spatial_filter].value, dtype=np.float32)
         h = np.asarray(h.value, dtype=np.float32)
-        smoothed_map = scatter(x=x, y=y, m=m, h=h, res=self.resolution)
-        smoothed_map = np.ma.masked_invalid(smoothed_map.T)
+        smoothed_map = scatter(x=x, y=y, m=m, h=h, res=self.resolution).T
+        smoothed_map = np.ma.masked_invalid(smoothed_map)
         read.pprint(smoothed_map)
 
         return smoothed_map# * weights.units / coord.units ** 2
