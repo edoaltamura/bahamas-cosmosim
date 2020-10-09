@@ -36,8 +36,8 @@ class Mapping:
         params = yaml.load(open(param_file))
 
         # Handle default parameters
-        if 'Default' in params and len(params['Default'].items()) > 0:
-
+        if 'Default' in params:
+            assert len(params['Default'].keys()) > 0
             if 'output_to_file' in params['Default']:
                 if params['Default']['output_to_file']:
                     assert 'basename' in params['Default'], 'File basename not specified in the parameter file.'
