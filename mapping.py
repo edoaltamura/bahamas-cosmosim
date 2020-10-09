@@ -195,7 +195,7 @@ class Mapping:
 
         return
 
-    def make_map(self, particle_type: int, weights: unyt.array, tilt: str = 'z') -> unyt.array:
+    def make_map(self, particle_type: int, weights: unyt.array, tilt: str = 'z') -> np.ndarray:
 
         cop = self.data.subfind_tab.FOF.GroupCentreOfPotential
         R500c = self.data.subfind_tab.FOF.Group_R_Crit500
@@ -226,33 +226,33 @@ class Mapping:
             res=self.resolution
         )
 
-        return smoothed_map.T * weights.units / coord.units ** 2
+        return smoothed_map.T# * weights.units / coord.units ** 2
 
-    def map_particle_number(self, particle_type: int, tilt: str = 'z') -> unyt.array:
+    def map_particle_number(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
         masses = self.data.subfind_particles[f'PartType{particle_type}']['Mass']
         weights = np.ones_like(masses.value, dtype=np.float32) * unyt.dimensionless
         del masses
         return self.make_map(particle_type, weights, tilt=tilt)
 
-    def map_mass(self, particle_type: int, tilt: str = 'z') -> unyt.array:
+    def map_mass(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
         weights = self.data.subfind_particles[f'PartType{particle_type}']['Mass']
         return self.make_map(particle_type, weights, tilt=tilt)
 
-    def map_density(self, particle_type: int, tilt: str = 'z') -> unyt.array:
+    def map_density(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
         if particle_type != 1:
             weights = self.data.subfind_particles[f'PartType{particle_type}']['Mass']
             return self.make_map(particle_type, weights, tilt=tilt)
         else:
             read.wwarn('Density map not defined for dark_matter particles.')
 
-    def map_metallicity(self, particle_type: int, tilt: str = 'z') -> unyt.array:
+    def map_metallicity(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
         if particle_type != 1:
             weights = self.data.subfind_particles[f'PartType{particle_type}']['Metallicity']
             return self.make_map(particle_type, weights, tilt=tilt)
         else:
             read.wwarn('Metallicity map not defined for dark_matter particles.')
 
-    def map_mass_weighted_temperature(self, particle_type: int, tilt: str = 'z') -> unyt.array:
+    def map_mass_weighted_temperature(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
         if particle_type == 0:
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * \
                                   self.data.subfind_particles[f'PartType{particle_type}']['Temperature']
@@ -263,7 +263,7 @@ class Mapping:
         else:
             read.wwarn('Mass-weighted-temperature map only defined for gas particles.')
 
-    def map_tSZ(self, particle_type: int, tilt: str = 'z') -> unyt.array:
+    def map_tSZ(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
         if particle_type == 0:
             const = unyt.thompson_cross_section * unyt.boltzmann_constant / 1.16 / \
                     unyt.speed_of_light ** 2 / unyt.proton_mass / unyt.electron_mass
@@ -274,7 +274,7 @@ class Mapping:
         else:
             read.wwarn('Thermal SZ map only defined for gas particles.')
 
-    def map_kSZ(self, particle_type: int, tilt: str = 'z') -> unyt.array:
+    def map_kSZ(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
         if particle_type == 0:
 
             # Derotate velocities
@@ -304,7 +304,7 @@ class Mapping:
         else:
             read.wwarn('Kinetic SZ map only defined for gas particles.')
 
-    def map_rkSZ(self, particle_type: int, tilt: str = 'z') -> unyt.array:
+    def map_rkSZ(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
         if particle_type == 0:
 
             # Derotate velocities and subtract bulk motion (work in cluster's frame)
