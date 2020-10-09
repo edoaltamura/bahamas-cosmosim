@@ -22,7 +22,7 @@ class Mapping:
         self.output_to_file = True
         self.plot_limits_scale = 'R500crit'
         self.plot_limits = [-5., 5., -5., 5.]
-        self.resolution = 2048
+        self.resolution = 512
         self.hot_gas_temperature_threshold = 1.e5
 
         self.basename = None
@@ -70,7 +70,6 @@ class Mapping:
             ],
             'Dark_matter': [
                 'mass',
-                'density',
                 'particle_dot',
                 'particle_number',
             ],
@@ -421,14 +420,6 @@ class Mapping:
             #     origin="lower",
             # )
             # ax_row[8].text(.5, .9, 'DM mass', horizontalalignment='center', transform=ax_row[8].transAxes)
-
-            # ax_row[9].imshow(
-            #     self.map_density(1, tilt=viewpoint),
-            #     norm=LogNorm(),
-            #     cmap="inferno",
-            #     origin="lower",
-            # )
-            # ax_row[9].text(.5, .9, 'DM density', horizontalalignment='center', transform=ax_row[9].transAxes)
 
             coord_x, coord_y = self.map_particle_dot(1, tilt=viewpoint)
             axarr[i_plot, 10].plot(coord_x, coord_y, ',', c="C0", alpha=1)
