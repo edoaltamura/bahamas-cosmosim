@@ -310,10 +310,10 @@ class Mapping:
             velocities[:, 0] -= self.peculiar_velocity_hot_gas[0]
             velocities[:, 1] -= self.peculiar_velocity_hot_gas[1]
             velocities[:, 2] -= self.peculiar_velocity_hot_gas[2]
-            center = np.array([0, 0, 0], dtype=np.float64)
+            center = np.array([0, 0, 0], dtype=np.float64) * unyt.dimensionless
 
             if len(tilt) == 1:
-                vec = np.array([0., 0., 1.])
+                vec = np.array([0., 0., 1.]) * unyt.dimensionless
                 if tilt == 'z':
                     ax = 'y'
                 elif tilt == 'y':
@@ -336,7 +336,7 @@ class Mapping:
             read.wwarn('Rotational-kinetic SZ map only defined for gas particles.')
 
     def map_particle_dot(self, particle_type: int, tilt: str = 'z') -> unyt.array:
-        coord_rot = self.rotate_cluster(particle_type, tilt)
+        coord_rot = self.rotate_cluster(particle_type, tilt=tilt)
         return coord_rot[0, :], coord_rot[1, :]
 
     def view_all(self):
