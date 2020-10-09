@@ -13,7 +13,7 @@ import read
 
 class Mapping:
 
-    def __init__(self, cluster_data, param_file: str) -> None:
+    def __init__(self, cluster_data) -> None:
 
         self.data = cluster_data
 
@@ -25,7 +25,9 @@ class Mapping:
         self.resolution = 1024
         self.hot_gas_temperature_threshold = 1.e5
 
-        self.__parameter_parser(param_file)
+        self.basename = None
+        self.subdir = None
+
         self.set_dm_particles()
         self.set_hot_gas()
         self.view_all()
@@ -463,7 +465,6 @@ class Mapping:
 
 
 if __name__ == '__main__':
-    import sys
     # -------------------------------------------------------------------- #
     # Edit these parameters
     simulation_type = 'hydro'
@@ -478,4 +479,4 @@ if __name__ == '__main__':
     fof = read.fof_group(cluster_id, fofs)
     cluster_data = read.class_wrap(read.fof_particles(fof, csrm)).data
     # -------------------------------------------------------------------- #
-    Mapping(cluster_data, sys.argv[1])
+    Mapping(cluster_data)
