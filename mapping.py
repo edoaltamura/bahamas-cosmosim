@@ -117,12 +117,17 @@ class Mapping:
         _vector = vector.value
 
         # Normalise vector for more reliable handling
-        vector /= np.linalg.norm(_vector)
+        _vector /= np.linalg.norm(_vector)
 
         # Get the de-rotation matrix:
         # axis='z' is the default and corresponds to face-on (looking down z-axis)
         # axis='y' corresponds to edge-on (maximum rotational signal)
+        assert type(_vector) == np.ndarray
         rotation_matrix = rotation_matrix_from_vector(_vector, axis=axis)
+
+        assert type(rotation_matrix) == np.ndarray
+        assert type(_coordinates) == np.ndarray
+        assert type(_rotation_center) == np.ndarray
 
         if _rotation_center is not None:
             # Rotate co-ordinates as required
