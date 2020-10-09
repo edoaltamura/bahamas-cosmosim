@@ -300,7 +300,7 @@ class Mapping:
             const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * radial_velocities
             weights = mass_weighted_temps * const
-            return self.make_map(particle_type, weights, tilt=tilt)
+            return self.make_map(particle_type, weights, tilt=tilt).value
         else:
             read.wwarn('Kinetic SZ map only defined for gas particles.')
 
@@ -333,7 +333,7 @@ class Mapping:
             const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * radial_velocities
             weights = mass_weighted_temps * const
-            return self.make_map(particle_type, weights, tilt=tilt)
+            return self.make_map(particle_type, weights, tilt=tilt).value
         else:
             read.wwarn('Rotational-kinetic SZ map only defined for gas particles.')
 
