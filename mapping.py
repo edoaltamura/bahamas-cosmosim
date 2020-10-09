@@ -204,9 +204,9 @@ class Mapping:
         coord_rot = self.rotate_cluster(particle_type, tilt=tilt)
         smoothing_lengths = self.data.subfind_particles[f'PartType{particle_type}']['SmoothingLength']
 
-        read.pprint(cop, R500c, coord, coord_rot, smoothing_lengths, sep='\n')
 
         aperture = unyt.unyt_quantity(5 * R500c / np.sqrt(3), coord.units)
+        read.pprint(cop, R500c, coord, coord_rot, smoothing_lengths, aperture, sep='\n')
         spatial_filter = np.where(
             np.abs(coord_rot[:, 0] - cop[0]) <= aperture &
             np.abs(coord_rot[:, 1] - cop[1]) <= aperture &
@@ -348,7 +348,7 @@ class Mapping:
 
         for i_plot, viewpoint in enumerate(viewpoints):
 
-            read.pprint(f"Rendering veiwpoint {i_plot:d}/{len(viewpoints):d}: {viewpoint:s}.")
+            read.pprint(f"Rendering veiwpoint {i_plot + 1:d}/{len(viewpoints):d}: {viewpoint:s}.")
 
             ax_row = axarr[i_plot, :]
             for ax in ax_row:
