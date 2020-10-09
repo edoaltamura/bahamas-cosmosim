@@ -375,7 +375,7 @@ class Mapping:
 
             coord_x, coord_y = self.map_particle_dot(0, tilt=viewpoint)
             axarr[i_plot, 2].plot(coord_x, coord_y, ',', c="C0", alpha=1)
-            axarr[i_plot, 2].text(.5, .9, 'Gas dot', horizontalalignment='center', transform=axarr[i_plot, 2].transAxes)
+            # axarr[i_plot, 2].text(.5, .9, 'Gas dot', horizontalalignment='center', transform=axarr[i_plot, 2].transAxes)
 
             axarr[i_plot, 3].imshow(
                 self.map_particle_number(0, tilt=viewpoint),
@@ -393,39 +393,39 @@ class Mapping:
             )
             # axarr[i_plot, 4].text(.5, .9, 'Gas mass-weighted temperature', horizontalalignment='center', transform=axarr[i_plot, 4].transAxes)
 
-            # ax_row[5].imshow(
-            #     self.map_tSZ(0, tilt=viewpoint),
-            #     norm=LogNorm(),
-            #     cmap="inferno",
-            #     origin="lower",
-            # )
-            # ax_row[5].text(.5, .9, 'Gas tSZ', horizontalalignment='center', transform=ax_row[5].transAxes)
-            #
-            # ksz = self.map_kSZ(0, tilt=viewpoint)
-            # ax_row[6].imshow(
-            #     ksz,
-            #     norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
-            #     cmap="inferno",
-            #     origin="lower",
-            # )
-            # ax_row[6].text(.5, .9, 'Gas kSZ', horizontalalignment='center', transform=ax_row[6].transAxes)
-            #
-            # rksz = self.map_rkSZ(0, tilt=viewpoint)
-            # ax_row[7].imshow(
-            #     rksz,
-            #     norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
-            #     cmap="PuOr",
-            #     origin="lower",
-            # )
-            # ax_row[7].text(.5, .9, 'Gas rkSZ', horizontalalignment='center', transform=ax_row[7].transAxes)
-            #
-            # ax_row[8].imshow(
-            #     self.map_mass(1, tilt=viewpoint),
-            #     norm=LogNorm(),
-            #     cmap="PuOr",
-            #     origin="lower",
-            # )
-            # ax_row[8].text(.5, .9, 'DM mass', horizontalalignment='center', transform=ax_row[8].transAxes)
+            axarr[i_plot, 5].imshow(
+                self.map_tSZ(0, tilt=viewpoint),
+                norm=LogNorm(),
+                cmap="inferno",
+                origin="lower",
+            )
+            # axarr[i_plot, 5].text(.5, .9, 'Gas tSZ', horizontalalignment='center', transform=axarr[i_plot, 5].transAxes)
+
+            ksz = self.map_kSZ(0, tilt=viewpoint)
+            axarr[i_plot, 6].imshow(
+                ksz,
+                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
+                cmap="inferno",
+                origin="lower",
+            )
+            # axarr[i_plot, 6].text(.5, .9, 'Gas kSZ', horizontalalignment='center', transform=axarr[i_plot, 6].transAxes)
+
+            rksz = self.map_rkSZ(0, tilt=viewpoint)
+            axarr[i_plot, 7].imshow(
+                rksz,
+                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
+                cmap="PuOr",
+                origin="lower",
+            )
+            # axarr[i_plot, 7].text(.5, .9, 'Gas rkSZ', horizontalalignment='center', transform=axarr[i_plot, 7].transAxes)
+
+            axarr[i_plot, 8].imshow(
+                self.map_mass(1, tilt=viewpoint),
+                norm=LogNorm(),
+                cmap="PuOr",
+                origin="lower",
+            )
+            # axarr[i_plot, 8].text(.5, .9, 'DM mass', horizontalalignment='center', transform=axarr[i_plot, 8].transAxes)
 
             coord_x, coord_y = self.map_particle_dot(1, tilt=viewpoint)
             axarr[i_plot, 10].plot(coord_x, coord_y, ',', c="C0", alpha=1)
@@ -466,6 +466,8 @@ class Mapping:
                 origin="lower",
             )
             # axarr[i_plot, 15].text(.5, .9, 'Star particle number', horizontalalignment='center', transform=axarr[i_plot, 15].transAxes)
+
+            plt.tight_layout()
 
 
 if __name__ == '__main__':
