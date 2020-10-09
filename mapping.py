@@ -337,7 +337,7 @@ class Mapping:
 
     def map_particle_dot(self, particle_type: int, tilt: str = 'z') -> unyt.array:
         coord_rot = self.rotate_cluster(particle_type, tilt=tilt)
-        return coord_rot[0, :], coord_rot[1, :]
+        return coord_rot[:, 0], coord_rot[:, 1]
 
     def view_all(self):
 
