@@ -204,11 +204,21 @@ class Mapping:
         coord_rot = self.rotate_cluster(particle_type, tilt=tilt)
         smoothing_lengths = self.data.subfind_particles[f'PartType{particle_type}']['SmoothingLength']
         aperture = unyt.unyt_quantity(5 * R500c / np.sqrt(3), coord.units)
-        spatial_filter = np.where(
-            (np.abs(coord_rot[:, 0] - cop[0]) < aperture) &
-            (np.abs(coord_rot[:, 1] - cop[1]) < aperture) &
-            (np.abs(coord_rot[:, 2] - cop[2]) < aperture)
-        )[0]
+
+        if particle_type == 0:
+            temperature = self.data.subfind_particles['PartType0']['Temperature']
+            spatial_filter = np.where(
+                (np.abs(coord_rot[:, 0] - cop[0]) < aperture) &
+                (np.abs(coord_rot[:, 1] - cop[1]) < aperture) &
+                (np.abs(coord_rot[:, 2] - cop[2]) < aperture) &
+                (temperature.value > self.hot_gas_temperature_threshold)
+            )[0]
+        else:
+            spatial_filter = np.where(
+                (np.abs(coord_rot[:, 0] - cop[0]) < aperture) &
+                (np.abs(coord_rot[:, 1] - cop[1]) < aperture) &
+                (np.abs(coord_rot[:, 2] - cop[2]) < aperture)
+            )[0]
 
         x_max = np.max(coord_rot[spatial_filter, 0])
         x_min = np.min(coord_rot[spatial_filter, 0])
@@ -226,8 +236,11 @@ class Mapping:
         m = np.asarray(weights[spatial_filter].value, dtype=np.float32)
         h = np.asarray(h.value, dtype=np.float32)
         smoothed_map = scatter(x=x, y=y, m=m, h=h, res=self.resolution).T
-        smoothed_map = np.ma.masked_where(np.abs(smoothed_map) < 1.e-8, smoothed_map)
-        read.pprint(smoothed_map)
+        smoothed_map = np.ma.masked_where(np.abs(smoothed_map) < 1.e-9, smoothed_map)
+
+        surface_element = x_range * y_range / self.resolution ** 2
+        setattr(Mapping, f'surface_element{particle_type}', surface_element)
+        read.pprint(surface_element)
 
         return smoothed_map  # * weights.units / coord.units ** 2
 
@@ -270,7 +283,7 @@ class Mapping:
         if particle_type == 0:
             const = unyt.thompson_cross_section * unyt.boltzmann_constant / 1.16 / \
                     unyt.speed_of_light ** 2 / unyt.proton_mass / unyt.electron_mass / \
-                    unyt.unyt_quantity(1.e-4, unyt.Mpc) ** 2
+                    self.surface_element0
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * \
                                   self.data.subfind_particles[f'PartType{particle_type}']['Temperature']
             weights = mass_weighted_temps * const
@@ -302,7 +315,7 @@ class Mapping:
 
             radial_velocities = self._rotation_align_with_vector(velocities, center, vec, ax)[:, 2]
             const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass / \
-                    unyt.unyt_quantity(1.e-4, unyt.Mpc) ** 2
+                    self.surface_element0
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * radial_velocities
             weights = mass_weighted_temps * const
             return self.make_map(particle_type, weights, tilt=tilt)
@@ -336,7 +349,7 @@ class Mapping:
 
             radial_velocities = self._rotation_align_with_vector(velocities, center, vec, ax)[:, 2]
             const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass / \
-                    unyt.unyt_quantity(1.e-4, unyt.Mpc) ** 2
+                    self.surface_element0
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * radial_velocities
             weights = mass_weighted_temps * const
             return self.make_map(particle_type, weights, tilt=tilt)
