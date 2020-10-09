@@ -22,7 +22,7 @@ class Mapping:
         self.output_to_file = True
         self.plot_limits_scale = 'R500crit'
         self.plot_limits = [-5., 5., -5., 5.]
-        self.resolution = 2048
+        self.resolution = 512
         self.hot_gas_temperature_threshold = 1.e5
 
         self.basename = None
@@ -405,7 +405,7 @@ class Mapping:
             ksz = self.map_kSZ(0, tilt=viewpoint)
             axarr[i_plot, 6].imshow(
                 ksz,
-                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
+                norm=SymLogNorm(linthresh=1e-8, linscale=0.1, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
                 cmap="inferno",
                 origin="lower",
             )
@@ -414,7 +414,7 @@ class Mapping:
             rksz = self.map_rkSZ(0, tilt=viewpoint)
             axarr[i_plot, 7].imshow(
                 rksz,
-                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
+                norm=SymLogNorm(linthresh=1e-8, linscale=0.1, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
                 cmap="PuOr",
                 origin="lower",
             )
