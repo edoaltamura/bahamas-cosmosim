@@ -224,6 +224,7 @@ class Mapping:
         )
 
         smoothed_map = np.ma.masked_invalid(smoothed_map.T)
+        read.pprint(smoothed_map)
 
         return smoothed_map# * weights.units / coord.units ** 2
 
