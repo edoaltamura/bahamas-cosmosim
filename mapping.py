@@ -376,6 +376,8 @@ class Mapping:
 
             coord_x, coord_y = self.map_particle_dot(0, tilt=viewpoint)
             axarr[i_plot, 2].plot(coord_x, coord_y, ',', c="C0", alpha=1)
+            axarr[i_plot, 2].set_xlim([np.min(coord_x), np.max(coord_x)])
+            axarr[i_plot, 2].set_ylim([np.min(coord_y), np.max(coord_y)])
             # axarr[i_plot, 2].text(.5, .9, 'Gas dot', horizontalalignment='center', transform=axarr[i_plot, 2].transAxes)
 
             axarr[i_plot, 3].imshow(
@@ -395,14 +397,14 @@ class Mapping:
             # axarr[i_plot, 4].text(.5, .9, 'Gas mass-weighted temperature', horizontalalignment='center', transform=axarr[i_plot, 4].transAxes)
 
             axarr[i_plot, 5].imshow(
-                self.map_tSZ(0, tilt=viewpoint),
+                self.map_tSZ(0, tilt=viewpoint) * 1.e4,
                 norm=LogNorm(),
                 cmap="inferno",
                 origin="lower",
             )
             # axarr[i_plot, 5].text(.5, .9, 'Gas tSZ', horizontalalignment='center', transform=axarr[i_plot, 5].transAxes)
 
-            ksz = self.map_kSZ(0, tilt=viewpoint)
+            ksz = self.map_kSZ(0, tilt=viewpoint) * 1.e5
             axarr[i_plot, 6].imshow(
                 ksz,
                 norm=SymLogNorm(linthresh=1e-8, linscale=0.1, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
@@ -411,10 +413,10 @@ class Mapping:
             )
             # axarr[i_plot, 6].text(.5, .9, 'Gas kSZ', horizontalalignment='center', transform=axarr[i_plot, 6].transAxes)
 
-            rksz = self.map_rkSZ(0, tilt=viewpoint)
+            rksz = self.map_rkSZ(0, tilt=viewpoint) * 1.e5
             axarr[i_plot, 7].imshow(
                 rksz,
-                norm=SymLogNorm(linthresh=1e-8, linscale=0.1, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
+                norm=SymLogNorm(linthresh=1e-8, linscale=1, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
                 cmap="PuOr",
                 origin="lower",
             )
@@ -430,6 +432,8 @@ class Mapping:
 
             coord_x, coord_y = self.map_particle_dot(1, tilt=viewpoint)
             axarr[i_plot, 10].plot(coord_x, coord_y, ',', c="C0", alpha=1)
+            axarr[i_plot, 10].set_xlim([np.min(coord_x), np.max(coord_x)])
+            axarr[i_plot, 10].set_ylim([np.min(coord_y), np.max(coord_y)])
             # axarr[i_plot, 10].text(.5, .9, 'DM dot', horizontalalignment='center', transform=axarr[i_plot, 10].transAxes)
 
             axarr[i_plot, 11].imshow(
@@ -458,6 +462,8 @@ class Mapping:
 
             coord_x, coord_y = self.map_particle_dot(4, tilt=viewpoint)
             axarr[i_plot, 14].plot(coord_x, coord_y, ',', c="C0", alpha=1)
+            axarr[i_plot, 14].set_xlim([np.min(coord_x), np.max(coord_x)])
+            axarr[i_plot, 14].set_ylim([np.min(coord_y), np.max(coord_y)])
             # axarr[i_plot, 14].text(.5, .9, 'Star dot', horizontalalignment='center', transform=axarr[i_plot, 14].transAxes)
 
             axarr[i_plot, 15].imshow(
