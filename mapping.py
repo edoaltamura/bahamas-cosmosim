@@ -1,7 +1,7 @@
 import numpy as np
 import unyt
 import yaml
-from swiftsimio.visualisation.projection import scatter#_parallel as scatter
+from swiftsimio.visualisation.projection import scatter_parallel as scatter
 from swiftsimio.visualisation.rotation import rotation_matrix_from_vector
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
 
@@ -210,8 +210,14 @@ class Mapping:
             (np.abs(coord_rot[:, 2] - cop[2]) < aperture)
         )[0]
 
-        x = (coord_rot[spatial_filter, 0] - aperture) / (2 * aperture)
-        y = (coord_rot[spatial_filter, 1] - aperture) / (2 * aperture)
+        x_max = np.max(coord_rot[spatial_filter, 0])
+        x_min = np.min(coord_rot[spatial_filter, 0])
+        y_max = np.max(coord_rot[spatial_filter, 1])
+        y_min = np.min(coord_rot[spatial_filter, 1])
+        x_range = x_max - x_min
+        y_range = y_max - y_min
+        x = (coord_rot[spatial_filter, 0] - x_min) / x_range
+        y = (coord_rot[spatial_filter, 1] - y_min) / y_range
         h = smoothing_lengths[spatial_filter] / (2 * aperture)
 
         # Gather and handle coordinates to be processed
