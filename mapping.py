@@ -226,7 +226,7 @@ class Mapping:
         m = np.asarray(weights[spatial_filter].value, dtype=np.float32)
         h = np.asarray(h.value, dtype=np.float32)
         smoothed_map = scatter(x=x, y=y, m=m, h=h, res=self.resolution).T
-        smoothed_map = np.ma.masked_invalid(smoothed_map)
+        smoothed_map = np.ma.masked_where(smoothed_map < 1.e-6, smoothed_map)
         read.pprint(smoothed_map)
 
         return smoothed_map# * weights.units / coord.units ** 2
