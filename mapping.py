@@ -32,7 +32,7 @@ class Mapping:
         self.set_hot_gas()
         if read.rank == 0:
             self.view_all()
-            plt.show()
+            plt.savefig(f'{output_directory}/test_cluster_data.png')
 
     def __parameter_parser(self, param_file: str) -> None:
 
@@ -498,3 +498,4 @@ if __name__ == '__main__':
     cluster_data = read.class_wrap(cluster_dict).data
     # -------------------------------------------------------------------- #
     Mapping(cluster_data)
+
