@@ -337,9 +337,9 @@ class Mapping:
         else:
             read.wwarn('Rotational-kinetic SZ map only defined for gas particles.')
 
-    def map_particle_dot(self, particle_type: int, tilt: str = 'z') -> unyt.array:
+    def map_particle_dot(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
         coord_rot = self.rotate_cluster(particle_type, tilt=tilt)
-        return coord_rot[:, 0], coord_rot[:, 1]
+        return coord_rot[:, 0].value, coord_rot[:, 1].value
 
     def view_all(self):
 
