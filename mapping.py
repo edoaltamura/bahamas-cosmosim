@@ -22,7 +22,7 @@ class Mapping:
         self.output_to_file = True
         self.plot_limits_scale = 'R500crit'
         self.plot_limits = [-5., 5., -5., 5.]
-        self.resolution = 1024
+        self.resolution = 2048
         self.hot_gas_temperature_threshold = 1.e5
 
         self.basename = None
@@ -189,9 +189,11 @@ class Mapping:
 
         peculiar_velocity = np.sum(vel * masses[:, None], axis=0) / np.sum(masses)
         setattr(self, 'peculiar_velocity_hot_gas', peculiar_velocity)
+        read.pprint(self.peculiar_velocity_hot_gas)
 
         angular_momentum = np.sum(np.cross(coord, vel * masses[:, None]), axis=0)
         setattr(self, 'angular_momentum_hot_gas', angular_momentum)
+        read.pprint(self.angular_momentum_hot_gas)
 
         return
 
