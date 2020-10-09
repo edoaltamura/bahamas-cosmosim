@@ -122,12 +122,7 @@ class Mapping:
         # Get the de-rotation matrix:
         # axis='z' is the default and corresponds to face-on (looking down z-axis)
         # axis='y' corresponds to edge-on (maximum rotational signal)
-        assert type(_vector) == np.ndarray
         rotation_matrix = rotation_matrix_from_vector(_vector, axis=axis)
-
-        assert type(rotation_matrix) == np.ndarray
-        assert type(_coordinates) == np.ndarray
-        assert type(_rotation_center) == np.ndarray
 
         if _rotation_center is not None:
             # Rotate co-ordinates as required
@@ -213,9 +208,9 @@ class Mapping:
         aperture = unyt.unyt_quantity(5 * R500c / np.sqrt(3), coord.units)
         read.pprint(cop, R500c, coord, coord_rot, smoothing_lengths, aperture, sep='\n')
         spatial_filter = np.where(
-            np.abs(coord_rot[:, 0] - cop[0]) <= aperture &
-            np.abs(coord_rot[:, 1] - cop[1]) <= aperture &
-            np.abs(coord_rot[:, 2] - cop[2]) <= aperture
+            np.abs(coord_rot[:, 0] - cop[0]) < aperture &
+            np.abs(coord_rot[:, 1] - cop[1]) < aperture &
+            np.abs(coord_rot[:, 2] - cop[2]) < aperture
         )[0]
 
         # Gather and handle coordinates to be processed
