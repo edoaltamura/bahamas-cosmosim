@@ -32,7 +32,7 @@ class Mapping:
         self.set_hot_gas()
         if read.rank == 0:
             self.view_all()
-            plt.savefig(f'{output_directory}/test_cluster_data.png', dpi=700)
+            plt.savefig(f'{output_directory}/test_cluster_data.png', dpi=(2048*16)//32)
 
     def __parameter_parser(self, param_file: str) -> None:
 
@@ -346,7 +346,7 @@ class Mapping:
 
     def view_all(self):
 
-        fig, axarr = plt.subplots(nrows=5, ncols=16, sharex=True, sharey=True, figsize=(8, 26))
+        fig, axarr = plt.subplots(nrows=5, ncols=16, sharex=True, sharey=True, figsize=(32, 10))
         plt.subplots_adjust(wspace=0., hspace=0.)
         viewpoints = ['z', 'y', 'x', 'faceon', 'edgeon']
 
