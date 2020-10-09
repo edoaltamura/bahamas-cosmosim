@@ -38,7 +38,7 @@ def rotation_align_with_vector(coordinates: np.ndarray, rotation_center: np.ndar
     # Normalise vector for more reliable handling
     vector /= np.linalg.norm(vector)
 
-    # Get the derotation matrix:
+    # Get the de-rotation matrix:
     # axis='z' is the default and corresponds to face-on (looking down z-axis)
     # axis='y' corresponds to edge-on (maximum rotational signal)
     rotation_matrix = rotation_matrix_from_vector(vector, axis='y')

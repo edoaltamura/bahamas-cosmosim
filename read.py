@@ -4,6 +4,7 @@ import h5py as h5
 import unyt
 from scipy.sparse import csr_matrix
 from mpi4py import MPI
+from warnings import warn
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -15,6 +16,11 @@ from metadata import Metadata, AttrDict
 def pprint(*args, **kwargs):
     if rank == 0:
         print(*args, **kwargs)
+
+
+def wwarn(*args, **kwargs):
+    if rank == 0:
+        warn(*args, **kwargs)
 
 
 def class_wrap(input: dict) -> AttrDict:
