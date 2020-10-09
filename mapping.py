@@ -488,11 +488,13 @@ if __name__ == '__main__':
         fofs = read.fof_groups(files)
         csrm = read.csr_index_matrix(fofs)
         fof = read.fof_group(cluster_id, fofs)
-        cluster_data = read.class_wrap(read.fof_particles(fof, csrm)).data
+
         with open(f'{output_directory}/test_cluster_data.pickle', 'wb') as handle:
-            pickle.dump(cluster_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(read.fof_particles(fof, csrm), handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     with open(f'{output_directory}/test_cluster_data.pickle', 'rb') as handle:
-        cluster_data = pickle.load(handle)
+        cluster_dict = pickle.load(handle)
+
+    cluster_data = read.class_wrap(cluster_dict).data
     # -------------------------------------------------------------------- #
     Mapping(cluster_data)
