@@ -1,11 +1,11 @@
 Default:
-  display_live: 1
-  output_to_file: 1
+#  display_live: 1
+#  output_to_file: 1
   basename: test_maps
   subdir: ~/
   hot_gas_temperature_threshold: 1.e5
   plot_limits_scale: R500crit
-  plot_limits: [-5., 5., -5., 5.]
+#  plot_limits: [-5., 5., -5., 5.]
   resolution: 2048
 
   rotations:

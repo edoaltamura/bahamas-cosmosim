@@ -6,7 +6,7 @@ from swiftsimio.visualisation.rotation import rotation_matrix_from_vector
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
 
 from matplotlib import pyplot as plt
-from matplotlib.colors import LogNorm
+from matplotlib.colors import LogNorm, SymLogNorm
 
 import read
 
@@ -365,7 +365,7 @@ class Mapping:
             ax_row[3].imshow(
                 self.map_particle_number(0, tilt=viewpoint),
                 norm=LogNorm(),
-                cmap="inferno",
+                cmap="cividis",
                 origin="lower",
             )
             ax_row[3].text(.5, .9, 'Gas particle number', horizontalalignment='center', transform=ax_row[3].transAxes)
@@ -386,18 +386,20 @@ class Mapping:
             )
             ax_row[5].text(.5, .9, 'Gas tSZ', horizontalalignment='center', transform=ax_row[5].transAxes)
 
+            ksz = self.map_kSZ(0, tilt=viewpoint)
             ax_row[6].imshow(
-                self.map_kSZ(0, tilt=viewpoint),
-                norm=LogNorm(),
+                ksz,
+                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
                 cmap="inferno",
                 origin="lower",
             )
             ax_row[6].text(.5, .9, 'Gas kSZ', horizontalalignment='center', transform=ax_row[6].transAxes)
 
+            rksz = self.map_rkSZ(0, tilt=viewpoint)
             ax_row[7].imshow(
-                self.map_rkSZ(0, tilt=viewpoint),
-                norm=LogNorm(),
-                cmap="inferno",
+                rksz,
+                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
+                cmap="PuOr",
                 origin="lower",
             )
             ax_row[7].text(.5, .9, 'Gas rkSZ', horizontalalignment='center', transform=ax_row[7].transAxes)
@@ -405,7 +407,7 @@ class Mapping:
             ax_row[8].imshow(
                 self.map_mass(1, tilt=viewpoint),
                 norm=LogNorm(),
-                cmap="inferno",
+                cmap="PuOr",
                 origin="lower",
             )
             ax_row[8].text(.5, .9, 'DM mass', horizontalalignment='center', transform=ax_row[8].transAxes)
@@ -425,7 +427,7 @@ class Mapping:
             ax_row[11].imshow(
                 self.map_particle_number(1, tilt=viewpoint),
                 norm=LogNorm(),
-                cmap="inferno",
+                cmap="cividis",
                 origin="lower",
             )
             ax_row[11].text(.5, .9, 'DM particle number', horizontalalignment='center', transform=ax_row[11].transAxes)
@@ -453,7 +455,7 @@ class Mapping:
             ax_row[15].imshow(
                 self.map_particle_number(4, tilt=viewpoint),
                 norm=LogNorm(),
-                cmap="inferno",
+                cmap="cividis",
                 origin="lower",
             )
             ax_row[15].text(.5, .9, 'Star particle number', horizontalalignment='center', transform=ax_row[15].transAxes)
