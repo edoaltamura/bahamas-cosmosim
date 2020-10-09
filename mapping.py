@@ -128,7 +128,15 @@ class Mapping:
         else:
             x, y, z = coordinates.T
 
-        return np.vstack((x, y, z)).T
+        rotated = np.vstack((x, y, z)).T
+
+        if type(rotated) != unyt.array:
+            rotated *= coordinates.units
+
+        if rotated.units != coordinates.units:
+            rotated = rotated.value * coordinates.units
+
+        return rotated
 
     def rotate_cluster(self, particle_type: int, tilt: str = 'z') -> unyt.array:
 
