@@ -369,7 +369,7 @@ class Mapping:
             read.pprint(f"Rendering veiwpoint {i_plot + 1:d}/{len(viewpoints):d}: {viewpoint:s}.")
 
             for ax in axarr[i_plot, :]:
-                # ax.set_aspect('equal')
+                ax.set_aspect('equal')
                 ax.axis("off")
 
             axarr[i_plot, 0].imshow(
@@ -378,7 +378,7 @@ class Mapping:
                 cmap="inferno",
                 origin="lower",
             )
-            # axarr[i_plot, 0].text(.5, .9, 'Gas mass', horizontalalignment='center', transform=axarr[i_plot, 0].transAxes)
+            axarr[i_plot, 0].text(.5, .9, 'Gas mass', horizontalalignment='center', transform=axarr[i_plot, 0].transAxes)
 
             axarr[i_plot, 1].imshow(
                 self.map_density(0, tilt=viewpoint),
@@ -386,13 +386,13 @@ class Mapping:
                 cmap="inferno",
                 origin="lower",
             )
-            # axarr[i_plot, 1].text(.5, .9, 'Gas density', horizontalalignment='center', transform=axarr[i_plot, 1].transAxes)
+            axarr[i_plot, 1].text(.5, .9, 'Gas density', horizontalalignment='center', transform=axarr[i_plot, 1].transAxes)
 
             coord_x, coord_y = self.map_particle_dot(0, tilt=viewpoint)
             axarr[i_plot, 2].plot(coord_x, coord_y, ',', c="C0", alpha=1)
             axarr[i_plot, 2].set_xlim([np.min(coord_x), np.max(coord_x)])
             axarr[i_plot, 2].set_ylim([np.min(coord_y), np.max(coord_y)])
-            # axarr[i_plot, 2].text(.5, .9, 'Gas dot', horizontalalignment='center', transform=axarr[i_plot, 2].transAxes)
+            axarr[i_plot, 2].text(.5, .9, 'Gas dot', horizontalalignment='center', transform=axarr[i_plot, 2].transAxes)
 
             axarr[i_plot, 3].imshow(
                 self.map_particle_number(0, tilt=viewpoint),
@@ -400,7 +400,7 @@ class Mapping:
                 cmap="cividis",
                 origin="lower",
             )
-            # axarr[i_plot, 3].text(.5, .9, 'Gas particle number', horizontalalignment='center', transform=axarr[i_plot, 3].transAxes)
+            axarr[i_plot, 3].text(.5, .9, 'Gas particle number', horizontalalignment='center', transform=axarr[i_plot, 3].transAxes)
 
             axarr[i_plot, 4].imshow(
                 self.map_mass_weighted_temperature(0, tilt=viewpoint),
@@ -408,7 +408,7 @@ class Mapping:
                 cmap="inferno",
                 origin="lower",
             )
-            # axarr[i_plot, 4].text(.5, .9, 'Gas mass-weighted temperature', horizontalalignment='center', transform=axarr[i_plot, 4].transAxes)
+            axarr[i_plot, 4].text(.5, .9, 'Gas mass-weighted temperature', horizontalalignment='center', transform=axarr[i_plot, 4].transAxes)
 
             axarr[i_plot, 5].imshow(
                 self.map_tSZ(0, tilt=viewpoint),
@@ -416,7 +416,7 @@ class Mapping:
                 cmap="inferno",
                 origin="lower",
             )
-            # axarr[i_plot, 5].text(.5, .9, 'Gas tSZ', horizontalalignment='center', transform=axarr[i_plot, 5].transAxes)
+            axarr[i_plot, 5].text(.5, .9, 'Gas tSZ', horizontalalignment='center', transform=axarr[i_plot, 5].transAxes)
 
             ksz = self.map_kSZ(0, tilt=viewpoint)
             axarr[i_plot, 6].imshow(
@@ -425,7 +425,7 @@ class Mapping:
                 cmap="inferno",
                 origin="lower",
             )
-            # axarr[i_plot, 6].text(.5, .9, 'Gas kSZ', horizontalalignment='center', transform=axarr[i_plot, 6].transAxes)
+            axarr[i_plot, 6].text(.5, .9, 'Gas kSZ', horizontalalignment='center', transform=axarr[i_plot, 6].transAxes)
 
             rksz = self.map_rkSZ(0, tilt=viewpoint)
             axarr[i_plot, 7].imshow(
@@ -434,7 +434,7 @@ class Mapping:
                 cmap="PuOr",
                 origin="lower",
             )
-            # axarr[i_plot, 7].text(.5, .9, 'Gas rkSZ', horizontalalignment='center', transform=axarr[i_plot, 7].transAxes)
+            axarr[i_plot, 7].text(.5, .9, 'Gas rkSZ', horizontalalignment='center', transform=axarr[i_plot, 7].transAxes)
 
             axarr[i_plot, 8].imshow(
                 self.map_mass(1, tilt=viewpoint),
@@ -442,13 +442,13 @@ class Mapping:
                 cmap="PuOr",
                 origin="lower",
             )
-            # axarr[i_plot, 8].text(.5, .9, 'DM mass', horizontalalignment='center', transform=axarr[i_plot, 8].transAxes)
+            axarr[i_plot, 8].text(.5, .9, 'DM mass', horizontalalignment='center', transform=axarr[i_plot, 8].transAxes)
 
             coord_x, coord_y = self.map_particle_dot(1, tilt=viewpoint)
             axarr[i_plot, 9].plot(coord_x, coord_y, ',', c="C0", alpha=1)
             axarr[i_plot, 9].set_xlim([np.min(coord_x), np.max(coord_x)])
             axarr[i_plot, 9].set_ylim([np.min(coord_y), np.max(coord_y)])
-            # axarr[i_plot, 9].text(.5, .9, 'DM dot', horizontalalignment='center', transform=axarr[i_plot, 9].transAxes)
+            axarr[i_plot, 9].text(.5, .9, 'DM dot', horizontalalignment='center', transform=axarr[i_plot, 9].transAxes)
 
             axarr[i_plot, 10].imshow(
                 self.map_particle_number(1, tilt=viewpoint),
@@ -456,7 +456,7 @@ class Mapping:
                 cmap="cividis",
                 origin="lower",
             )
-            # axarr[i_plot, 10].text(.5, .9, 'DM particle number', horizontalalignment='center', transform=axarr[i_plot, 10].transAxes)
+            axarr[i_plot, 10].text(.5, .9, 'DM particle number', horizontalalignment='center', transform=axarr[i_plot, 10].transAxes)
 
             axarr[i_plot, 11].imshow(
                 self.map_mass(4, tilt=viewpoint),
@@ -464,7 +464,7 @@ class Mapping:
                 cmap="inferno",
                 origin="lower",
             )
-            # axarr[i_plot, 11].text(.5, .9, 'Star mass', horizontalalignment='center', transform=axarr[i_plot, 11].transAxes)
+            axarr[i_plot, 11].text(.5, .9, 'Star mass', horizontalalignment='center', transform=axarr[i_plot, 11].transAxes)
 
             axarr[i_plot, 12].imshow(
                 self.map_density(4, tilt=viewpoint),
@@ -472,13 +472,13 @@ class Mapping:
                 cmap="inferno",
                 origin="lower",
             )
-            # axarr[i_plot, 12].text(.5, .9, 'Star density', horizontalalignment='center', transform=axarr[i_plot, 12].transAxes)
+            axarr[i_plot, 12].text(.5, .9, 'Star density', horizontalalignment='center', transform=axarr[i_plot, 12].transAxes)
 
             coord_x, coord_y = self.map_particle_dot(4, tilt=viewpoint)
             axarr[i_plot, 13].plot(coord_x, coord_y, ',', c="C0", alpha=1)
             axarr[i_plot, 13].set_xlim([np.min(coord_x), np.max(coord_x)])
             axarr[i_plot, 13].set_ylim([np.min(coord_y), np.max(coord_y)])
-            # axarr[i_plot, 13].text(.5, .9, 'Star dot', horizontalalignment='center', transform=axarr[i_plot, 13].transAxes)
+            axarr[i_plot, 13].text(.5, .9, 'Star dot', horizontalalignment='center', transform=axarr[i_plot, 13].transAxes)
 
             axarr[i_plot, 14].imshow(
                 self.map_particle_number(4, tilt=viewpoint),
@@ -486,7 +486,7 @@ class Mapping:
                 cmap="cividis",
                 origin="lower",
             )
-            # axarr[i_plot, 14].text(.5, .9, 'Star particle number', horizontalalignment='center', transform=axarr[i_plot, 14].transAxes)
+            axarr[i_plot, 14].text(.5, .9, 'Star particle number', horizontalalignment='center', transform=axarr[i_plot, 14].transAxes)
 
             plt.tight_layout()
 
