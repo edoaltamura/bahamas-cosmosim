@@ -397,7 +397,7 @@ class Mapping:
             # axarr[i_plot, 4].text(.5, .9, 'Gas mass-weighted temperature', horizontalalignment='center', transform=axarr[i_plot, 4].transAxes)
 
             axarr[i_plot, 5].imshow(
-                self.map_tSZ(0, tilt=viewpoint) * 1.e4,
+                self.map_tSZ(0, tilt=viewpoint) * 1.e-4,
                 norm=LogNorm(),
                 cmap="inferno",
                 origin="lower",
@@ -416,7 +416,7 @@ class Mapping:
             rksz = self.map_rkSZ(0, tilt=viewpoint) * 1.e5
             axarr[i_plot, 7].imshow(
                 rksz,
-                norm=SymLogNorm(linthresh=1e-8, linscale=1, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
+                norm=SymLogNorm(linthresh=1e-8, linscale=0.1, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
                 cmap="PuOr",
                 origin="lower",
             )
