@@ -110,6 +110,11 @@ class Mapping:
             coordinates: unyt.array, rotation_center: unyt.array, vector: unyt.array, axis: str
     ) -> unyt.array:
 
+        out_units = coordinates.units
+        coordinates = coordinates.value
+        rotation_center = rotation_center.value
+        vector = vector.value
+
         # Normalise vector for more reliable handling
         vector /= np.linalg.norm(vector)
 
@@ -130,13 +135,7 @@ class Mapping:
 
         rotated = np.vstack((x, y, z)).T
 
-        if type(rotated) != unyt.array:
-            rotated *= coordinates.units
-
-        if rotated.units != coordinates.units:
-            rotated = rotated.value * coordinates.units
-
-        return rotated
+        return rotated * out_units
 
     def rotate_cluster(self, particle_type: int, tilt: str = 'z') -> unyt.array:
 
@@ -144,7 +143,7 @@ class Mapping:
         coord = self.data.subfind_particles[f'PartType{particle_type}']['Coordinates']
 
         if len(tilt) == 1:
-            vec = np.array([0., 0., 1.])
+            vec = np.array([0., 0., 1.]) * unyt.dimensionless
             if tilt == 'z':
                 ax = 'y'
             elif tilt == 'y':
@@ -277,10 +276,10 @@ class Mapping:
 
             # Derotate velocities
             velocities = self.data.subfind_particles[f'PartType{particle_type}']['Velocity']
-            center = np.array([0, 0, 0], dtype=np.float64)
+            center = np.array([0, 0, 0], dtype=np.float64) * unyt.Mpc
 
             if len(tilt) == 1:
-                vec = np.array([0., 0., 1.])
+                vec = np.array([0., 0., 1.]) * unyt.dimensionless
                 if tilt == 'z':
                     ax = 'y'
                 elif tilt == 'y':
