@@ -219,10 +219,10 @@ class Mapping:
         m = np.asarray(weights[spatial_filter].value, dtype=np.float32)
         h = np.asarray(smoothing_lengths[spatial_filter].value, dtype=np.float32)
         smoothed_map = scatter(
-            x=(x - aperture) / (2 * aperture),
-            y=(y - aperture) / (2 * aperture),
+            x=(x - aperture.value) / (2 * aperture.value),
+            y=(y - aperture.value) / (2 * aperture.value),
             m=m,
-            h=h / (2 * aperture),
+            h=h / (2 * aperture.value),
             res=self.resolution
         )
 
