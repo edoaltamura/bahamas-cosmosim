@@ -38,9 +38,10 @@ class Mapping:
         # Handle default parameters
         if 'Default' in params and len(params['Default'].items()) > 0:
 
-            if params['Default']['output_to_file']:
-                assert 'basename' in params['Default'], 'File basename not specified in the parameter file.'
-                assert 'subdir' in params['Default'], 'Output directory not specified in the parameter file.'
+            if 'output_to_file' in params['Default']:
+                if params['Default']['output_to_file']:
+                    assert 'basename' in params['Default'], 'File basename not specified in the parameter file.'
+                    assert 'subdir' in params['Default'], 'Output directory not specified in the parameter file.'
 
                 if params['Default']['display_live']:
                     read.wwarn('If you are going to save many figures, you may want to turn off `display_live`.')
