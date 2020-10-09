@@ -107,8 +107,8 @@ class Mapping:
 
     @staticmethod
     def _rotation_align_with_vector(
-            coordinates: np.ndarray, rotation_center: np.ndarray, vector: np.ndarray, axis: str
-    ) -> np.ndarray:
+            coordinates: unyt.array, rotation_center: unyt.array, vector: unyt.array, axis: str
+    ) -> unyt.array:
 
         # Normalise vector for more reliable handling
         vector /= np.linalg.norm(vector)
@@ -130,7 +130,7 @@ class Mapping:
 
         return np.vstack((x, y, z)).T
 
-    def rotate_cluster(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
+    def rotate_cluster(self, particle_type: int, tilt: str = 'z') -> unyt.array:
 
         cop = self.data.subfind_tab.FOF.GroupCentreOfPotential
         coord = self.data.subfind_particles[f'PartType{particle_type}']['Coordinates']
