@@ -355,7 +355,6 @@ class Mapping:
             read.pprint(f"Rendering veiwpoint {i_plot + 1:d}/{len(viewpoints):d}: {viewpoint:s}.")
 
             for ax in axarr[i_plot, :]:
-                ax.set_aspect('equal')
                 ax.axis("off")
 
             axarr[i_plot, 0].imshow(
