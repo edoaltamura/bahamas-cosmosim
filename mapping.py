@@ -30,8 +30,9 @@ class Mapping:
 
         self.set_dm_particles()
         self.set_hot_gas()
-        self.view_all()
-        plt.show()
+        if read.rank == 0:
+            self.view_all()
+            plt.show()
 
     def __parameter_parser(self, param_file: str) -> None:
 
@@ -111,27 +112,27 @@ class Mapping:
     ) -> unyt.array:
 
         out_units = coordinates.units
-        coordinates = coordinates.value
-        rotation_center = rotation_center.value
-        vector = vector.value
+        _coordinates = coordinates.value
+        _rotation_center = rotation_center.value
+        _vector = vector.value
 
         # Normalise vector for more reliable handling
-        vector /= np.linalg.norm(vector)
+        vector /= np.linalg.norm(_vector)
 
         # Get the de-rotation matrix:
         # axis='z' is the default and corresponds to face-on (looking down z-axis)
         # axis='y' corresponds to edge-on (maximum rotational signal)
-        rotation_matrix = rotation_matrix_from_vector(vector, axis=axis)
+        rotation_matrix = rotation_matrix_from_vector(_vector, axis=axis)
 
-        if rotation_center is not None:
+        if _rotation_center is not None:
             # Rotate co-ordinates as required
-            x, y, z = np.matmul(rotation_matrix, (coordinates - rotation_center).T)
-            x += rotation_center[0]
-            y += rotation_center[1]
-            z += rotation_center[2]
+            x, y, z = np.matmul(rotation_matrix, (_coordinates - _rotation_center).T)
+            x += _rotation_center[0]
+            y += _rotation_center[1]
+            z += _rotation_center[2]
 
         else:
-            x, y, z = coordinates.T
+            x, y, z = _coordinates.T
 
         rotated = np.vstack((x, y, z)).T
 
