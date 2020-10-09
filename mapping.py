@@ -341,8 +341,25 @@ class Mapping:
             read.wwarn('Rotational-kinetic SZ map only defined for gas particles.')
 
     def map_particle_dot(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
+        cop = self.data.subfind_tab.FOF.GroupCentreOfPotential
+        R500c = self.data.subfind_tab.FOF.Group_R_Crit500
+        coord = self.data.subfind_particles[f'PartType{particle_type}']['Coordinates']
         coord_rot = self.rotate_cluster(particle_type, tilt=tilt)
-        return coord_rot[:, 0].value, coord_rot[:, 1].value
+        aperture = unyt.unyt_quantity(5 * R500c / np.sqrt(3), coord.units)
+        spatial_filter = np.where(
+            (np.abs(coord_rot[:, 0] - cop[0]) < aperture) &
+            (np.abs(coord_rot[:, 1] - cop[1]) < aperture) &
+            (np.abs(coord_rot[:, 2] - cop[2]) < aperture)
+        )[0]
+        x_max = np.max(coord_rot[spatial_filter, 0])
+        x_min = np.min(coord_rot[spatial_filter, 0])
+        y_max = np.max(coord_rot[spatial_filter, 1])
+        y_min = np.min(coord_rot[spatial_filter, 1])
+        x_range = x_max - x_min
+        y_range = y_max - y_min
+        x = (coord_rot[spatial_filter, 0] - x_min) / x_range
+        y = (coord_rot[spatial_filter, 1] - y_min) / y_range
+        return x.value, y.value
 
     def view_all(self):
 
