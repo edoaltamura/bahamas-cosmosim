@@ -269,7 +269,8 @@ class Mapping:
     def map_tSZ(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
         if particle_type == 0:
             const = unyt.thompson_cross_section * unyt.boltzmann_constant / 1.16 / \
-                    unyt.speed_of_light ** 2 / unyt.proton_mass / unyt.electron_mass
+                    unyt.speed_of_light ** 2 / unyt.proton_mass / unyt.electron_mass / \
+                    unyt.unyt_quantity(1., unyt.Mpc) ** 2
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * \
                                   self.data.subfind_particles[f'PartType{particle_type}']['Temperature']
             weights = mass_weighted_temps * const
@@ -300,7 +301,8 @@ class Mapping:
                     ax = 'y'
 
             radial_velocities = self._rotation_align_with_vector(velocities, center, vec, ax)[:, 2]
-            const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass
+            const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass / \
+                    unyt.unyt_quantity(1., unyt.Mpc) ** 2
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * radial_velocities
             weights = mass_weighted_temps * const
             return self.make_map(particle_type, weights, tilt=tilt)
@@ -333,7 +335,8 @@ class Mapping:
                     ax = 'y'
 
             radial_velocities = self._rotation_align_with_vector(velocities, center, vec, ax)[:, 2]
-            const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass
+            const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass / \
+                    unyt.unyt_quantity(1., unyt.Mpc) ** 2
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * radial_velocities
             weights = mass_weighted_temps * const
             return self.make_map(particle_type, weights, tilt=tilt)
