@@ -200,13 +200,9 @@ class Mapping:
         cop = self.data.subfind_tab.FOF.GroupCentreOfPotential
         R500c = self.data.subfind_tab.FOF.Group_R_Crit500
         coord = self.data.subfind_particles[f'PartType{particle_type}']['Coordinates']
-
         coord_rot = self.rotate_cluster(particle_type, tilt=tilt)
         smoothing_lengths = self.data.subfind_particles[f'PartType{particle_type}']['SmoothingLength']
-
-
         aperture = unyt.unyt_quantity(5 * R500c / np.sqrt(3), coord.units)
-        read.pprint(cop, R500c, coord, coord_rot, smoothing_lengths, aperture, sep='\n')
         spatial_filter = np.where(
             (np.abs(coord_rot[:, 0] - cop[0]) < aperture) &
             (np.abs(coord_rot[:, 1] - cop[1]) < aperture) &
