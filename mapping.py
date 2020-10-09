@@ -208,9 +208,9 @@ class Mapping:
         aperture = unyt.unyt_quantity(5 * R500c / np.sqrt(3), coord.units)
         read.pprint(cop, R500c, coord, coord_rot, smoothing_lengths, aperture, sep='\n')
         spatial_filter = np.where(
-            np.abs(coord_rot[:, 0] - cop[0]) < aperture &
-            np.abs(coord_rot[:, 1] - cop[1]) < aperture &
-            np.abs(coord_rot[:, 2] - cop[2]) < aperture
+            (np.abs(coord_rot[:, 0] - cop[0]) < aperture) &
+            (np.abs(coord_rot[:, 1] - cop[1]) < aperture) &
+            (np.abs(coord_rot[:, 2] - cop[2]) < aperture)
         )[0]
 
         # Gather and handle coordinates to be processed
