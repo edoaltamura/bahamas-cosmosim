@@ -369,7 +369,7 @@ class Mapping:
             read.pprint(f"Rendering veiwpoint {i_plot + 1:d}/{len(viewpoints):d}: {viewpoint:s}.")
 
             for ax in axarr[i_plot, :]:
-                ax.set_aspect('equal')
+                # ax.set_aspect('equal')
                 ax.axis("off")
 
             axarr[i_plot, 0].imshow(
@@ -421,7 +421,7 @@ class Mapping:
             ksz = self.map_kSZ(0, tilt=viewpoint)
             axarr[i_plot, 6].imshow(
                 ksz,
-                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
+                norm=SymLogNorm(linthresh=1e-6, linscale=0.05, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
                 cmap="inferno",
                 origin="lower",
             )
@@ -430,7 +430,7 @@ class Mapping:
             rksz = self.map_rkSZ(0, tilt=viewpoint)
             axarr[i_plot, 7].imshow(
                 rksz,
-                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
+                norm=SymLogNorm(linthresh=1e-6, linscale=0.05, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
                 cmap="PuOr",
                 origin="lower",
             )
