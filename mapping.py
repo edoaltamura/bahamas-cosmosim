@@ -22,7 +22,7 @@ class Mapping:
         self.output_to_file = True
         self.plot_limits_scale = 'R500crit'
         self.plot_limits = [-5., 5., -5., 5.]
-        self.resolution = 512
+        self.resolution = 2048
         self.hot_gas_temperature_threshold = 1.e5
 
         self.basename = None
@@ -229,7 +229,7 @@ class Mapping:
         smoothed_map = np.ma.masked_where(np.abs(smoothed_map) < 1.e-8, smoothed_map)
         read.pprint(smoothed_map)
 
-        return smoothed_map# * weights.units / coord.units ** 2
+        return smoothed_map  # * weights.units / coord.units ** 2
 
     def map_particle_number(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
         masses = self.data.subfind_particles[f'PartType{particle_type}']['Mass']
@@ -346,8 +346,8 @@ class Mapping:
 
     def view_all(self):
 
-        fig, axarr = plt.subplots(5, 16, sharex=True, sharey=True)
-        plt.subplots_adjust(wspace=0, hspace=0)
+        fig, axarr = plt.subplots(nrows=5, ncols=16, sharex=True, sharey=True, figsize=(8, 26))
+        plt.subplots_adjust(wspace=0., hspace=0.)
         viewpoints = ['z', 'y', 'x', 'faceon', 'edgeon']
 
         for i_plot, viewpoint in enumerate(viewpoints):
@@ -474,6 +474,7 @@ class Mapping:
 if __name__ == '__main__':
     import pickle
     import os
+
     # -------------------------------------------------------------------- #
     # Edit these parameters
     simulation_type = 'hydro'
@@ -497,4 +498,3 @@ if __name__ == '__main__':
     cluster_data = read.class_wrap(cluster_dict).data
     # -------------------------------------------------------------------- #
     Mapping(cluster_data)
-
