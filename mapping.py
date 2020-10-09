@@ -240,7 +240,6 @@ class Mapping:
 
         surface_element = x_range * y_range / self.resolution ** 2
         setattr(Mapping, f'surface_element{particle_type}', surface_element)
-        read.pprint(surface_element)
 
         return smoothed_map  # * weights.units / coord.units ** 2
 
@@ -432,18 +431,20 @@ class Mapping:
             axarr[i_plot, 5].text(.5, .9, 'Gas tSZ', horizontalalignment='center', transform=axarr[i_plot, 5].transAxes)
 
             ksz = self.map_kSZ(0, tilt=viewpoint)
+            read.pprint(np.abs(ksz).max())
             axarr[i_plot, 6].imshow(
                 ksz,
-                norm=SymLogNorm(linthresh=1e-3, linscale=0.5, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
-                cmap="inferno",
+                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
+                cmap="PuOr",
                 origin="lower",
             )
             axarr[i_plot, 6].text(.5, .9, 'Gas kSZ', horizontalalignment='center', transform=axarr[i_plot, 6].transAxes)
 
             rksz = self.map_rkSZ(0, tilt=viewpoint)
+            read.pprint(np.abs(rksz).max())
             axarr[i_plot, 7].imshow(
                 rksz,
-                norm=SymLogNorm(linthresh=1e-3, linscale=0.5, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
+                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
                 cmap="PuOr",
                 origin="lower",
             )
