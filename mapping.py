@@ -210,20 +210,16 @@ class Mapping:
             (np.abs(coord_rot[:, 2] - cop[2]) < aperture)
         )[0]
 
-        # Gather and handle coordinates to be processed
-        x = np.asarray(coord_rot[spatial_filter, 0].value, dtype=np.float64)
-        y = np.asarray(coord_rot[spatial_filter, 1].value, dtype=np.float64)
-        m = np.asarray(weights[spatial_filter].value, dtype=np.float32)
-        h = np.asarray(smoothing_lengths[spatial_filter].value, dtype=np.float32)
-        read.pprint(m)
-        smoothed_map = scatter(
-            x=(x - aperture.value) / (2 * aperture.value),
-            y=(y - aperture.value) / (2 * aperture.value),
-            m=m,
-            h=h / (2 * aperture.value),
-            res=self.resolution
-        )
+        x = (coord_rot[spatial_filter, 0] - aperture) / (2 * aperture)
+        y = (coord_rot[spatial_filter, 1] - aperture) / (2 * aperture)
+        h = smoothing_lengths[spatial_filter] / (2 * aperture)
 
+        # Gather and handle coordinates to be processed
+        x = np.asarray(x.value, dtype=np.float64)
+        y = np.asarray(y.value, dtype=np.float64)
+        m = np.asarray(weights[spatial_filter].value, dtype=np.float32)
+        h = np.asarray(h.value, dtype=np.float32)
+        smoothed_map = scatter(x=x, y=y, m=m, h=h, res=self.resolution)
         smoothed_map = np.ma.masked_invalid(smoothed_map.T)
         read.pprint(smoothed_map)
 
