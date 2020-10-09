@@ -270,7 +270,7 @@ class Mapping:
         if particle_type == 0:
             const = unyt.thompson_cross_section * unyt.boltzmann_constant / 1.16 / \
                     unyt.speed_of_light ** 2 / unyt.proton_mass / unyt.electron_mass / \
-                    unyt.unyt_quantity(1., unyt.Mpc) ** 2
+                    unyt.unyt_quantity(1.e-4, unyt.Mpc) ** 2
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * \
                                   self.data.subfind_particles[f'PartType{particle_type}']['Temperature']
             weights = mass_weighted_temps * const
@@ -302,7 +302,7 @@ class Mapping:
 
             radial_velocities = self._rotation_align_with_vector(velocities, center, vec, ax)[:, 2]
             const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass / \
-                    unyt.unyt_quantity(1., unyt.Mpc) ** 2
+                    unyt.unyt_quantity(1.e-4, unyt.Mpc) ** 2
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * radial_velocities
             weights = mass_weighted_temps * const
             return self.make_map(particle_type, weights, tilt=tilt)
@@ -336,7 +336,7 @@ class Mapping:
 
             radial_velocities = self._rotation_align_with_vector(velocities, center, vec, ax)[:, 2]
             const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass / \
-                    unyt.unyt_quantity(1., unyt.Mpc) ** 2
+                    unyt.unyt_quantity(1.e-4, unyt.Mpc) ** 2
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * radial_velocities
             weights = mass_weighted_temps * const
             return self.make_map(particle_type, weights, tilt=tilt)
@@ -354,14 +354,8 @@ class Mapping:
             (np.abs(coord_rot[:, 1] - cop[1]) < aperture) &
             (np.abs(coord_rot[:, 2] - cop[2]) < aperture)
         )[0]
-        x_max = np.max(coord_rot[spatial_filter, 0])
-        x_min = np.min(coord_rot[spatial_filter, 0])
-        y_max = np.max(coord_rot[spatial_filter, 1])
-        y_min = np.min(coord_rot[spatial_filter, 1])
-        x_range = x_max - x_min
-        y_range = y_max - y_min
-        x = (coord_rot[spatial_filter, 0] - x_min) / x_range
-        y = (coord_rot[spatial_filter, 1] - y_min) / y_range
+        x = coord_rot[spatial_filter, 0] - cop[0]
+        y = coord_rot[spatial_filter, 1] - cop[1]
         return x.value, y.value
 
     def view_all(self):
@@ -417,26 +411,26 @@ class Mapping:
             # axarr[i_plot, 4].text(.5, .9, 'Gas mass-weighted temperature', horizontalalignment='center', transform=axarr[i_plot, 4].transAxes)
 
             axarr[i_plot, 5].imshow(
-                self.map_tSZ(0, tilt=viewpoint) * 1.e-4,
+                self.map_tSZ(0, tilt=viewpoint),
                 norm=LogNorm(),
                 cmap="inferno",
                 origin="lower",
             )
             # axarr[i_plot, 5].text(.5, .9, 'Gas tSZ', horizontalalignment='center', transform=axarr[i_plot, 5].transAxes)
 
-            ksz = self.map_kSZ(0, tilt=viewpoint) * 1.e5
+            ksz = self.map_kSZ(0, tilt=viewpoint)
             axarr[i_plot, 6].imshow(
                 ksz,
-                norm=SymLogNorm(linthresh=1e-8, linscale=0.1, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
+                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
                 cmap="inferno",
                 origin="lower",
             )
             # axarr[i_plot, 6].text(.5, .9, 'Gas kSZ', horizontalalignment='center', transform=axarr[i_plot, 6].transAxes)
 
-            rksz = self.map_rkSZ(0, tilt=viewpoint) * 1.e5
+            rksz = self.map_rkSZ(0, tilt=viewpoint)
             axarr[i_plot, 7].imshow(
                 rksz,
-                norm=SymLogNorm(linthresh=1e-8, linscale=0.1, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
+                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
                 cmap="PuOr",
                 origin="lower",
             )
