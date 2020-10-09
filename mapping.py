@@ -203,7 +203,7 @@ class Mapping:
         coord_rot = self.rotate_cluster(particle_type, tilt)
         smoothing_lengths = self.data.subfind_particles[f'PartType{particle_type}']['SmoothingLength']
 
-        aperture = 5 * R500c / np.sqrt(3)
+        aperture = unyt.unyt_quantity(5 * R500c / np.sqrt(3), coord.units)
         spatial_filter = np.where(
             np.abs(coord_rot[:, 0] - cop[0]) <= aperture &
             np.abs(coord_rot[:, 1] - cop[1]) <= aperture &
