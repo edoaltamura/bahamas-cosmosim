@@ -201,7 +201,7 @@ class Mapping:
         R500c = self.data.subfind_tab.FOF.Group_R_Crit500
         coord = self.data.subfind_particles[f'PartType{particle_type}']['Coordinates']
 
-        coord_rot = self.rotate_cluster(particle_type, tilt)
+        coord_rot = self.rotate_cluster(particle_type, tilt=tilt)
         smoothing_lengths = self.data.subfind_particles[f'PartType{particle_type}']['SmoothingLength']
 
         aperture = unyt.unyt_quantity(5 * R500c / np.sqrt(3), coord.units)
