@@ -215,6 +215,7 @@ class Mapping:
         y = np.asarray(coord_rot[spatial_filter, 1].value, dtype=np.float64)
         m = np.asarray(weights[spatial_filter].value, dtype=np.float32)
         h = np.asarray(smoothing_lengths[spatial_filter].value, dtype=np.float32)
+        read.pprint(m)
         smoothed_map = scatter(
             x=(x - aperture.value) / (2 * aperture.value),
             y=(y - aperture.value) / (2 * aperture.value),
