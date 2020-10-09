@@ -22,7 +22,7 @@ class Mapping:
         self.output_to_file = True
         self.plot_limits_scale = 'R500crit'
         self.plot_limits = [-5., 5., -5., 5.]
-        self.resolution = 512
+        self.resolution = 2048
         self.hot_gas_temperature_threshold = 1.e5
 
         self.basename = None
@@ -32,7 +32,7 @@ class Mapping:
         self.set_hot_gas()
         if read.rank == 0:
             self.view_all()
-            plt.savefig(f'{output_directory}/test_cluster_data.png')
+            plt.savefig(f'{output_directory}/test_cluster_data.png', dpi=500)
 
     def __parameter_parser(self, param_file: str) -> None:
 
