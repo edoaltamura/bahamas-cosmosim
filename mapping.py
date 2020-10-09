@@ -32,7 +32,7 @@ class Mapping:
         self.set_hot_gas()
         if read.rank == 0:
             self.view_all()
-            plt.savefig(f'{output_directory}/test_cluster_data.png', dpi=(2048*16)//32)
+            plt.savefig(f'{output_directory}/test_cluster_data.png', dpi=(self.resolution*16)//32)
 
     def __parameter_parser(self, param_file: str) -> None:
 
