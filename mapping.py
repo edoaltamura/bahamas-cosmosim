@@ -22,7 +22,7 @@ class Mapping:
         self.output_to_file = True
         self.plot_limits_scale = 'R500crit'
         self.plot_limits = [-5., 5., -5., 5.]
-        self.resolution = 2048
+        self.resolution = 512
         self.hot_gas_temperature_threshold = 1.e5
 
         self.basename = None
@@ -32,7 +32,7 @@ class Mapping:
         self.set_hot_gas()
         if read.rank == 0:
             self.view_all()
-            plt.savefig(f'{output_directory}/test_cluster_data.png', dpi=500)
+            plt.savefig(f'{output_directory}/test_cluster_data.png', dpi=700)
 
     def __parameter_parser(self, param_file: str) -> None:
 
@@ -226,7 +226,7 @@ class Mapping:
         m = np.asarray(weights[spatial_filter].value, dtype=np.float32)
         h = np.asarray(h.value, dtype=np.float32)
         smoothed_map = scatter(x=x, y=y, m=m, h=h, res=self.resolution).T
-        smoothed_map = np.ma.masked_where(smoothed_map < 1.e-6, smoothed_map)
+        smoothed_map = np.ma.masked_where(np.abs(smoothed_map) < 1.e-8, smoothed_map)
         read.pprint(smoothed_map)
 
         return smoothed_map# * weights.units / coord.units ** 2
@@ -347,6 +347,7 @@ class Mapping:
     def view_all(self):
 
         fig, axarr = plt.subplots(5, 16, sharex=True, sharey=True)
+        plt.subplots_adjust(wspace=0, hspace=0)
         viewpoints = ['z', 'y', 'x', 'faceon', 'edgeon']
 
         for i_plot, viewpoint in enumerate(viewpoints):
