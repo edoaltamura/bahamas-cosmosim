@@ -387,47 +387,47 @@ class Mapping:
             )
             ax_row[4].text(.5, .9, 'Gas mass-weighted temperature', horizontalalignment='center', transform=ax_row[4].transAxes)
 
-            ax_row[5].imshow(
-                self.map_tSZ(0, tilt=viewpoint),
-                norm=LogNorm(),
-                cmap="inferno",
-                origin="lower",
-            )
-            ax_row[5].text(.5, .9, 'Gas tSZ', horizontalalignment='center', transform=ax_row[5].transAxes)
+            # ax_row[5].imshow(
+            #     self.map_tSZ(0, tilt=viewpoint),
+            #     norm=LogNorm(),
+            #     cmap="inferno",
+            #     origin="lower",
+            # )
+            # ax_row[5].text(.5, .9, 'Gas tSZ', horizontalalignment='center', transform=ax_row[5].transAxes)
+            #
+            # ksz = self.map_kSZ(0, tilt=viewpoint)
+            # ax_row[6].imshow(
+            #     ksz,
+            #     norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
+            #     cmap="inferno",
+            #     origin="lower",
+            # )
+            # ax_row[6].text(.5, .9, 'Gas kSZ', horizontalalignment='center', transform=ax_row[6].transAxes)
+            #
+            # rksz = self.map_rkSZ(0, tilt=viewpoint)
+            # ax_row[7].imshow(
+            #     rksz,
+            #     norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
+            #     cmap="PuOr",
+            #     origin="lower",
+            # )
+            # ax_row[7].text(.5, .9, 'Gas rkSZ', horizontalalignment='center', transform=ax_row[7].transAxes)
+            #
+            # ax_row[8].imshow(
+            #     self.map_mass(1, tilt=viewpoint),
+            #     norm=LogNorm(),
+            #     cmap="PuOr",
+            #     origin="lower",
+            # )
+            # ax_row[8].text(.5, .9, 'DM mass', horizontalalignment='center', transform=ax_row[8].transAxes)
 
-            ksz = self.map_kSZ(0, tilt=viewpoint)
-            ax_row[6].imshow(
-                ksz,
-                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(ksz).max(), vmax=np.abs(ksz).max()),
-                cmap="inferno",
-                origin="lower",
-            )
-            ax_row[6].text(.5, .9, 'Gas kSZ', horizontalalignment='center', transform=ax_row[6].transAxes)
-
-            rksz = self.map_rkSZ(0, tilt=viewpoint)
-            ax_row[7].imshow(
-                rksz,
-                norm=SymLogNorm(linthresh=1e-5, linscale=0.5, vmin=-np.abs(rksz).max(), vmax=np.abs(rksz).max()),
-                cmap="PuOr",
-                origin="lower",
-            )
-            ax_row[7].text(.5, .9, 'Gas rkSZ', horizontalalignment='center', transform=ax_row[7].transAxes)
-
-            ax_row[8].imshow(
-                self.map_mass(1, tilt=viewpoint),
-                norm=LogNorm(),
-                cmap="PuOr",
-                origin="lower",
-            )
-            ax_row[8].text(.5, .9, 'DM mass', horizontalalignment='center', transform=ax_row[8].transAxes)
-
-            ax_row[9].imshow(
-                self.map_density(1, tilt=viewpoint),
-                norm=LogNorm(),
-                cmap="inferno",
-                origin="lower",
-            )
-            ax_row[9].text(.5, .9, 'DM density', horizontalalignment='center', transform=ax_row[9].transAxes)
+            # ax_row[9].imshow(
+            #     self.map_density(1, tilt=viewpoint),
+            #     norm=LogNorm(),
+            #     cmap="inferno",
+            #     origin="lower",
+            # )
+            # ax_row[9].text(.5, .9, 'DM density', horizontalalignment='center', transform=ax_row[9].transAxes)
 
             coord_x, coord_y = self.map_particle_dot(1, tilt=viewpoint)
             ax_row[10].plot(coord_x, coord_y, ',', c="C0", alpha=1)
