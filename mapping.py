@@ -226,7 +226,7 @@ class Mapping:
             res=self.resolution
         )
 
-        return smoothed_map.T * m.units / coord.units ** 2
+        return smoothed_map.T * weights.units / coord.units ** 2
 
     def map_particle_number(self, particle_type: int, tilt: str = 'z') -> unyt.array:
         masses = self.data.subfind_particles[f'PartType{particle_type}']['Mass']
