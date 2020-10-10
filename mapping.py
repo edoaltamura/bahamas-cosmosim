@@ -286,7 +286,7 @@ class Mapping:
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * \
                                   self.data.subfind_particles[f'PartType{particle_type}']['Temperature']
             weights = mass_weighted_temps * const
-            return self.make_map(particle_type, weights, tilt=tilt)
+            return self.make_map(particle_type, weights, tilt=tilt) * self.surface_element0.value
         else:
             read.wwarn('Thermal SZ map only defined for gas particles.')
 
@@ -317,7 +317,7 @@ class Mapping:
                     self.surface_element0
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * radial_velocities
             weights = mass_weighted_temps * const
-            return self.make_map(particle_type, weights, tilt=tilt)
+            return self.make_map(particle_type, weights, tilt=tilt) * self.surface_element0.value
         else:
             read.wwarn('Kinetic SZ map only defined for gas particles.')
 
@@ -351,7 +351,7 @@ class Mapping:
                     self.surface_element0
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * radial_velocities
             weights = mass_weighted_temps * const
-            return self.make_map(particle_type, weights, tilt=tilt)
+            return self.make_map(particle_type, weights, tilt=tilt) * self.surface_element0.value
         else:
             read.wwarn('Rotational-kinetic SZ map only defined for gas particles.')
 
@@ -387,7 +387,7 @@ class Mapping:
             axarr[i_plot, 0].imshow(
                 self.map_mass(0, tilt=viewpoint),
                 norm=LogNorm(),
-                cmap="inferno",
+                cmap="PuOr",
                 origin="lower",
             )
             axarr[i_plot, 0].text(.5, .9, 'Gas mass', horizontalalignment='center', transform=axarr[i_plot, 0].transAxes)
@@ -483,7 +483,7 @@ class Mapping:
             axarr[i_plot, 12].imshow(
                 self.map_density(4, tilt=viewpoint),
                 norm=LogNorm(),
-                cmap="inferno",
+                cmap="PuOr",
                 origin="lower",
             )
             axarr[i_plot, 12].text(.5, .9, 'Star density', horizontalalignment='center', transform=axarr[i_plot, 12].transAxes)
