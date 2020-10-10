@@ -508,22 +508,25 @@ if __name__ == '__main__':
     import pickle
     import os
 
-    # -------------------------------------------------------------------- #
-    # Edit these parameters
-    simulation_type = 'hydro'
-    redshift = 'z003p000'
-    cluster_id = 0
-    output_directory = '/local/scratch/altamura/bahamas/maps'
-    # -------------------------------------------------------------------- #
-    if not os.path.isfile(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle'):
-        # Boot up the BAHAMAS data
-        files = read.find_files(simulation_type, redshift)
-        fofs = read.fof_groups(files)
-        csrm = read.csr_index_matrix(fofs)
-        fof = read.fof_group(cluster_id, fofs)
+    redshifts = ['z003p000', 'z002p000', 'z001p000', 'z000p250', 'z000p000']
 
-        with open(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle', 'wb') as handle:
-            pickle.dump(read.fof_particles(fof, csrm), handle, protocol=pickle.HIGHEST_PROTOCOL)
+    for redshift in redshifts:
+        # -------------------------------------------------------------------- #
+        # Edit these parameters
+        simulation_type = 'hydro'
+        # redshift = 'z003p000'
+        cluster_id = 0
+        output_directory = '/local/scratch/altamura/bahamas/maps'
+        # -------------------------------------------------------------------- #
+        if not os.path.isfile(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle'):
+            # Boot up the BAHAMAS data
+            files = read.find_files(simulation_type, redshift)
+            fofs = read.fof_groups(files)
+            csrm = read.csr_index_matrix(fofs)
+            fof = read.fof_group(cluster_id, fofs)
+
+            with open(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle', 'wb') as handle:
+                pickle.dump(read.fof_particles(fof, csrm), handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     with open(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle', 'rb') as handle:
         cluster_dict = pickle.load(handle)
