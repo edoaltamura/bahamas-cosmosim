@@ -22,7 +22,7 @@ class Mapping:
         self.output_to_file = True
         self.plot_limits_scale = 'R500crit'
         self.plot_limits = [-5., 5., -5., 5.]
-        self.resolution = 512
+        self.resolution = 2048
         self.hot_gas_temperature_threshold = 1.e5
 
         self.basename = None
@@ -373,7 +373,7 @@ class Mapping:
     def view_all(self):
 
         fig, axarr = plt.subplots(nrows=5, ncols=15, sharex=False, sharey=False, figsize=(30, 10))
-        plt.subplots_adjust(wspace=0., hspace=0.)
+
         viewpoints = ['z', 'y', 'x', 'faceon', 'edgeon']
 
         for i_plot, viewpoint in enumerate(viewpoints):
@@ -420,7 +420,7 @@ class Mapping:
                 cmap="inferno",
                 origin="lower",
             )
-            axarr[i_plot, 4].text(.5, .9, 'Gas mass-weighted temperature', horizontalalignment='center', transform=axarr[i_plot, 4].transAxes)
+            axarr[i_plot, 4].text(.5, .9, 'Gas temperature', horizontalalignment='center', transform=axarr[i_plot, 4].transAxes)
 
             axarr[i_plot, 5].imshow(
                 self.map_tSZ(0, tilt=viewpoint),
@@ -502,6 +502,7 @@ class Mapping:
             )
             axarr[i_plot, 14].text(.5, .9, 'Star particle number', horizontalalignment='center', transform=axarr[i_plot, 14].transAxes)
 
+            plt.subplots_adjust(wspace=0., hspace=0.)
             plt.tight_layout()
 
 
