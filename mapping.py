@@ -1,6 +1,7 @@
 import numpy as np
 import unyt
 import yaml
+from typing import Tuple
 from swiftsimio.visualisation.projection import scatter_parallel as scatter
 from swiftsimio.visualisation.rotation import rotation_matrix_from_vector
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
@@ -9,6 +10,10 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import LogNorm, SymLogNorm
 
 import read
+
+ksz_const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass
+tsz_const = unyt.thompson_cross_section * unyt.boltzmann_constant / 1.16 / \
+            unyt.speed_of_light ** 2 / unyt.proton_mass / unyt.electron_mass
 
 
 class Mapping:
@@ -32,7 +37,7 @@ class Mapping:
         self.set_hot_gas()
         if read.rank == 0:
             self.view_all()
-            plt.savefig(f'{output_directory}/test_cluster_data.png', dpi=(self.resolution*15)//30)
+            plt.savefig(f'{output_directory}/test_cluster_data.png', dpi=(self.resolution * 15) // 30)
 
     def __parameter_parser(self, param_file: str) -> None:
 
@@ -137,10 +142,7 @@ class Mapping:
 
         return rotated * out_units
 
-    def rotate_cluster(self, particle_type: int, tilt: str = 'z') -> unyt.array:
-
-        cop = self.data.subfind_tab.FOF.GroupCentreOfPotential
-        coord = self.data.subfind_particles[f'PartType{particle_type}']['Coordinates']
+    def get_tilt(self, tilt: str = 'z') -> Tuple[unyt.unyt_array, str]:
 
         if len(tilt) == 1:
             vec = np.array([0., 0., 1.]) * unyt.dimensionless
@@ -157,13 +159,37 @@ class Mapping:
             elif tilt == 'edgeon':
                 ax = 'y'
 
+        return vec, ax
+
+    def rotate_coordinates(self, particle_type: int, tilt: str = 'z') -> unyt.array:
+
+        cop = self.data.subfind_tab.FOF.GroupCentreOfPotential
+        coord = self.data.subfind_particles[f'PartType{particle_type}']['Coordinates']
+        vec, ax = self.get_tilt(tilt=tilt)
         new_coord = self._rotation_align_with_vector(coord, cop, vec, ax)
         return new_coord
+
+    def rotate_velocities(self, particle_type: int, tilt: str = 'z', boost: unyt.unyt_array = None) -> unyt.array:
+
+        velocities = self.data.subfind_particles[f'PartType{particle_type}']['Velocity']
+        if boost is not None:
+            velocities[:, 0] -= boost[0]
+            velocities[:, 1] -= boost[1]
+            velocities[:, 2] -= boost[2]
+        center = np.array([0, 0, 0], dtype=np.float64) * unyt.Mpc
+        vec, ax = self.get_tilt(tilt=tilt)
+        new_velocities = self._rotation_align_with_vector(velocities, center, vec, ax)
+        return new_velocities
 
     def set_dm_particles(self) -> None:
 
         boxsize = self.data.boxsize
         coord = self.data.subfind_particles[f'PartType1']['Coordinates']
+        for i in [0, 1, 2]:
+            if np.min(coord[:, i]) < 0:
+                coord[:, i] += boxsize / 2
+            elif np.max(coord[:, i]) > boxsize:
+                coord[:, i] -= boxsize / 2
         smoothing_lengths = generate_smoothing_lengths(
             coord,
             boxsize,
@@ -201,7 +227,7 @@ class Mapping:
         cop = self.data.subfind_tab.FOF.GroupCentreOfPotential
         R500c = self.data.subfind_tab.FOF.Group_R_Crit500
         coord = self.data.subfind_particles[f'PartType{particle_type}']['Coordinates']
-        coord_rot = self.rotate_cluster(particle_type, tilt=tilt)
+        coord_rot = self.rotate_coordinates(particle_type, tilt=tilt)
         smoothing_lengths = self.data.subfind_particles[f'PartType{particle_type}']['SmoothingLength']
         aperture = unyt.unyt_quantity(5 * R500c / np.sqrt(3), coord.units)
 
@@ -280,78 +306,37 @@ class Mapping:
 
     def map_tSZ(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
         if particle_type == 0:
-            const = unyt.thompson_cross_section * unyt.boltzmann_constant / 1.16 / \
-                    unyt.speed_of_light ** 2 / unyt.proton_mass / unyt.electron_mass / \
-                    self.surface_element0
+
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * \
                                   self.data.subfind_particles[f'PartType{particle_type}']['Temperature']
-            weights = mass_weighted_temps * const
-            return self.make_map(particle_type, weights, tilt=tilt) * self.surface_element0.value
+            weights = mass_weighted_temps * tsz_const / unyt.unyt_quantity(1., unyt.Mpc)
+            return self.make_map(particle_type, weights, tilt=tilt)
         else:
             read.wwarn('Thermal SZ map only defined for gas particles.')
 
     def map_kSZ(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
+
         if particle_type == 0:
-
-            # Derotate velocities
-            velocities = self.data.subfind_particles[f'PartType{particle_type}']['Velocity']
-            center = np.array([0, 0, 0], dtype=np.float64) * unyt.Mpc
-
-            if len(tilt) == 1:
-                vec = np.array([0., 0., 1.]) * unyt.dimensionless
-                if tilt == 'z':
-                    ax = 'y'
-                elif tilt == 'y':
-                    ax = 'x'
-                elif tilt == 'x':
-                    ax = 'z'
-            else:
-                vec = self.angular_momentum_hot_gas
-                if tilt == 'faceon':
-                    ax = 'z'
-                elif tilt == 'edgeon':
-                    ax = 'y'
-
-            radial_velocities = self._rotation_align_with_vector(velocities, center, vec, ax)[:, 2]
-            const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass / \
-                    self.surface_element0
+            radial_velocities = self.rotate_velocities(particle_type, tilt=tilt)[:, 2]
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * radial_velocities
-            weights = mass_weighted_temps * const
-            return self.make_map(particle_type, weights, tilt=tilt) * self.surface_element0.value
+            weights = mass_weighted_temps * ksz_const / unyt.unyt_quantity(1., unyt.Mpc)
+            return self.make_map(particle_type, weights, tilt=tilt)
         else:
             read.wwarn('Kinetic SZ map only defined for gas particles.')
 
     def map_rkSZ(self, particle_type: int, tilt: str = 'z') -> np.ndarray:
+
         if particle_type == 0:
-
             # Derotate velocities and subtract bulk motion (work in cluster's frame)
-            velocities = self.data.subfind_particles[f'PartType{particle_type}']['Velocity']
-            velocities[:, 0] -= self.peculiar_velocity_hot_gas[0]
-            velocities[:, 1] -= self.peculiar_velocity_hot_gas[1]
-            velocities[:, 2] -= self.peculiar_velocity_hot_gas[2]
-            center = np.array([0, 0, 0], dtype=np.float64) * unyt.dimensionless
-
-            if len(tilt) == 1:
-                vec = np.array([0., 0., 1.]) * unyt.dimensionless
-                if tilt == 'z':
-                    ax = 'y'
-                elif tilt == 'y':
-                    ax = 'x'
-                elif tilt == 'x':
-                    ax = 'z'
-            else:
-                vec = self.angular_momentum_hot_gas
-                if tilt == 'faceon':
-                    ax = 'z'
-                elif tilt == 'edgeon':
-                    ax = 'y'
-
-            radial_velocities = self._rotation_align_with_vector(velocities, center, vec, ax)[:, 2]
-            const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass / \
-                    self.surface_element0
+            # The boost velocity is subtracted as bulk motion
+            radial_velocities = self.rotate_velocities(
+                particle_type,
+                tilt=tilt,
+                boost=self.peculiar_velocity_hot_gas
+            )[:, 2]
             mass_weighted_temps = self.data.subfind_particles[f'PartType{particle_type}']['Mass'].T * radial_velocities
-            weights = mass_weighted_temps * const
-            return self.make_map(particle_type, weights, tilt=tilt) * self.surface_element0.value
+            weights = mass_weighted_temps * ksz_const / unyt.unyt_quantity(1., unyt.Mpc)
+            return self.make_map(particle_type, weights, tilt=tilt)
         else:
             read.wwarn('Rotational-kinetic SZ map only defined for gas particles.')
 
@@ -359,7 +344,7 @@ class Mapping:
         cop = self.data.subfind_tab.FOF.GroupCentreOfPotential
         R500c = self.data.subfind_tab.FOF.Group_R_Crit500
         coord = self.data.subfind_particles[f'PartType{particle_type}']['Coordinates']
-        coord_rot = self.rotate_cluster(particle_type, tilt=tilt)
+        coord_rot = self.rotate_coordinates(particle_type, tilt=tilt)
         aperture = unyt.unyt_quantity(5 * R500c / np.sqrt(3), coord.units)
         spatial_filter = np.where(
             (np.abs(coord_rot[:, 0] - cop[0]) < aperture) &
@@ -390,7 +375,8 @@ class Mapping:
                 cmap="PuOr",
                 origin="lower",
             )
-            axarr[i_plot, 0].text(.5, .9, 'Gas mass', horizontalalignment='center', transform=axarr[i_plot, 0].transAxes)
+            axarr[i_plot, 0].text(.5, .9, 'Gas mass', horizontalalignment='center',
+                                  transform=axarr[i_plot, 0].transAxes)
 
             axarr[i_plot, 1].imshow(
                 self.map_density(0, tilt=viewpoint),
@@ -398,7 +384,8 @@ class Mapping:
                 cmap="inferno",
                 origin="lower",
             )
-            axarr[i_plot, 1].text(.5, .9, 'Gas density', horizontalalignment='center', transform=axarr[i_plot, 1].transAxes)
+            axarr[i_plot, 1].text(.5, .9, 'Gas density', horizontalalignment='center',
+                                  transform=axarr[i_plot, 1].transAxes)
 
             coord_x, coord_y = self.map_particle_dot(0, tilt=viewpoint)
             axarr[i_plot, 2].plot(coord_x, coord_y, ',', c="C0", alpha=1)
@@ -412,7 +399,8 @@ class Mapping:
                 cmap="cividis",
                 origin="lower",
             )
-            axarr[i_plot, 3].text(.5, .9, 'Gas particle number', horizontalalignment='center', transform=axarr[i_plot, 3].transAxes)
+            axarr[i_plot, 3].text(.5, .9, 'Gas particle number', horizontalalignment='center',
+                                  transform=axarr[i_plot, 3].transAxes)
 
             axarr[i_plot, 4].imshow(
                 self.map_mass_weighted_temperature(0, tilt=viewpoint),
@@ -420,7 +408,8 @@ class Mapping:
                 cmap="inferno",
                 origin="lower",
             )
-            axarr[i_plot, 4].text(.5, .9, 'Gas temperature', horizontalalignment='center', transform=axarr[i_plot, 4].transAxes)
+            axarr[i_plot, 4].text(.5, .9, 'Gas temperature', horizontalalignment='center',
+                                  transform=axarr[i_plot, 4].transAxes)
 
             axarr[i_plot, 5].imshow(
                 self.map_tSZ(0, tilt=viewpoint),
@@ -448,7 +437,8 @@ class Mapping:
                 cmap="PuOr",
                 origin="lower",
             )
-            axarr[i_plot, 7].text(.5, .9, 'Gas rkSZ', horizontalalignment='center', transform=axarr[i_plot, 7].transAxes)
+            axarr[i_plot, 7].text(.5, .9, 'Gas rkSZ', horizontalalignment='center',
+                                  transform=axarr[i_plot, 7].transAxes)
 
             axarr[i_plot, 8].imshow(
                 self.map_mass(1, tilt=viewpoint),
@@ -470,7 +460,8 @@ class Mapping:
                 cmap="cividis",
                 origin="lower",
             )
-            axarr[i_plot, 10].text(.5, .9, 'DM particle number', horizontalalignment='center', transform=axarr[i_plot, 10].transAxes)
+            axarr[i_plot, 10].text(.5, .9, 'DM particle number', horizontalalignment='center',
+                                   transform=axarr[i_plot, 10].transAxes)
 
             axarr[i_plot, 11].imshow(
                 self.map_mass(4, tilt=viewpoint),
@@ -478,7 +469,8 @@ class Mapping:
                 cmap="inferno",
                 origin="lower",
             )
-            axarr[i_plot, 11].text(.5, .9, 'Star mass', horizontalalignment='center', transform=axarr[i_plot, 11].transAxes)
+            axarr[i_plot, 11].text(.5, .9, 'Star mass', horizontalalignment='center',
+                                   transform=axarr[i_plot, 11].transAxes)
 
             axarr[i_plot, 12].imshow(
                 self.map_density(4, tilt=viewpoint),
@@ -486,13 +478,15 @@ class Mapping:
                 cmap="PuOr",
                 origin="lower",
             )
-            axarr[i_plot, 12].text(.5, .9, 'Star density', horizontalalignment='center', transform=axarr[i_plot, 12].transAxes)
+            axarr[i_plot, 12].text(.5, .9, 'Star density', horizontalalignment='center',
+                                   transform=axarr[i_plot, 12].transAxes)
 
             coord_x, coord_y = self.map_particle_dot(4, tilt=viewpoint)
             axarr[i_plot, 13].plot(coord_x, coord_y, ',', c="C0", alpha=1)
             axarr[i_plot, 13].set_xlim([np.min(coord_x), np.max(coord_x)])
             axarr[i_plot, 13].set_ylim([np.min(coord_y), np.max(coord_y)])
-            axarr[i_plot, 13].text(.5, .9, 'Star dot', horizontalalignment='center', transform=axarr[i_plot, 13].transAxes)
+            axarr[i_plot, 13].text(.5, .9, 'Star dot', horizontalalignment='center',
+                                   transform=axarr[i_plot, 13].transAxes)
 
             axarr[i_plot, 14].imshow(
                 self.map_particle_number(4, tilt=viewpoint),
@@ -500,7 +494,8 @@ class Mapping:
                 cmap="cividis",
                 origin="lower",
             )
-            axarr[i_plot, 14].text(.5, .9, 'Star particle number', horizontalalignment='center', transform=axarr[i_plot, 14].transAxes)
+            axarr[i_plot, 14].text(.5, .9, 'Star particle number', horizontalalignment='center',
+                                   transform=axarr[i_plot, 14].transAxes)
 
             plt.subplots_adjust(wspace=0., hspace=0.)
             plt.tight_layout()
