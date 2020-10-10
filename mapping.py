@@ -27,7 +27,7 @@ class Mapping:
         self.output_to_file = True
         self.plot_limits_scale = 'R500crit'
         self.plot_limits = [-5., 5., -5., 5.]
-        self.resolution = 2048
+        self.resolution = 512
         self.hot_gas_temperature_threshold = 1.e5
 
         self.basename = None
