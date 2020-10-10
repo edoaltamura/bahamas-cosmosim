@@ -37,7 +37,7 @@ class Mapping:
         self.set_hot_gas()
         if read.rank == 0:
             self.view_all()
-            plt.savefig(f'{output_directory}/test_cluster_data.png', dpi=(self.resolution * 15) // 30)
+            plt.savefig(f'{output_directory}/test_{redshift}_{cluster_id}.png', dpi=(self.resolution * 15) // 30)
 
     def __parameter_parser(self, param_file: str) -> None:
 
@@ -511,21 +511,21 @@ if __name__ == '__main__':
     # -------------------------------------------------------------------- #
     # Edit these parameters
     simulation_type = 'hydro'
-    redshift = 'z000p000'
+    redshift = 'z003p000'
     cluster_id = 0
     output_directory = '/local/scratch/altamura/bahamas/maps'
     # -------------------------------------------------------------------- #
-    if not os.path.isfile(f'{output_directory}/test_cluster_data.pickle'):
+    if not os.path.isfile(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle'):
         # Boot up the BAHAMAS data
         files = read.find_files(simulation_type, redshift)
         fofs = read.fof_groups(files)
         csrm = read.csr_index_matrix(fofs)
         fof = read.fof_group(cluster_id, fofs)
 
-        with open(f'{output_directory}/test_cluster_data.pickle', 'wb') as handle:
+        with open(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle', 'wb') as handle:
             pickle.dump(read.fof_particles(fof, csrm), handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    with open(f'{output_directory}/test_cluster_data.pickle', 'rb') as handle:
+    with open(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle', 'rb') as handle:
         cluster_dict = pickle.load(handle)
 
     cluster_data = read.class_wrap(cluster_dict).data
