@@ -176,7 +176,7 @@ class Mapping:
             velocities[:, 0] -= boost[0]
             velocities[:, 1] -= boost[1]
             velocities[:, 2] -= boost[2]
-        center = np.array([0, 0, 0], dtype=np.float64) * unyt.Mpc
+        center = np.array([0., 0., 0.]) * unyt.Mpc
         vec, ax = self.get_tilt(tilt=tilt)
         new_velocities = self._rotation_align_with_vector(velocities, center, vec, ax)
         return new_velocities
@@ -246,6 +246,7 @@ class Mapping:
                 (np.abs(coord_rot[:, 2] - cop[2]) < aperture)
             )[0]
 
+        read.pprint(coord_rot, spatial_filter)
         x_max = np.max(coord_rot[spatial_filter, 0])
         x_min = np.min(coord_rot[spatial_filter, 0])
         y_max = np.max(coord_rot[spatial_filter, 1])
