@@ -511,7 +511,7 @@ if __name__ == '__main__':
     output_directory = '/local/scratch/altamura/bahamas/maps'
     simulation_type = 'hydro'
     redshifts = ['z003p000', 'z002p000', 'z001p000', 'z000p250', 'z000p000']
-    cluster_ids = [0, 50, 100, 200, 1000, 2000]
+    cluster_ids = [0, 1, 2, 50, 100, 200, 1000]
 
     for redshift in redshifts:
         # -------------------------------------------------------------------- #
