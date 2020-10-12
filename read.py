@@ -326,16 +326,11 @@ def fof_groups(files: list) -> dict:
         subfind_tab_data['FOF']['Group_M_Mean200'] > 1e13
     )[0]
 
-    pprint(subfind_tab_data['FOF']['FirstSubhaloID'])
-
     for category in ['FOF', 'Subhalo']:
         for dataset in subfind_tab_data[category]:
             subfind_tab_data[category][dataset] = subfind_tab_data[category][dataset][filter_idx]
     for dataset in group_tab_data['FOF']:
         group_tab_data['FOF'][dataset] = group_tab_data['FOF'][dataset][filter_idx]
-
-    pprint(subfind_tab_data['FOF']['FirstSubhaloID'])
-
 
     # Gather all data into a large dictionary
     data_dict = {}

@@ -532,9 +532,9 @@ if __name__ == '__main__':
                 with open(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle', 'wb') as handle:
                     pickle.dump(cluster_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    with open(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle', 'rb') as handle:
-        cluster_dict = pickle.load(handle)
-
-    cluster_data = read.class_wrap(cluster_dict).data
-    # -------------------------------------------------------------------- #
-    Mapping(cluster_data)
+    # with open(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle', 'rb') as handle:
+    #     cluster_dict = pickle.load(handle)
+    #
+    # cluster_data = read.class_wrap(cluster_dict).data
+    # # -------------------------------------------------------------------- #
+    # Mapping(cluster_data)
