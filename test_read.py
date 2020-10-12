@@ -2,7 +2,7 @@ import read
 
 simulation_type = 'hydro'
 redshift = 'z003p000'
-cluster_id = 0
+cluster_id = 1
 
 # -------------------------------------------------------------------- #
 
