@@ -10,6 +10,8 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import LogNorm, SymLogNorm
 
 import read
+from metadata import AttrDict
+
 
 ksz_const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass
 tsz_const = unyt.thompson_cross_section * unyt.boltzmann_constant / 1.16 / \
@@ -18,7 +20,7 @@ tsz_const = unyt.thompson_cross_section * unyt.boltzmann_constant / 1.16 / \
 
 class Mapping:
 
-    def __init__(self, cluster_data) -> None:
+    def __init__(self, cluster_data: AttrDict) -> None:
 
         self.data = cluster_data
 
@@ -37,7 +39,7 @@ class Mapping:
         self.set_hot_gas()
         if read.rank == 0:
             self.view_all()
-            plt.savefig(f'{output_directory}/test_{redshift}_{cluster_id}.png', dpi=(self.resolution * 15) // 30)
+            plt.savefig(f'{output_directory}/test_{redshift}_{n}.png', dpi=(self.resolution * 15) // 30)
 
     def __parameter_parser(self, param_file: str) -> None:
 
@@ -523,14 +525,17 @@ if __name__ == '__main__':
         fofs = read.fof_groups(files)
         csrm = read.csr_index_matrix(fofs)
 
-        for cluster_id in cluster_ids:
+        for n in cluster_ids:
 
-            if not os.path.isfile(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle'):
-                fof = read.fof_group(cluster_id, fofs)
-                cluster_dict = read.fof_particles(fof, csrm)
+            if not os.path.isfile(f'{output_directory}/test_cluster_data.{redshift}_{n}.pickle'):
+                pass
 
-                with open(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle', 'wb') as handle:
-                    pickle.dump(cluster_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            fof = read.fof_group(n, fofs)
+            cluster_dict = read.fof_particles(fof, csrm)
+            read.pprint("Dark matter particle mass:", cluster_dict['mass_DMpart'])
+
+            with open(f'{output_directory}/test_cluster_data.{redshift}_{n}.pickle', 'wb') as handle:
+                pickle.dump(cluster_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     # with open(f'{output_directory}/test_cluster_data.{redshift}_{cluster_id}.pickle', 'rb') as handle:
     #     cluster_dict = pickle.load(handle)

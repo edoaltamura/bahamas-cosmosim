@@ -323,7 +323,7 @@ def fof_groups(files: list) -> dict:
 
     # Edit the AttrDict object and push the filtered data
     filter_idx = np.where(
-        subfind_tab_data['FOF']['Group_M_Mean200'] > 1e13
+        subfind_tab_data['FOF']['Group_M_Crit500'] > 1e13
     )[0]
 
     for category in ['FOF', 'Subhalo']:
