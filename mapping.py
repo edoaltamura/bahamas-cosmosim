@@ -551,6 +551,6 @@ if __name__ == '__main__':
     files = read.find_files(simulation_type, redshifts[0])
     fofs = read.fof_groups(files)
     csrm = read.csr_index_matrix(fofs)
-    fof = read.fof_group(cluster_ids[1], fofs)
+    fof = read.fof_group(cluster_ids[-1], fofs)
     cluster_dict = read.fof_particles(fof, csrm)
     read.pprint("Dark matter particle mass:", cluster_dict['mass_DMpart'])
