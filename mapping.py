@@ -548,7 +548,7 @@ if __name__ == '__main__':
     #             Mapping(cluster_data)
 
 
-    files = read.find_files(simulation_type, redshifts[0])
+    files = read.find_files(simulation_type, redshifts[3])
     fofs = read.fof_groups(files)
     csrm = read.csr_index_matrix(fofs)
     fof = read.fof_group(cluster_ids[-1], fofs)
