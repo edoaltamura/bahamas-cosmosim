@@ -248,7 +248,7 @@ class Mapping:
                 (np.abs(coord_rot[:, 2] - cop[2]) < aperture)
             )[0]
 
-        read.pprint(coord_rot, spatial_filter)
+        read.pprint(coord_rot, cop, spatial_filter, sep='\n')
         x_max = np.max(coord_rot[spatial_filter, 0])
         x_min = np.min(coord_rot[spatial_filter, 0])
         y_max = np.max(coord_rot[spatial_filter, 1])
@@ -529,7 +529,6 @@ if __name__ == '__main__':
 
                 fof = read.fof_group(n, fofs)
                 cluster_dict = read.fof_particles(fof, csrm)
-                read.pprint("Dark matter particle mass:", cluster_dict['mass_DMpart'])
 
                 with open(f'{output_directory}/test_cluster_data.{redshift}_{n}.pickle', 'wb') as handle:
                     pickle.dump(cluster_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
