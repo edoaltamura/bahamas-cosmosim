@@ -555,3 +555,5 @@ if __name__ == '__main__':
             fof = read.fof_group(i, fofs)
             cluster_dict = read.fof_particles(fof, csrm)
             read.pprint(z, i, "Dark matter particle mass:", cluster_dict['mass_DMpart'])
+            del fof, cluster_dict
+        del files, fofs, csrm
