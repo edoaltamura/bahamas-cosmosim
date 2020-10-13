@@ -547,10 +547,11 @@ if __name__ == '__main__':
     #             cluster_data = read.class_wrap(cluster_dict).data
     #             Mapping(cluster_data)
 
-
-    files = read.find_files(simulation_type, redshifts[3])
-    fofs = read.fof_groups(files)
-    csrm = read.csr_index_matrix(fofs)
-    fof = read.fof_group(cluster_ids[-1], fofs)
-    cluster_dict = read.fof_particles(fof, csrm)
-    read.pprint("Dark matter particle mass:", cluster_dict['mass_DMpart'])
+    for z in ['z003p000', 'z002p000', 'z001p000', 'z000p250', 'z000p000']:
+        files = read.find_files(simulation_type, z)
+        fofs = read.fof_groups(files)
+        csrm = read.csr_index_matrix(fofs)
+        for i in [0, 1, 2, 50, 100, 200, 1000]:
+            fof = read.fof_group(i, fofs)
+            cluster_dict = read.fof_particles(fof, csrm)
+            read.pprint(z, i, "Dark matter particle mass:", cluster_dict['mass_DMpart'])
