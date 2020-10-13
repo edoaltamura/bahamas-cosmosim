@@ -131,8 +131,10 @@ class Mapping:
         rotation_matrix = rotation_matrix_from_vector(_vector, axis=axis)
 
         if _rotation_center is not None:
-            # Rotate co-ordinates as required
-            x, y, z = np.matmul(rotation_matrix, (_coordinates - _rotation_center).T)
+            _coordinates[:, 0] -= _rotation_center[0]
+            _coordinates[:, 1] -= _rotation_center[1]
+            _coordinates[:, 2] -= _rotation_center[2]
+            x, y, z = np.matmul(rotation_matrix, _coordinates.T)
             x += _rotation_center[0]
             y += _rotation_center[1]
             z += _rotation_center[2]
