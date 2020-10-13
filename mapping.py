@@ -12,7 +12,6 @@ from matplotlib.colors import LogNorm, SymLogNorm
 import read
 from metadata import AttrDict
 
-
 ksz_const = - unyt.thompson_cross_section / 1.16 / unyt.speed_of_light / unyt.proton_mass
 tsz_const = unyt.thompson_cross_section * unyt.boltzmann_constant / 1.16 / \
             unyt.speed_of_light ** 2 / unyt.proton_mass / unyt.electron_mass
@@ -112,65 +111,85 @@ class Mapping:
 
         return
 
-    @staticmethod
-    def _rotation_align_with_vector(
-            coordinates: unyt.array, rotation_center: unyt.array, vector: unyt.array, axis: str
-    ) -> unyt.array:
-
-        out_units = coordinates.units
-        _coordinates = coordinates.value
-        _rotation_center = rotation_center.value
-        _vector = vector.value
-
-        # Normalise vector for more reliable handling
-        _vector /= np.linalg.norm(_vector)
-
-        # Get the de-rotation matrix:
-        # axis='z' is the default and corresponds to face-on (looking down z-axis)
-        # axis='y' corresponds to edge-on (maximum rotational signal)
-        rotation_matrix = rotation_matrix_from_vector(_vector, axis=axis)
-
-        if _rotation_center is not None:
-            _coordinates[:, 0] -= _rotation_center[0]
-            _coordinates[:, 1] -= _rotation_center[1]
-            _coordinates[:, 2] -= _rotation_center[2]
-            x, y, z = np.matmul(rotation_matrix, _coordinates.T)
-            x += _rotation_center[0]
-            y += _rotation_center[1]
-            z += _rotation_center[2]
-
-        else:
-            x, y, z = _coordinates.T
-
-        rotated = np.vstack((x, y, z)).T
-
-        return rotated * out_units
-
-    def get_tilt(self, tilt: str = 'z') -> Tuple[unyt.unyt_array, str]:
-
-        if len(tilt) == 1:
-            vec = np.array([0., 0., 1.]) * unyt.dimensionless
-            if tilt == 'z':
-                ax = 'y'
-            elif tilt == 'y':
-                ax = 'x'
-            elif tilt == 'x':
-                ax = 'z'
-        else:
-            vec = self.angular_momentum_hot_gas
-            if tilt == 'faceon':
-                ax = 'z'
-            elif tilt == 'edgeon':
-                ax = 'y'
-
-        return vec, ax
+    # @staticmethod
+    # def _rotation_align_with_vector(
+    #         coordinates: unyt.array, rotation_center: unyt.array, vector: unyt.array, axis: str
+    # ) -> unyt.array:
+    #
+    #     out_units = coordinates.units
+    #     _coordinates = coordinates.value
+    #     _rotation_center = rotation_center.value
+    #     _vector = vector.value
+    #
+    #     # Normalise vector for more reliable handling
+    #     _vector /= np.linalg.norm(_vector)
+    #
+    #     # Get the de-rotation matrix:
+    #     # axis='z' is the default and corresponds to face-on (looking down z-axis)
+    #     # axis='y' corresponds to edge-on (maximum rotational signal)
+    #     rotation_matrix = rotation_matrix_from_vector(_vector, axis=axis)
+    #
+    #     if _rotation_center is not None:
+    #         _coordinates[:, 0] -= _rotation_center[0]
+    #         _coordinates[:, 1] -= _rotation_center[1]
+    #         _coordinates[:, 2] -= _rotation_center[2]
+    #         x, y, z = np.matmul(rotation_matrix, _coordinates.T)
+    #         x += _rotation_center[0]
+    #         y += _rotation_center[1]
+    #         z += _rotation_center[2]
+    #
+    #     else:
+    #         x, y, z = _coordinates.T
+    #
+    #     rotated = np.vstack((x, y, z)).T
+    #
+    #     return rotated * out_units
+    #
+    # def get_tilt(self, tilt: str = 'z') -> Tuple[unyt.unyt_array, str]:
+    #
+    #     if len(tilt) == 1:
+    #         vec = np.array([0., 0., 1.]) * unyt.dimensionless
+    #         if tilt == 'z':
+    #             ax = 'y'
+    #         elif tilt == 'y':
+    #             ax = 'x'
+    #         elif tilt == 'x':
+    #             ax = 'z'
+    #     else:
+    #         vec = self.angular_momentum_hot_gas
+    #         if tilt == 'faceon':
+    #             ax = 'y'
+    #         elif tilt == 'edgeon':
+    #             ax = 'z'
+    #
+    #     return vec, ax
 
     def rotate_coordinates(self, particle_type: int, tilt: str = 'z') -> unyt.array:
 
         cop = self.data.subfind_tab.FOF.GroupCentreOfPotential
         coord = self.data.subfind_particles[f'PartType{particle_type}']['Coordinates']
-        vec, ax = self.get_tilt(tilt=tilt)
-        new_coord = self._rotation_align_with_vector(coord, cop, vec, ax)
+        coord[:, 0] -= cop[0]
+        coord[:, 1] -= cop[1]
+        coord[:, 2] -= cop[2]
+        x, y, z = coord.value.T
+
+        if tilt == 'y':
+            new_coord = np.vstack((x, z, y)).T
+        elif tilt == 'z':
+            new_coord = np.vstack((x, -y, z)).T
+        elif tilt == 'x':
+            new_coord = np.vstack((-z, -y, x)).T
+        elif tilt == 'faceon':
+            face_on_rotation_matrix = rotation_matrix_from_vector(self.angular_momentum_hot_gas.value)
+            new_coord = np.einsum('ijk,ik->ij', face_on_rotation_matrix, coord.value)
+        elif tilt == 'edgeon':
+            edge_on_rotation_matrix = rotation_matrix_from_vector(self.angular_momentum_hot_gas.value, axis='y')
+            new_coord = np.einsum('ijk,ik->ij', edge_on_rotation_matrix, coord.value)
+
+        new_coord *= coord.units
+        new_coord[:, 0] += cop[0]
+        new_coord[:, 1] += cop[1]
+        new_coord[:, 2] += cop[2]
         return new_coord
 
     def rotate_velocities(self, particle_type: int, tilt: str = 'z', boost: unyt.unyt_array = None) -> unyt.array:
@@ -180,10 +199,23 @@ class Mapping:
             velocities[:, 0] -= boost[0]
             velocities[:, 1] -= boost[1]
             velocities[:, 2] -= boost[2]
-        center = np.array([0., 0., 0.]) * unyt.Mpc
-        vec, ax = self.get_tilt(tilt=tilt)
-        new_velocities = self._rotation_align_with_vector(velocities, center, vec, ax)
-        return new_velocities
+
+        vx, vy, vz = velocities.value.T
+
+        if tilt == 'y':
+            new_vel = np.vstack((vx, vz, vy)).T
+        elif tilt == 'z':
+            new_vel = np.vstack((vx, -vy, vz)).T
+        elif tilt == 'x':
+            new_vel = np.vstack((-vz, -vy, vx)).T
+        elif tilt == 'faceon':
+            face_on_rotation_matrix = rotation_matrix_from_vector(self.angular_momentum_hot_gas.value)
+            new_vel = np.einsum('ijk,ik->ij', face_on_rotation_matrix, velocities.value)
+        elif tilt == 'edgeon':
+            edge_on_rotation_matrix = rotation_matrix_from_vector(self.angular_momentum_hot_gas.value, axis='y')
+            new_vel = np.einsum('ijk,ik->ij', edge_on_rotation_matrix, velocities.value)
+
+        return new_vel * velocities.units
 
     def set_dm_particles(self) -> None:
 
@@ -528,7 +560,6 @@ if __name__ == '__main__':
         for n in cluster_ids:
 
             if not os.path.isfile(f'{output_directory}/test_cluster_data.{redshift}_{n}.pickle'):
-
                 fof = read.fof_group(n, fofs)
                 cluster_dict = read.fof_particles(fof, csrm)
 
@@ -536,10 +567,8 @@ if __name__ == '__main__':
                     pickle.dump(cluster_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
             if not os.path.isfile(f'{output_directory}/test.{redshift}_{n}.png'):
-
                 with open(f'{output_directory}/test_cluster_data.{redshift}_{n}.pickle', 'rb') as handle:
                     cluster_dict = pickle.load(handle)
 
                 cluster_data = read.class_wrap(cluster_dict).data
                 Mapping(cluster_data)
-
