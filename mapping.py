@@ -187,9 +187,9 @@ class Mapping:
             new_coord = np.einsum('ijk,ik->ij', edge_on_rotation_matrix, coord.value)
 
         new_coord *= coord.units
-        new_coord[:, 0] += cop[0]
-        new_coord[:, 1] += cop[1]
-        new_coord[:, 2] += cop[2]
+        # new_coord[:, 0] += cop[0]
+        # new_coord[:, 1] += cop[1]
+        # new_coord[:, 2] += cop[2]
         return new_coord
 
     def rotate_velocities(self, particle_type: int, tilt: str = 'z', boost: unyt.unyt_array = None) -> unyt.array:
@@ -270,16 +270,16 @@ class Mapping:
         if particle_type == 0:
             temperature = self.data.subfind_particles['PartType0']['Temperature']
             spatial_filter = np.where(
-                (np.abs(coord_rot[:, 0] - cop[0]) < aperture) &
-                (np.abs(coord_rot[:, 1] - cop[1]) < aperture) &
-                (np.abs(coord_rot[:, 2] - cop[2]) < aperture) &
+                (np.abs(coord_rot[:, 0]) < aperture) &
+                (np.abs(coord_rot[:, 1]) < aperture) &
+                (np.abs(coord_rot[:, 2]) < aperture) &
                 (temperature.value > self.hot_gas_temperature_threshold)
             )[0]
         else:
             spatial_filter = np.where(
-                (np.abs(coord_rot[:, 0] - cop[0]) < aperture) &
-                (np.abs(coord_rot[:, 1] - cop[1]) < aperture) &
-                (np.abs(coord_rot[:, 2] - cop[2]) < aperture)
+                (np.abs(coord_rot[:, 0]) < aperture) &
+                (np.abs(coord_rot[:, 1]) < aperture) &
+                (np.abs(coord_rot[:, 2]) < aperture)
             )[0]
 
         read.pprint(coord_rot, cop, spatial_filter, sep='\n')
