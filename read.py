@@ -158,11 +158,11 @@ def fof_groups(files: list) -> dict:
     header = master_header['subfind_particles']
 
     # Conversion factors
-    conv_mass = 1e10 / header['HubbleParam']
+    conv_mass = 1.e10 / header['HubbleParam']
     conv_length = header['ExpansionFactor'] / header['HubbleParam']
-    conv_density = 1e10 * header['HubbleParam'] ** 2 / header['ExpansionFactor'] ** 3
+    conv_density = 1.e10 * header['HubbleParam'] ** 2 / header['ExpansionFactor'] ** 3
     conv_velocity = np.sqrt(header['ExpansionFactor'])
-    conv_starFormationRate = 1e10 * header['HubbleParam'] ** 2 / header['ExpansionFactor'] ** 3
+    conv_starFormationRate = 1.e10 * header['HubbleParam'] ** 2 / header['ExpansionFactor'] ** 3
 
     # Units
     unit_mass = unyt.Solar_Mass
@@ -324,7 +324,7 @@ def fof_groups(files: list) -> dict:
 
     # Edit the AttrDict object and push the filtered data
     filter_idx = np.where(
-        subfind_tab_data['FOF']['Group_M_Crit500'] > 1e13
+        subfind_tab_data['FOF']['Group_M_Crit500'] > 1.e13
     )[0]
 
     for category in ['FOF', 'Subhalo']:
@@ -467,12 +467,12 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
     # pprint(f"[+] Find particle information...")
 
     # Conversion factors
-    conv_mass = 1e10 / fofgroup['header']['subfind_particles']['HubbleParam']
+    conv_mass = 1.e10 / fofgroup['header']['subfind_particles']['HubbleParam']
     conv_length = fofgroup['header']['subfind_particles']['ExpansionFactor'] / fofgroup['header']['subfind_particles']['HubbleParam']
-    conv_density = 1e10 * fofgroup['header']['subfind_particles']['HubbleParam'] ** 2 / fofgroup['header']['subfind_particles']['ExpansionFactor'] ** 3
+    conv_density = 1.e10 * fofgroup['header']['subfind_particles']['HubbleParam'] ** 2 / fofgroup['header']['subfind_particles']['ExpansionFactor'] ** 3
     conv_velocity = np.sqrt(fofgroup['header']['subfind_particles']['ExpansionFactor'])
-    conv_starFormationRate = 1e10 * fofgroup['header']['subfind_particles']['HubbleParam'] ** 2 / fofgroup['header']['subfind_particles']['ExpansionFactor'] ** 3
-    conv_time = 3.08568e+19
+    conv_starFormationRate = 1.e10 * fofgroup['header']['subfind_particles']['HubbleParam'] ** 2 / fofgroup['header']['subfind_particles']['ExpansionFactor'] ** 3
+    conv_time = 3.08568e19
 
     # Units
     unit_mass = unyt.Solar_Mass

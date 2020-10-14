@@ -40,77 +40,77 @@ class Mapping:
             self.view_all()
             plt.savefig(f'{output_directory}/test.{redshift}_{n}.png', dpi=(self.resolution * 15) // 30)
 
-    def __parameter_parser(self, param_file: str) -> None:
-
-        params = yaml.load(open(param_file))
-
-        # Handle default parameters
-        if 'Default' in params:
-            assert len(params['Default'].keys()) > 0
-            if 'output_to_file' in params['Default']:
-                if params['Default']['output_to_file']:
-                    assert 'basename' in params['Default'], 'File basename not specified in the parameter file.'
-                    assert 'subdir' in params['Default'], 'Output directory not specified in the parameter file.'
-
-                if params['Default']['display_live']:
-                    read.wwarn('If you are going to save many figures, you may want to turn off `display_live`.')
-
-            # Push parameters onto class
-            for param in params['Default']:
-                setattr(self, param, params[param])
-        else:
-            read.wwarn('Default parameters do not appear to be specified in the parameter file.')
-
-        # Handle particle parameters {partType: allowed_maps}
-        maps_register = {
-            'Gas': [
-                'mass',
-                'density',
-                'particle_dot',
-                'particle_number',
-                'mass_weighted_temperature',
-                'metallicity',
-                'tSZ',
-                'kSZ',
-                'rkSZ',
-            ],
-            'Dark_matter': [
-                'mass',
-                'particle_dot',
-                'particle_number',
-            ],
-            'Stars': [
-                'mass',
-                'density',
-                'particle_dot',
-                'particle_number',
-                'metallicity',
-            ],
-        }
-
-        for particle_species in maps_register:
-
-            if particle_species in params and len(params[particle_species].items()) > 0:
-
-                # Gather all map info into one dictionary
-                part_type_info = dict()
-
-                # Check allowed map_types
-                if 'map_type' in params[particle_species]:
-
-                    for map_type_call in params[particle_species]['map_type']:
-                        assert map_type_call in maps_register[particle_species], \
-                            f"Map type {map_type_call} is not allowed for {particle_species} maps."
-
-                    part_type_info['map_type'] = params[particle_species]['map_type']
-
-                else:
-                    read.wwarn(f"`map_type` not detected for {particle_species} particles.")
-
-                setattr(self, particle_species, part_type_info)
-
-        return
-
+    # def __parameter_parser(self, param_file: str) -> None:
+    #
+    #     params = yaml.load(open(param_file))
+    #
+    #     # Handle default parameters
+    #     if 'Default' in params:
+    #         assert len(params['Default'].keys()) > 0
+    #         if 'output_to_file' in params['Default']:
+    #             if params['Default']['output_to_file']:
+    #                 assert 'basename' in params['Default'], 'File basename not specified in the parameter file.'
+    #                 assert 'subdir' in params['Default'], 'Output directory not specified in the parameter file.'
+    #
+    #             if params['Default']['display_live']:
+    #                 read.wwarn('If you are going to save many figures, you may want to turn off `display_live`.')
+    #
+    #         # Push parameters onto class
+    #         for param in params['Default']:
+    #             setattr(self, param, params[param])
+    #     else:
+    #         read.wwarn('Default parameters do not appear to be specified in the parameter file.')
+    #
+    #     # Handle particle parameters {partType: allowed_maps}
+    #     maps_register = {
+    #         'Gas': [
+    #             'mass',
+    #             'density',
+    #             'particle_dot',
+    #             'particle_number',
+    #             'mass_weighted_temperature',
+    #             'metallicity',
+    #             'tSZ',
+    #             'kSZ',
+    #             'rkSZ',
+    #         ],
+    #         'Dark_matter': [
+    #             'mass',
+    #             'particle_dot',
+    #             'particle_number',
+    #         ],
+    #         'Stars': [
+    #             'mass',
+    #             'density',
+    #             'particle_dot',
+    #             'particle_number',
+    #             'metallicity',
+    #         ],
+    #     }
+    #
+    #     for particle_species in maps_register:
+    #
+    #         if particle_species in params and len(params[particle_species].items()) > 0:
+    #
+    #             # Gather all map info into one dictionary
+    #             part_type_info = dict()
+    #
+    #             # Check allowed map_types
+    #             if 'map_type' in params[particle_species]:
+    #
+    #                 for map_type_call in params[particle_species]['map_type']:
+    #                     assert map_type_call in maps_register[particle_species], \
+    #                         f"Map type {map_type_call} is not allowed for {particle_species} maps."
+    #
+    #                 part_type_info['map_type'] = params[particle_species]['map_type']
+    #
+    #             else:
+    #                 read.wwarn(f"`map_type` not detected for {particle_species} particles.")
+    #
+    #             setattr(self, particle_species, part_type_info)
+    #
+    #     return
+    #
     # @staticmethod
     # def _rotation_align_with_vector(
     #         coordinates: unyt.array, rotation_center: unyt.array, vector: unyt.array, axis: str
@@ -176,9 +176,9 @@ class Mapping:
         if tilt == 'y':
             new_coord = np.vstack((x, z, y)).T
         elif tilt == 'z':
-            new_coord = np.vstack((x, -y, z)).T
+            new_coord = np.vstack((x, y, z)).T
         elif tilt == 'x':
-            new_coord = np.vstack((-z, -y, x)).T
+            new_coord = np.vstack((z, y, x)).T
         elif tilt == 'faceon':
             face_on_rotation_matrix = rotation_matrix_from_vector(self.angular_momentum_hot_gas.value)
             new_coord = np.einsum('ijk,ik->ij', face_on_rotation_matrix, coord.value)
