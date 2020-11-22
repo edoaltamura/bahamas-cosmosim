@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem=20000
 #SBATCH --exclusive
-#SBATCH -J matmul_benchmark
+#SBATCH -J benchmark
 #SBATCH -o log_benchmark.out
 #SBATCH -e log_benchmark.err
 #SBATCH -t 1:00:00
