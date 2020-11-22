@@ -40,7 +40,7 @@ for iteration, msg_length in enumerate(np.logspace(0., 7, 100, dtype=np.int)):
     if rank == 0:
         data = np.ones((msg_length, 3))
         msg_bytes = data.nbytes
-        print(f"\n({iteration + 1}/60) Message size: {sizeof_fmt(msg_bytes)}")
+        print(f"\n({iteration + 1}/100) Message size: {sizeof_fmt(msg_bytes)}")
         startdelta = 0.
         stopdelta = 0.
         transmitdelta = 0.
