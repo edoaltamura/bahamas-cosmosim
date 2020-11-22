@@ -44,9 +44,9 @@ for msg_length in [10, 1000, 10000, 100000, 1000000]:
         recvstop = datetime.datetime.now()
 
         # if a spawned node, report communication latencies in microseconds
-        startdelta = float((recvstart - startdata).milliseconds)
-        stopdelta = float((recvstop - stopdata).milliseconds)
-        transmitdelta = float((stopdata - startdata).milliseconds)
+        startdelta = float((recvstart - startdata).microseconds) * 1e3
+        stopdelta = float((recvstop - stopdata).microseconds) * 1e3
+        transmitdelta = float((stopdata - startdata).microseconds) * 1e3
 
 
     startdelta_sum = comm.reduce(startdelta, op=MPI.SUM, root=0)
