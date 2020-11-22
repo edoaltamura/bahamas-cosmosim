@@ -66,7 +66,7 @@ for msg_length in np.logspace(0., 8.8, 60, dtype=np.int):
         # if a spawned node, report communication latencies in microseconds
         startdelta = float((recvstart - startdata).microseconds) * 1e-3
         stopdelta = float((recvstop - stopdata).microseconds) * 1e-3
-        transmitdelta = float((stopdata - startdata).microseconds) * 1e-3
+        transmitdelta = float((recvstop - startdata).microseconds) * 1e-3
 
     startdelta_sum = comm.reduce(startdelta, op=MPI.SUM, root=0)
     stopdelta_sum = comm.reduce(stopdelta, op=MPI.SUM, root=0)
@@ -90,7 +90,7 @@ for msg_length in np.logspace(0., 8.8, 60, dtype=np.int):
         print(f'start difference (msec) : {startdelta_sum / (size - 1):.0f} | max {startdelta_max:.0f} ')
         print(f'stop difference (msec) : {stopdelta_sum / (size - 1):.0f} | max {stopdelta_max:.0f} ')
         print(f'transmit difference (msec) : {transmitdelta_sum / (size - 1):.0f} | max {transmitdelta_max:.0f} ')
-        print(f"Shared memory: {shared_memory}")
+        print(f"Shared memory: {sizeof_fmt(shared_memory)}")
 
     comm.Barrier()  # wait for all hosts
 
