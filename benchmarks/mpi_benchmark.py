@@ -34,13 +34,21 @@ else:
     transmitdelta = float((stopdata - startdata).microseconds)
 
 
-startdelta = comm.reduce(startdelta, op=MPI.SUM, root=0)
-stopdelta = comm.reduce(stopdelta, op=MPI.SUM, root=0)
-transmitdelta = comm.reduce(transmitdelta, op=MPI.SUM, root=0)
+startdelta = comm.reduce(startdelta, op=MPI.SUM, root=0) / (size - 1)
+stopdelta = comm.reduce(stopdelta, op=MPI.SUM, root=0) / (size - 1)
+transmitdelta = comm.reduce(transmitdelta, op=MPI.SUM, root=0) / (size - 1)
+
+startdelta_min = comm.reduce(startdelta, op=MPI.MIN, root=0)
+stopdelta_min = comm.reduce(stopdelta, op=MPI.MIN, root=0)
+transmitdelta_min = comm.reduce(transmitdelta, op=MPI.MIN, root=0)
+
+startdelta_max = comm.reduce(startdelta, op=MPI.MAX, root=0)
+stopdelta_max = comm.reduce(stopdelta, op=MPI.MAX, root=0)
+transmitdelta_max = comm.reduce(transmitdelta, op=MPI.MAX, root=0)
 
 if rank == 0:
-    print('start difference (uS) : ' + str(startdelta / (size - 1)))
-    print('stop difference (uS) : ' + str(stopdelta / (size - 1)))
-    print('transmit difference (uS) : ' + str(transmitdelta / (size - 1)) + '\n')
+    print(f'start difference (usec) : {startdelta:.0f} | min {startdelta_min:.0f} | max {startdelta_max:.0f} ')
+    print(f'stop difference (usec) : {stopdelta:.0f} | min {stopdelta_min:.0f} | max {stopdelta_max:.0f} ')
+    print(f'transmit difference (usec) : {transmitdelta:.0f} | min {transmitdelta_min:.0f} | max {transmitdelta_max:.0f} ')
 
 comm.Barrier()  # wait for all hosts
