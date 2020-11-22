@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=2
+#SBATCH --nodes=2
+#SBATCH --ntasks-per-node=1
 #SBATCH --mem=20000
 #SBATCH --exclusive
 #SBATCH -J matmul_benchmark
@@ -10,9 +10,7 @@
 #SBATCH -t 1:00:00
 
 module purge
-module load rocks-openmpi_ib
-module load intelcompilers2017
-module load hdf5_1.10.4
+module load rocks-openmpi
 module load python37
 
 source /home/altamura/nas/rksz-venv/bin/activate
