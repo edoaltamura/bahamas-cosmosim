@@ -25,7 +25,7 @@ msg_length = np.empty(0, dtype=np.float)
 transmission = np.empty(0, dtype=np.float)
 transmission_max = np.empty(0, dtype=np.float)
 
-for msg_length in np.logspace(0, 12, 40, dtype=np.int):
+for msg_length in np.logspace(0., 8.8, 60, dtype=np.int):
 
     msg_bytes = None
 
