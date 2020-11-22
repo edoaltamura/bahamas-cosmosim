@@ -34,13 +34,13 @@ else:
     transmitdelta = stopdata - startdata
 
 
-startdelta = comm.reduce(startdelta, op=MPI.SUM, root=0) / (size - 1)
-stopdelta = comm.reduce(stopdelta, op=MPI.SUM, root=0) / (size - 1)
-transmitdelta = comm.reduce(transmitdelta, op=MPI.SUM, root=0) / (size - 1)
+startdelta = comm.reduce(startdelta, op=MPI.SUM, root=0)
+stopdelta = comm.reduce(stopdelta, op=MPI.SUM, root=0)
+transmitdelta = comm.reduce(transmitdelta, op=MPI.SUM, root=0)
 
 if rank == 0:
-    print('start difference (uS) : ' + str(startdelta.microseconds))
-    print('stop difference (uS) : ' + str(stopdelta.microseconds))
-    print('transmit difference (uS) : ' + str(transmitdelta.microseconds) + '\n')
+    print('start difference (uS) : ' + str(startdelta.microseconds / (size - 1)))
+    print('stop difference (uS) : ' + str(stopdelta.microseconds / (size - 1)))
+    print('transmit difference (uS) : ' + str(transmitdelta.microseconds / (size - 1)) + '\n')
 
 comm.Barrier()  # wait for all hosts
