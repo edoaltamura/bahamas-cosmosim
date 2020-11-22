@@ -25,7 +25,7 @@ msg_length = np.empty(0, dtype=np.float)
 transmission = np.empty(0, dtype=np.float)
 transmission_max = np.empty(0, dtype=np.float)
 
-for msg_length in np.logspace(0., 8.8, 60, dtype=np.int):
+for iteration, msg_length in np.ndenumerate(np.logspace(0., 8.8, 60, dtype=np.int)):
 
     msg_bytes = None
 
@@ -39,10 +39,8 @@ for msg_length in np.logspace(0., 8.8, 60, dtype=np.int):
     # master process
     if rank == 0:
         data = np.ones(msg_length)
-        print(f"Message size: {sizeof_fmt(data.nbytes)}")
-
         msg_bytes = data.nbytes
-
+        print(f"\n({iteration}/60)Message size: {sizeof_fmt(msg_bytes)}")
         startdelta = 0.
         stopdelta = 0.
         transmitdelta = 0.
@@ -80,8 +78,6 @@ for msg_length in np.logspace(0., 8.8, 60, dtype=np.int):
 
     mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     shared_memory = comm.reduce(mem, op=MPI.SUM, root=0)
-
-
 
     if rank == 0:
         msg_length = np.append(msg_length, msg_bytes)
