@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --nodes=2
+#SBATCH --nodes=16
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem=20000
 #SBATCH --exclusive
