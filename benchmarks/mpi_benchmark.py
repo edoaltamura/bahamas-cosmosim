@@ -21,7 +21,12 @@ for msg_length in [10, 1000, 10000, 100000, 1000000]:
     # master process
     if rank == 0:
         data = np.ones(msg_length)
-        print(f"Message size: {data.nbytes}")
+        print(f"Message size: {data.nbytes} bytes")
+
+        startdelta = 0.
+        stopdelta = 0.
+        transmitdelta = 0.
+
         # master process sends data to worker processes by
         # going through the ranks of all worker processes
         for i in range(1, size):
