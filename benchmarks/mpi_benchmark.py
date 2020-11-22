@@ -15,7 +15,7 @@ def sizeof_fmt(num, suffix='B'):
     return "%.1f %s%s" % (num, 'Yi', suffix)
 
 
-for msg_length in [10, 1000, 10000, 100000, 1000000]:
+for msg_length in np.logspace(1, 8, 10, dtype=np.int):
 
     startdelta_sum = 0.
     stopdelta_sum = 0.
@@ -50,9 +50,9 @@ for msg_length in [10, 1000, 10000, 100000, 1000000]:
         recvstop = datetime.datetime.now()
 
         # if a spawned node, report communication latencies in microseconds
-        startdelta = float((recvstart - startdata).microseconds) * 1e3
-        stopdelta = float((recvstop - stopdata).microseconds) * 1e3
-        transmitdelta = float((stopdata - startdata).microseconds) * 1e3
+        startdelta = float((recvstart - startdata).microseconds) * 1e-3
+        stopdelta = float((recvstop - stopdata).microseconds) * 1e-3
+        transmitdelta = float((stopdata - startdata).microseconds) * 1e-3
 
     startdelta_sum = comm.reduce(startdelta, op=MPI.SUM, root=0)
     stopdelta_sum = comm.reduce(stopdelta, op=MPI.SUM, root=0)
