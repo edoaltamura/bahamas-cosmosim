@@ -86,7 +86,7 @@ for iteration, msg_length in enumerate(np.logspace(0., 7, 100, dtype=np.int)):
         print(f'start difference (msec) : {startdelta_sum / (size - 1):.0f} | max {startdelta_max:.0f} ')
         print(f'stop difference (msec) : {stopdelta_sum / (size - 1):.0f} | max {stopdelta_max:.0f} ')
         print(f'transmit difference (msec) : {transmitdelta_sum / (size - 1):.0f} | max {transmitdelta_max:.0f} ')
-        print(f"Shared memory: {sizeof_fmt(shared_memory)}")
+        print(f"Shared memory: {sizeof_fmt(shared_memory * 1024 * 1024)}")
 
     comm.Barrier()  # wait for all hosts
 
