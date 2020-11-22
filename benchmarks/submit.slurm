@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=1
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=2
 #SBATCH --mem=20000
 #SBATCH --exclusive
 #SBATCH -J matmul_benchmark
