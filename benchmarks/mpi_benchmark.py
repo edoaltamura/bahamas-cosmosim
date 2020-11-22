@@ -9,6 +9,9 @@ size = comm.Get_size()
 # master process
 if rank == 0:
     data = np.ones(1000000)
+    startdelta = None
+    stopdelta = None
+    transmitdelta = None
     # master process sends data to worker processes by
     # going through the ranks of all worker processes
     for i in range(1, size):
@@ -26,12 +29,18 @@ else:
     recvstop = datetime.datetime.now()
 
     # if a spawned node, report communication latencies in microseconds
-    print(f"Rank {rank}:")
     startdelta = recvstart - startdata
-    print('start difference (uS) : ' + str(startdelta.microseconds))
     stopdelta = recvstop - stopdata
-    print('stop difference (uS) : ' + str(stopdelta.microseconds))
     transmitdelta = stopdata - startdata
+
+
+startdelta = comm.reduce(startdelta, op=MPI.SUM, root=0) / (size - 1)
+stopdelta = comm.reduce(stopdelta, op=MPI.SUM, root=0) / (size - 1)
+transmitdelta = comm.reduce(transmitdelta, op=MPI.SUM, root=0) / (size - 1)
+
+if rank == 0:
+    print('start difference (uS) : ' + str(startdelta.microseconds))
+    print('stop difference (uS) : ' + str(stopdelta.microseconds))
     print('transmit difference (uS) : ' + str(transmitdelta.microseconds) + '\n')
 
 comm.Barrier()  # wait for all hosts
