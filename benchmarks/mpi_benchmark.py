@@ -29,9 +29,9 @@ else:
     recvstop = datetime.datetime.now()
 
     # if a spawned node, report communication latencies in microseconds
-    startdelta = recvstart - startdata
-    stopdelta = recvstop - stopdata
-    transmitdelta = stopdata - startdata
+    startdelta = float((recvstart - startdata).microseconds)
+    stopdelta = float((recvstop - stopdata).microseconds)
+    transmitdelta = float((stopdata - startdata).microseconds)
 
 
 startdelta = comm.reduce(startdelta, op=MPI.SUM, root=0)
@@ -39,8 +39,8 @@ stopdelta = comm.reduce(stopdelta, op=MPI.SUM, root=0)
 transmitdelta = comm.reduce(transmitdelta, op=MPI.SUM, root=0)
 
 if rank == 0:
-    print('start difference (uS) : ' + str(startdelta.microseconds / (size - 1)))
-    print('stop difference (uS) : ' + str(stopdelta.microseconds / (size - 1)))
-    print('transmit difference (uS) : ' + str(transmitdelta.microseconds / (size - 1)) + '\n')
+    print('start difference (uS) : ' + str(startdelta / (size - 1)))
+    print('stop difference (uS) : ' + str(stopdelta / (size - 1)))
+    print('transmit difference (uS) : ' + str(transmitdelta / (size - 1)) + '\n')
 
 comm.Barrier()  # wait for all hosts
