@@ -36,9 +36,6 @@ class Mapping:
 
         self.set_dm_particles()
         self.set_hot_gas()
-        if read.rank == 0:
-            self.view_all()
-            plt.savefig(f'{output_directory}/test.{redshift}_{n}.png', dpi=(self.resolution * 15) // 30)
 
     # def __parameter_parser(self, param_file: str) -> None:
     #
@@ -539,16 +536,22 @@ class Mapping:
             plt.subplots_adjust(wspace=0., hspace=0.)
             plt.tight_layout()
 
+        return fig, axarr
+
+    def savefig(self, fig, *args, **kwargs):
+
+        fig.savefig(*args, **kwargs)
+
 
 if __name__ == '__main__':
 
     import pickle
     import os
 
-    output_directory = '/local/scratch/altamura/bahamas/maps'
+    output_directory = '/home/altamura/nas/rksz-bahamas'
     simulation_type = 'hydro'
     redshifts = ['z003p000', 'z002p000', 'z001p000', 'z000p250', 'z000p000']
-    cluster_ids = [0, 1, 2, 50, 100, 200, 1000]
+    cluster_ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 50, 100, 200, 1000]
 
     for redshift in redshifts:
 
@@ -557,7 +560,12 @@ if __name__ == '__main__':
         fofs = read.fof_groups(files)
         csrm = read.csr_index_matrix(fofs)
 
-        for n in cluster_ids:
+        for job_id, n in enumerate(cluster_ids):
+
+            # Parallelize across ranks
+            # If image not allocated to specific rank, skip iteration
+            if job_id % read.nproc != read.rank:
+                continue
 
             if not os.path.isfile(f'{output_directory}/test_cluster_data.{redshift}_{n}.pickle'):
                 fof = read.fof_group(n, fofs)
@@ -571,4 +579,6 @@ if __name__ == '__main__':
                     cluster_dict = pickle.load(handle)
 
                 cluster_data = read.class_wrap(cluster_dict).data
-                Mapping(cluster_data)
+                maps = Mapping(cluster_data)
+                fig, _ = maps.view_all()
+                maps.savefig(fig, f'{output_directory}/test.{redshift}_{n}.png', dpi=(maps.resolution * 15) // 30)
