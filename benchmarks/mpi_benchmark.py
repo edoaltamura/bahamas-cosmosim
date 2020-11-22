@@ -25,7 +25,7 @@ msg_length = np.empty(0, dtype=np.float)
 transmission = np.empty(0, dtype=np.float)
 transmission_max = np.empty(0, dtype=np.float)
 
-for iteration, msg_length in enumerate(np.logspace(0., 7, 100, dtype=np.int)):
+for iteration, msg_length in enumerate(np.logspace(0., 5, 200, dtype=np.int)):
 
     msg_bytes = None
 
@@ -44,13 +44,14 @@ for iteration, msg_length in enumerate(np.logspace(0., 7, 100, dtype=np.int)):
         startdelta = 0.
         stopdelta = 0.
         transmitdelta = 0.
-
+        msg_length = np.append(msg_length, msg_bytes)
         # master process sends data to worker processes by
         # going through the ranks of all worker processes
         for i in range(1, size):
             comm.send(datetime.datetime.now(), dest=i, tag=i)
             comm.send(data, dest=i, tag=i * 2)
             comm.send(datetime.datetime.now(), dest=i, tag=i * 3)
+        mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
     # worker processes
     else:
@@ -60,6 +61,8 @@ for iteration, msg_length in enumerate(np.logspace(0., 7, 100, dtype=np.int)):
         data = comm.recv(source=0, tag=rank * 2)
         stopdata = comm.recv(source=0, tag=rank * 3)
         recvstop = datetime.datetime.now()
+
+        mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
         # if a spawned node, report communication latencies in microseconds
         startdelta = float((recvstart - startdata).microseconds) * 1e-3
@@ -75,18 +78,16 @@ for iteration, msg_length in enumerate(np.logspace(0., 7, 100, dtype=np.int)):
     transmitdelta_max = comm.reduce(transmitdelta, op=MPI.MAX, root=0)
 
     msg_bytes = comm.bcast(msg_bytes, root=0)
-
-    mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     shared_memory = comm.reduce(mem, op=MPI.SUM, root=0)
 
     if rank == 0:
-        msg_length = np.append(msg_length, msg_bytes)
+
         transmission = np.append(transmission, transmitdelta_sum / (size - 1))
         transmission_max = np.append(transmission_max, transmitdelta_max)
-        print(f'start difference (msec) : {startdelta_sum / (size - 1):.0f} | max {startdelta_max:.0f} ')
-        print(f'stop difference (msec) : {stopdelta_sum / (size - 1):.0f} | max {stopdelta_max:.0f} ')
-        print(f'transmit difference (msec) : {transmitdelta_sum / (size - 1):.0f} | max {transmitdelta_max:.0f} ')
-        print(f"Shared memory: {sizeof_fmt(shared_memory * 1024 * 1024)}")
+        print(f'start difference (msec) : {startdelta_sum / (size - 1):.2f} | max {startdelta_max:.2f} ')
+        print(f'stop difference (msec) : {stopdelta_sum / (size - 1):.2f} | max {stopdelta_max:.2f} ')
+        print(f'transmit difference (msec) : {transmitdelta_sum / (size - 1):.2f} | max {transmitdelta_max:.2f} ')
+        print(f"Shared memory: {sizeof_fmt(shared_memory)}")
 
     comm.Barrier()  # wait for all hosts
 
