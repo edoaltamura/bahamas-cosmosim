@@ -10,7 +10,7 @@
 #SBATCH -t 1:00:00
 
 module purge
-module load mpi/openmpi-x86_64
+module load rocks-openmpi_ib
 module load intelcompilers2017
 module load hdf5_1.10.4
 module load python37
