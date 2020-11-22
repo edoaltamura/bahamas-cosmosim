@@ -8,13 +8,20 @@ size = comm.Get_size()
 
 for msg_length in [10, 1000, 10000, 100000, 1000000]:
 
+    startdelta_sum = 0.
+    stopdelta_sum = 0.
+    transmitdelta_sum = 0.
+    startdelta_min = 0.
+    stopdelta_min = 0.
+    transmitdelta_min = 0.
+    startdelta_max = 0.
+    stopdelta_max = 0.
+    transmitdelta_max = 0.
+
     # master process
     if rank == 0:
         data = np.ones(msg_length)
         print(f"Message size: {data.nbytes}")
-        startdelta = 0.
-        stopdelta = 0.
-        transmitdelta = 0.
         # master process sends data to worker processes by
         # going through the ranks of all worker processes
         for i in range(1, size):
@@ -37,9 +44,9 @@ for msg_length in [10, 1000, 10000, 100000, 1000000]:
         transmitdelta = float((stopdata - startdata).microseconds)
 
 
-    startdelta = comm.reduce(startdelta, op=MPI.SUM, root=0)
-    stopdelta = comm.reduce(stopdelta, op=MPI.SUM, root=0)
-    transmitdelta = comm.reduce(transmitdelta, op=MPI.SUM, root=0)
+    startdelta_sum = comm.reduce(startdelta, op=MPI.SUM, root=0)
+    stopdelta_sum = comm.reduce(stopdelta, op=MPI.SUM, root=0)
+    transmitdelta_sum = comm.reduce(transmitdelta, op=MPI.SUM, root=0)
 
     startdelta_min = comm.reduce(startdelta, op=MPI.MIN, root=0)
     stopdelta_min = comm.reduce(stopdelta, op=MPI.MIN, root=0)
@@ -50,8 +57,8 @@ for msg_length in [10, 1000, 10000, 100000, 1000000]:
     transmitdelta_max = comm.reduce(transmitdelta, op=MPI.MAX, root=0)
 
     if rank == 0:
-        print(f'start difference (usec) : {startdelta / (size - 1):.0f} | min {startdelta_min:.0f} | max {startdelta_max:.0f} ')
-        print(f'stop difference (usec) : {stopdelta / (size - 1):.0f} | min {stopdelta_min:.0f} | max {stopdelta_max:.0f} ')
-        print(f'transmit difference (usec) : {transmitdelta / (size - 1):.0f} | min {transmitdelta_min:.0f} | max {transmitdelta_max:.0f} ')
+        print(f'start difference (usec) : {startdelta_sum / (size - 1):.0f} | min {startdelta_min:.0f} | max {startdelta_max:.0f} ')
+        print(f'stop difference (usec) : {stopdelta_sum / (size - 1):.0f} | min {stopdelta_min:.0f} | max {stopdelta_max:.0f} ')
+        print(f'transmit difference (usec) : {transmitdelta_sum / (size - 1):.0f} | min {transmitdelta_min:.0f} | max {transmitdelta_max:.0f} ')
 
     comm.Barrier()  # wait for all hosts
