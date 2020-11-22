@@ -5,8 +5,6 @@
 #SBATCH -J bahamas_proc
 #SBATCH -o log_bahamas.out
 #SBATCH -e log_bahamas.err
-#SBATCH -p CLUSTER
-#SBATCH -A altamura
 #SBATCH -t 10:00:00
 
 module purge
@@ -17,7 +15,7 @@ module load python37
 
 source /home/altamura/nas/rksz-venv/bin/activate
 
-mpirun -np $SLURM_NTASKS python3 flight.py
+mpirun -np $SLURM_NTASKS python3 bahamas-cosmosim/mapping.py
 
 deactivate
 
