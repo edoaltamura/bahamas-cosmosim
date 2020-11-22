@@ -9,9 +9,9 @@ size = comm.Get_size()
 # master process
 if rank == 0:
     data = np.ones(1000000)
-    startdelta = None
-    stopdelta = None
-    transmitdelta = None
+    startdelta = 0.
+    stopdelta = 0.
+    transmitdelta = 0.
     # master process sends data to worker processes by
     # going through the ranks of all worker processes
     for i in range(1, size):
