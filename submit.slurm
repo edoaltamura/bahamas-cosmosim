@@ -2,6 +2,7 @@
 
 #SBATCH --nodes=10
 #SBATCH --ntasks-per-node=15
+#SBATCH --cpus-per-task=1
 #SBATCH --mem=20000
 #SBATCH --exclusive
 #SBATCH -J bahamas_proc

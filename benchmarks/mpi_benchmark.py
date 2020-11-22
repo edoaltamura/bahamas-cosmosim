@@ -25,7 +25,7 @@ msg_length = np.empty(0, dtype=np.float)
 transmission = np.empty(0, dtype=np.float)
 transmission_max = np.empty(0, dtype=np.float)
 
-for iteration, msg_length in np.ndenumerate(np.logspace(0., 8.8, 60, dtype=np.int)):
+for iteration, msg_length in enumerate(np.logspace(0., 7, 100, dtype=np.int)):
 
     msg_bytes = None
 
@@ -38,9 +38,9 @@ for iteration, msg_length in np.ndenumerate(np.logspace(0., 8.8, 60, dtype=np.in
 
     # master process
     if rank == 0:
-        data = np.ones(msg_length)
+        data = np.ones((msg_length, 3))
         msg_bytes = data.nbytes
-        print(f"\n({iteration}/60)Message size: {sizeof_fmt(msg_bytes)}")
+        print(f"\n({iteration + 1}/60) Message size: {sizeof_fmt(msg_bytes)}")
         startdelta = 0.
         stopdelta = 0.
         transmitdelta = 0.
