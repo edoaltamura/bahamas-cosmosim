@@ -6,6 +6,7 @@ from mpi4py import MPI
 import datetime
 import numpy as np
 from matplotlib import pyplot as plt
+import resource
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -77,6 +78,9 @@ for msg_length in np.logspace(0, 12, 40, dtype=np.int):
 
     msg_bytes = comm.bcast(msg_bytes, root=0)
 
+    mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    shared_memory = comm.reduce(mem, op=MPI.SUM, root=0)
+
 
 
     if rank == 0:
@@ -86,6 +90,7 @@ for msg_length in np.logspace(0, 12, 40, dtype=np.int):
         print(f'start difference (msec) : {startdelta_sum / (size - 1):.0f} | max {startdelta_max:.0f} ')
         print(f'stop difference (msec) : {stopdelta_sum / (size - 1):.0f} | max {stopdelta_max:.0f} ')
         print(f'transmit difference (msec) : {transmitdelta_sum / (size - 1):.0f} | max {transmitdelta_max:.0f} ')
+        print(f"Shared memory: {shared_memory}")
 
     comm.Barrier()  # wait for all hosts
 
