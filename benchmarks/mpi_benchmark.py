@@ -77,11 +77,12 @@ for msg_length in np.logspace(0, 12, 40, dtype=np.int):
 
     msg_bytes = comm.bcast(msg_bytes, root=0)
 
-    msg_length = np.append(msg_length, msg_bytes)
-    transmission = np.append(transmission, transmitdelta_sum / (size - 1))
-    transmission_max = np.append(transmission_max, transmitdelta_max)
+
 
     if rank == 0:
+        msg_length = np.append(msg_length, msg_bytes)
+        transmission = np.append(transmission, transmitdelta_sum / (size - 1))
+        transmission_max = np.append(transmission_max, transmitdelta_max)
         print(f'start difference (msec) : {startdelta_sum / (size - 1):.0f} | max {startdelta_max:.0f} ')
         print(f'stop difference (msec) : {stopdelta_sum / (size - 1):.0f} | max {stopdelta_max:.0f} ')
         print(f'transmit difference (msec) : {transmitdelta_sum / (size - 1):.0f} | max {transmitdelta_max:.0f} ')
