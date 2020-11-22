@@ -20,9 +20,9 @@ def sizeof_fmt(num, suffix='B'):
     return "%.1f %s%s" % (num, 'Yi', suffix)
 
 
-msg_length = []
-transmission = []
-transmission_max = []
+msg_length = np.empty(0, dtype=np.float)
+transmission = np.empty(0, dtype=np.float)
+transmission_max = np.empty(0, dtype=np.float)
 
 for msg_length in np.logspace(0, 12, 40, dtype=np.int):
 
@@ -77,9 +77,9 @@ for msg_length in np.logspace(0, 12, 40, dtype=np.int):
 
     msg_bytes = comm.bcast(msg_bytes, root=0)
 
-    msg_length.append(msg_bytes)
-    transmission.append(transmitdelta_sum / (size - 1))
-    transmission_max.append(transmitdelta_max)
+    msg_length = np.append(msg_length, msg_bytes)
+    transmission = np.append(transmission, transmitdelta_sum / (size - 1))
+    transmission_max = np.append(transmission_max, transmitdelta_max)
 
     if rank == 0:
         print(f'start difference (msec) : {startdelta_sum / (size - 1):.0f} | max {startdelta_max:.0f} ')
