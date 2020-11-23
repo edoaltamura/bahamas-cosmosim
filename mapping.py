@@ -567,18 +567,26 @@ if __name__ == '__main__':
             if job_id % read.nproc != read.rank:
                 continue
 
-            if not os.path.isfile(f'{output_directory}/test_cluster_data.{redshift}_{n}.pickle'):
-                fof = read.fof_group(n, fofs)
-                cluster_dict = read.fof_particles(fof, csrm)
+            try:
 
-                with open(f'{output_directory}/test_cluster_data.{redshift}_{n}.pickle', 'wb') as handle:
-                    pickle.dump(cluster_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                if not os.path.isfile(f'{output_directory}/test_cluster_data.{redshift}_{n}.pickle'):
+                    fof = read.fof_group(n, fofs)
+                    cluster_dict = read.fof_particles(fof, csrm)
 
-            if not os.path.isfile(f'{output_directory}/test.{redshift}_{n}.png'):
-                with open(f'{output_directory}/test_cluster_data.{redshift}_{n}.pickle', 'rb') as handle:
-                    cluster_dict = pickle.load(handle)
+                    with open(f'{output_directory}/test_cluster_data.{redshift}_{n}.pickle', 'wb') as handle:
+                        pickle.dump(cluster_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-                cluster_data = read.class_wrap(cluster_dict).data
-                maps = Mapping(cluster_data)
-                fig, _ = maps.view_all()
-                maps.savefig(fig, f'{output_directory}/test.{redshift}_{n}.png', dpi=(maps.resolution * 15) // 30)
+                if not os.path.isfile(f'{output_directory}/test.{redshift}_{n}.png'):
+                    with open(f'{output_directory}/test_cluster_data.{redshift}_{n}.pickle', 'rb') as handle:
+                        cluster_dict = pickle.load(handle)
+
+                    cluster_data = read.class_wrap(cluster_dict).data
+                    maps = Mapping(cluster_data)
+                    fig, _ = maps.view_all()
+                    maps.savefig(fig, f'{output_directory}/test.{redshift}_{n}.png', dpi=(maps.resolution * 15) // 30)
+
+            except IndexError as e:
+                # Some high-index halos may not have sufficient mass to be picked up at high
+                # redshifts. Catch that exception and continue with other halos.
+                read.pprint(e)
+                continue
