@@ -44,7 +44,7 @@ for iteration, msg_length in enumerate(np.logspace(0., 5, 200, dtype=np.int)):
         startdelta = 0.
         stopdelta = 0.
         transmitdelta = 0.
-        msg_length = np.append(msg_length, msg_bytes)
+
         # master process sends data to worker processes by
         # going through the ranks of all worker processes
         for i in range(1, size):
@@ -84,6 +84,7 @@ for iteration, msg_length in enumerate(np.logspace(0., 5, 200, dtype=np.int)):
 
         transmission = np.append(transmission, transmitdelta_sum / (size - 1))
         transmission_max = np.append(transmission_max, transmitdelta_max)
+        msg_length = np.append(msg_length, msg_bytes)
         print(f'start difference (msec) : {startdelta_sum / (size - 1):.2f} | max {startdelta_max:.2f} ')
         print(f'stop difference (msec) : {stopdelta_sum / (size - 1):.2f} | max {stopdelta_max:.2f} ')
         print(f'transmit difference (msec) : {transmitdelta_sum / (size - 1):.2f} | max {transmitdelta_max:.2f} ')
