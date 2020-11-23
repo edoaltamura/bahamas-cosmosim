@@ -93,4 +93,5 @@ if rank == 0:
     plt.xlabel('Message size [Bytes]')
     plt.ylabel('Transmission time [milliseconds]')
     plt.xscale('log')
+    plt.yscale('log')
     plt.savefig('benchmark.png')
