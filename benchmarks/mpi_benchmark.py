@@ -21,7 +21,7 @@ def sizeof_fmt(num, suffix='B'):
     return "%.1f %s%s" % (num, 'Yi', suffix)
 
 
-for iteration, msg_length in enumerate(np.logspace(0., 5, 200, dtype=np.int)):
+for iteration, msg_length in enumerate(np.logspace(4., 8, 20, dtype=np.int)):
 
     msg_bytes = None
 
@@ -88,8 +88,8 @@ for iteration, msg_length in enumerate(np.logspace(0., 5, 200, dtype=np.int)):
 
 if rank == 0:
     data = np.loadtxt('benchmark.txt').T
-    plt.plot(data[0], data[1])
-    plt.plot(data[0], data[2])
+    plt.scatter(data[0], data[1])
+    plt.scatter(data[0], data[2])
     plt.xlabel('Message size [Bytes]')
     plt.ylabel('Transmission time [milliseconds]')
     plt.xscale('log')
