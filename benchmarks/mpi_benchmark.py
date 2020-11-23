@@ -21,8 +21,6 @@ def sizeof_fmt(num, suffix='B'):
     return "%.1f %s%s" % (num, 'Yi', suffix)
 
 
-
-
 for iteration, msg_length in enumerate(np.logspace(0., 5, 200, dtype=np.int)):
 
     msg_bytes = None
@@ -79,8 +77,8 @@ for iteration, msg_length in enumerate(np.logspace(0., 5, 200, dtype=np.int)):
     shared_memory = comm.reduce(mem, op=MPI.SUM, root=0)
 
     if rank == 0:
-        plt.plot(msg_length, transmitdelta_sum / (size - 1))
-        plt.plot(msg_length, transmitdelta_max)
+        with open('benchmark.txt', 'a+') as out_file:
+            print(f"{msg_length} {transmitdelta_sum / (size - 1)} {transmitdelta_max}", file=out_file)
         print(f'start difference (msec) : {startdelta_sum / (size - 1):.2f} | max {startdelta_max:.2f} ')
         print(f'stop difference (msec) : {stopdelta_sum / (size - 1):.2f} | max {stopdelta_max:.2f} ')
         print(f'transmit difference (msec) : {transmitdelta_sum / (size - 1):.2f} | max {transmitdelta_max:.2f} ')
@@ -89,6 +87,9 @@ for iteration, msg_length in enumerate(np.logspace(0., 5, 200, dtype=np.int)):
     comm.Barrier()  # wait for all hosts
 
 if rank == 0:
+    data = np.loadtxt('benchmark.txt').T
+    plt.plot(data[0], data[1])
+    plt.plot(data[0], data[2])
     plt.xlabel('Message size [Bytes]')
     plt.ylabel('Transmission time [milliseconds]')
     plt.xscale('log')
