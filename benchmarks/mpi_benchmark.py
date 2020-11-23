@@ -78,7 +78,7 @@ for iteration, msg_length in enumerate(np.logspace(0., 5, 200, dtype=np.int)):
 
     if rank == 0:
         with open('benchmark.txt', 'a+') as out_file:
-            print(f"{msg_length} {transmitdelta_sum / (size - 1)} {transmitdelta_max}", file=out_file)
+            print(f"{msg_bytes} {transmitdelta_sum / (size - 1)} {transmitdelta_max}", file=out_file)
         print(f'start difference (msec) : {startdelta_sum / (size - 1):.2f} | max {startdelta_max:.2f} ')
         print(f'stop difference (msec) : {stopdelta_sum / (size - 1):.2f} | max {stopdelta_max:.2f} ')
         print(f'transmit difference (msec) : {transmitdelta_sum / (size - 1):.2f} | max {transmitdelta_max:.2f} ')
