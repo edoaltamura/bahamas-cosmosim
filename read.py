@@ -459,7 +459,7 @@ def particle_index_from_csrm(fofgroup: dict, particle_type: int, csrm: dict) -> 
     start, _ = split(N_particles)
     idx = fofgroup['clusterID']
     particle_index = csrm[f'PartType{particle_type}'][idx][0] + start
-    # particle_index = commune(particle_index)
+    particle_index = commune(particle_index)
     return particle_index
 
 
