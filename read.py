@@ -497,6 +497,10 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
             particle_idx1 = particle_index_from_csrm(fofgroup, 1, csrm)
             particle_idx4 = particle_index_from_csrm(fofgroup, 4, csrm)
 
+            pprint('particle_idx0', particle_idx0)
+            pprint('particle_idx1', particle_idx1)
+            pprint('particle_idx4', particle_idx4)
+
             # Initialise empty arrays on all cores
             subfind_particle_data['PartType0']['Coordinates'] = np.empty(0, dtype=np.float)
             subfind_particle_data['PartType0']['Density'] = np.empty(0, dtype=np.float)

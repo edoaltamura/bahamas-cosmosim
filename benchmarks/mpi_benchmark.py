@@ -88,8 +88,8 @@ for iteration, msg_length in enumerate(np.logspace(4., 8, 20, dtype=np.int)):
 
 if rank == 0:
     data = np.loadtxt('benchmark.txt').T
-    plt.scatter(data[0], data[1])
-    plt.scatter(data[0], data[2])
+    plt.scatter(data[0], data[1], s=2)
+    plt.scatter(data[0], data[2], s=2)
     plt.xlabel('Message size [Bytes]')
     plt.ylabel('Transmission time [milliseconds]')
     plt.xscale('log')
