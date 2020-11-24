@@ -182,7 +182,6 @@ def fof_groups(files: list) -> dict:
         'CentreOfMass', 'CentreOfPotential', 'GasSpin', 'GroupNumber', 'HalfMassProjRad', 'HalfMassRad',
         'IDMostBound', 'SubLength', 'SubOffset', 'Velocity', 'Vmax', 'VmaxRadius'
     ]
-    # 'StarsSpin', 'StarFormationRate', 'StellarVelDisp'
 
     # Find eagle subfind tab hdf5 internal paths
     subfind_tab_data = {}
@@ -223,7 +222,7 @@ def fof_groups(files: list) -> dict:
 
                 # Convert FOF fields to the corresponding data type
                 subfind_tab_data['FOF'][fof_field] = subfind_tab_data['FOF'][fof_field].astype(
-                    str(field_data_handle.dtype)
+                    field_data_handle.dtype.char
                 )
 
             for subhalo_field in subhalo_fields:
@@ -235,7 +234,7 @@ def fof_groups(files: list) -> dict:
 
                 # Convert Subhalo fields to the corresponding data type
                 subfind_tab_data['Subhalo'][subhalo_field] = subfind_tab_data['Subhalo'][subhalo_field].astype(
-                    str(field_data_handle.dtype)
+                    field_data_handle.dtype.char
                 )
 
     st, fh = split(len(files[1]))
@@ -253,7 +252,7 @@ def fof_groups(files: list) -> dict:
 
                 # Convert group data fields to the corresponding data type
                 group_tab_data['FOF'][group_tab_field] = group_tab_data['FOF'][group_tab_field].astype(
-                    str(field_data_handle.dtype)
+                    field_data_handle.dtype.char
                 )
 
     for fof_field in fof_fields:
@@ -291,9 +290,6 @@ def fof_groups(files: list) -> dict:
     subfind_tab_data['Subhalo']['Velocity'] *= conv_velocity * unit_velocity
     subfind_tab_data['Subhalo']['Vmax'] *= conv_velocity * unit_velocity
     subfind_tab_data['Subhalo']['VmaxRadius'] *= conv_length * unit_length
-    # subfind_tab_data['Subhalo']['StarsMass'] *= conv_mass * unit_mass
-    # subfind_tab_data['Subhalo']['StarFormationRate'] *= conv_starFormationRate * unit_starFormationRate
-    # subfind_tab_data['Subhalo']['StellarVelDisp'] *= conv_velocity * unit_velocity
 
     # Give units to the datasets: FOF group-tab data
     group_tab_data['FOF']['CentreOfMass'] *= conv_length * unit_length
@@ -330,6 +326,7 @@ def fof_groups(files: list) -> dict:
     for category in ['FOF', 'Subhalo']:
         for dataset in subfind_tab_data[category]:
             subfind_tab_data[category][dataset] = subfind_tab_data[category][dataset][filter_idx]
+
     for dataset in group_tab_data['FOF']:
         group_tab_data['FOF'][dataset] = group_tab_data['FOF'][dataset][filter_idx]
 
