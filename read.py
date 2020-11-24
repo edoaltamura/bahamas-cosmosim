@@ -180,9 +180,9 @@ def fof_groups(files: list) -> dict:
     ]
     subhalo_fields = [
         'CentreOfMass', 'CentreOfPotential', 'GasSpin', 'GroupNumber', 'HalfMassProjRad', 'HalfMassRad',
-        'IDMostBound', 'SubLength', 'SubOffset', 'Velocity', 'Vmax', 'VmaxRadius', 'StarsSpin',
-        'StarFormationRate', 'StellarVelDisp'
+        'IDMostBound', 'SubLength', 'SubOffset', 'Velocity', 'Vmax', 'VmaxRadius'
     ]
+    # 'StarsSpin', 'StarFormationRate', 'StellarVelDisp'
 
     # Find eagle subfind tab hdf5 internal paths
     subfind_tab_data = {}
