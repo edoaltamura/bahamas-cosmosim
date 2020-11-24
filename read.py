@@ -255,49 +255,54 @@ def fof_groups(files: list) -> dict:
                     field_data_handle.dtype.char
                 )
 
+    # Make a copy of the dictionary to MPI-gather data
+    _subfind_tab_data = deepcopy(subfind_tab_data)
+    _group_tab_data = deepcopy(group_tab_data)
+
     for fof_field in fof_fields:
-        subfind_tab_data['FOF'][fof_field] = commune(subfind_tab_data['FOF'][fof_field])
+        _subfind_tab_data['FOF'][fof_field] = commune(subfind_tab_data['FOF'][fof_field])
 
     for subhalo_field in subhalo_fields:
-        subfind_tab_data['Subhalo'][subhalo_field] = commune(subfind_tab_data['Subhalo'][subhalo_field])
+        _subfind_tab_data['Subhalo'][subhalo_field] = commune(subfind_tab_data['Subhalo'][subhalo_field])
 
     for group_tab_field in group_tab_fields:
-        group_tab_data['FOF'][group_tab_field] = commune(group_tab_data['FOF'][group_tab_field])
+        _group_tab_data['FOF'][group_tab_field] = commune(group_tab_data['FOF'][group_tab_field])
 
     # Give units to the datasets: FOF Subfind data
-    subfind_tab_data['FOF']['GroupCentreOfPotential'] *= conv_length * unit_length
-    subfind_tab_data['FOF']['GroupMass'] *= conv_mass * unit_mass
-    subfind_tab_data['FOF']['Group_M_Crit200'] *= conv_mass * unit_mass
-    subfind_tab_data['FOF']['Group_M_Crit2500'] *= conv_mass * unit_mass
-    subfind_tab_data['FOF']['Group_M_Crit500'] *= conv_mass * unit_mass
-    subfind_tab_data['FOF']['Group_M_Mean200'] *= conv_mass * unit_mass
-    subfind_tab_data['FOF']['Group_M_Mean2500'] *= conv_mass * unit_mass
-    subfind_tab_data['FOF']['Group_M_Mean500'] *= conv_mass * unit_mass
-    subfind_tab_data['FOF']['Group_M_TopHat200'] *= conv_mass * unit_mass
-    subfind_tab_data['FOF']['Group_R_Crit200'] *= conv_length * unit_length
-    subfind_tab_data['FOF']['Group_R_Crit2500'] *= conv_length * unit_length
-    subfind_tab_data['FOF']['Group_R_Crit500'] *= conv_length * unit_length
-    subfind_tab_data['FOF']['Group_R_Mean200'] *= conv_length * unit_length
-    subfind_tab_data['FOF']['Group_R_Mean2500'] *= conv_length * unit_length
-    subfind_tab_data['FOF']['Group_R_Mean500'] *= conv_length * unit_length
-    subfind_tab_data['FOF']['Group_R_TopHat200'] *= conv_length * unit_length
+    _subfind_tab_data['FOF']['GroupCentreOfPotential'] *= conv_length * unit_length
+    _subfind_tab_data['FOF']['GroupMass'] *= conv_mass * unit_mass
+    _subfind_tab_data['FOF']['Group_M_Crit200'] *= conv_mass * unit_mass
+    _subfind_tab_data['FOF']['Group_M_Crit2500'] *= conv_mass * unit_mass
+    _subfind_tab_data['FOF']['Group_M_Crit500'] *= conv_mass * unit_mass
+    _subfind_tab_data['FOF']['Group_M_Mean200'] *= conv_mass * unit_mass
+    _subfind_tab_data['FOF']['Group_M_Mean2500'] *= conv_mass * unit_mass
+    _subfind_tab_data['FOF']['Group_M_Mean500'] *= conv_mass * unit_mass
+    _subfind_tab_data['FOF']['Group_M_TopHat200'] *= conv_mass * unit_mass
+    _subfind_tab_data['FOF']['Group_R_Crit200'] *= conv_length * unit_length
+    _subfind_tab_data['FOF']['Group_R_Crit2500'] *= conv_length * unit_length
+    _subfind_tab_data['FOF']['Group_R_Crit500'] *= conv_length * unit_length
+    _subfind_tab_data['FOF']['Group_R_Mean200'] *= conv_length * unit_length
+    _subfind_tab_data['FOF']['Group_R_Mean2500'] *= conv_length * unit_length
+    _subfind_tab_data['FOF']['Group_R_Mean500'] *= conv_length * unit_length
+    _subfind_tab_data['FOF']['Group_R_TopHat200'] *= conv_length * unit_length
 
     # Give units to the datasets: subhalo Subfind data
-    subfind_tab_data['Subhalo']['CentreOfMass'] *= conv_length * unit_length
-    subfind_tab_data['Subhalo']['CentreOfPotential'] *= conv_length * unit_length
-    subfind_tab_data['Subhalo']['HalfMassProjRad'] *= conv_length * unit_length
-    subfind_tab_data['Subhalo']['HalfMassRad'] *= conv_length * unit_length
-    subfind_tab_data['Subhalo']['Velocity'] *= conv_velocity * unit_velocity
-    subfind_tab_data['Subhalo']['Vmax'] *= conv_velocity * unit_velocity
-    subfind_tab_data['Subhalo']['VmaxRadius'] *= conv_length * unit_length
+    _subfind_tab_data['Subhalo']['CentreOfMass'] *= conv_length * unit_length
+    _subfind_tab_data['Subhalo']['CentreOfPotential'] *= conv_length * unit_length
+    _subfind_tab_data['Subhalo']['HalfMassProjRad'] *= conv_length * unit_length
+    _subfind_tab_data['Subhalo']['HalfMassRad'] *= conv_length * unit_length
+    _subfind_tab_data['Subhalo']['Velocity'] *= conv_velocity * unit_velocity
+    _subfind_tab_data['Subhalo']['Vmax'] *= conv_velocity * unit_velocity
+    _subfind_tab_data['Subhalo']['VmaxRadius'] *= conv_length * unit_length
 
     # Give units to the datasets: FOF group-tab data
-    group_tab_data['FOF']['CentreOfMass'] *= conv_length * unit_length
-    group_tab_data['FOF']['GroupMassType'] *= conv_mass * unit_mass
-    group_tab_data['FOF']['Mass'] *= conv_mass * unit_mass
+    _group_tab_data['FOF']['CentreOfMass'] *= conv_length * unit_length
+    _group_tab_data['FOF']['GroupMassType'] *= conv_mass * unit_mass
+    _group_tab_data['FOF']['Mass'] *= conv_mass * unit_mass
 
     # From the FOF dataset, only need to reshape the CoP
-    subfind_tab_data['FOF']['GroupCentreOfPotential'] = subfind_tab_data['FOF']['GroupCentreOfPotential'].reshape(-1, 3)
+    _subfind_tab_data['FOF']['GroupCentreOfPotential'] = \
+        _subfind_tab_data['FOF']['GroupCentreOfPotential'].reshape(-1, 3)
 
     # Reshape datasets from subhalo fields
     for key in [
@@ -306,36 +311,36 @@ def fof_groups(files: list) -> dict:
         'GasSpin',
         'Velocity',
     ]:
-        subfind_tab_data['Subhalo'][key] = subfind_tab_data['Subhalo'][key].reshape(-1, 3)
+        _subfind_tab_data['Subhalo'][key] = _subfind_tab_data['Subhalo'][key].reshape(-1, 3)
 
     # The HalfMassProjRad and HalfMassRad fields have special shape
-    subfind_tab_data['Subhalo']['HalfMassProjRad'] = subfind_tab_data['Subhalo']['HalfMassProjRad'].reshape(-1, 6)
-    subfind_tab_data['Subhalo']['HalfMassRad'] = subfind_tab_data['Subhalo']['HalfMassRad'].reshape(-1, 6)
+    _subfind_tab_data['Subhalo']['HalfMassProjRad'] = _subfind_tab_data['Subhalo']['HalfMassProjRad'].reshape(-1, 6)
+    _subfind_tab_data['Subhalo']['HalfMassRad'] = _subfind_tab_data['Subhalo']['HalfMassRad'].reshape(-1, 6)
 
     # Reshape group_tab_data fields that were flattened over MPI
-    group_tab_data['FOF']['CentreOfMass'] = group_tab_data['FOF']['CentreOfMass'].reshape(-1, 3)
-    group_tab_data['FOF']['GroupLengthType'] = group_tab_data['FOF']['GroupLengthType'].reshape(-1, 6)
-    group_tab_data['FOF']['GroupMassType'] = group_tab_data['FOF']['GroupMassType'].reshape(-1, 6)
-    group_tab_data['FOF']['GroupOffsetType'] = group_tab_data['FOF']['GroupOffsetType'].reshape(-1, 6)
+    _group_tab_data['FOF']['CentreOfMass'] = _group_tab_data['FOF']['CentreOfMass'].reshape(-1, 3)
+    _group_tab_data['FOF']['GroupLengthType'] = _group_tab_data['FOF']['GroupLengthType'].reshape(-1, 6)
+    _group_tab_data['FOF']['GroupMassType'] = _group_tab_data['FOF']['GroupMassType'].reshape(-1, 6)
+    _group_tab_data['FOF']['GroupOffsetType'] = _group_tab_data['FOF']['GroupOffsetType'].reshape(-1, 6)
 
     # Edit the AttrDict object and push the filtered data
     filter_idx = np.where(
-        subfind_tab_data['FOF']['Group_M_Crit500'] > 1.e13
+        _subfind_tab_data['FOF']['Group_M_Crit500'] > 1.e13
     )[0]
 
     for category in ['FOF', 'Subhalo']:
-        for dataset in subfind_tab_data[category]:
-            subfind_tab_data[category][dataset] = subfind_tab_data[category][dataset][filter_idx]
+        for dataset in _subfind_tab_data[category]:
+            _subfind_tab_data[category][dataset] = _subfind_tab_data[category][dataset][filter_idx]
 
-    for dataset in group_tab_data['FOF']:
-        group_tab_data['FOF'][dataset] = group_tab_data['FOF'][dataset][filter_idx]
+    for dataset in _group_tab_data['FOF']:
+        _group_tab_data['FOF'][dataset] = _group_tab_data['FOF'][dataset][filter_idx]
 
     # Gather all data into a large dictionary
     data_dict = {}
     data_dict['files'] = files
     data_dict['header'] = master_header
-    data_dict['subfind_tab'] = subfind_tab_data
-    data_dict['group_tab'] = group_tab_data
+    data_dict['subfind_tab'] = _subfind_tab_data
+    data_dict['group_tab'] = _group_tab_data
     data_dict['mass_DMpart'] = header['MassTable'][1] * conv_mass * unit_mass
 
     return data_dict
