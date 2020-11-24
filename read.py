@@ -309,7 +309,6 @@ def fof_groups(files: list) -> dict:
         'CentreOfPotential',
         'GasSpin',
         'Velocity',
-        'StarsSpin',
     ]:
         subfind_tab_data['Subhalo'][key] = subfind_tab_data['Subhalo'][key].reshape(-1, 3)
 
