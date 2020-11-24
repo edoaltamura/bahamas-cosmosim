@@ -347,6 +347,7 @@ def fof_groups(files: list) -> dict:
 def fof_group(clusterID: int, fofgroups: dict) -> dict:
     # pprint(f"[+] Find group information for cluster {clusterID}")
     _fofgroups = deepcopy(fofgroups)
+    pprint(_fofgroups)
 
     # Filter groups
     for dataset_category in _fofgroups.keys():
