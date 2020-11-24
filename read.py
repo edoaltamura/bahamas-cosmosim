@@ -349,9 +349,9 @@ def fof_group(clusterID: int, fofgroups: dict) -> dict:
     _fofgroups = deepcopy(fofgroups)
 
     # Filter groups
-    for dataset_category in _fofgroups:
-        for object_type in _fofgroups[dataset_category]:
-            for data_field in _fofgroups[dataset_category][object_type]:
+    for dataset_category in _fofgroups.keys():
+        for object_type in _fofgroups[dataset_category].keys():
+            for data_field in _fofgroups[dataset_category][object_type].keys():
                 _fofgroups[dataset_category][object_type][data_field] = \
                     fofgroups[dataset_category][object_type][data_field][clusterID]
 
