@@ -291,9 +291,9 @@ def fof_groups(files: list) -> dict:
     subfind_tab_data['Subhalo']['Velocity'] *= conv_velocity * unit_velocity
     subfind_tab_data['Subhalo']['Vmax'] *= conv_velocity * unit_velocity
     subfind_tab_data['Subhalo']['VmaxRadius'] *= conv_length * unit_length
-    subfind_tab_data['Subhalo']['StarsMass'] *= conv_mass * unit_mass
-    subfind_tab_data['Subhalo']['StarFormationRate'] *= conv_starFormationRate * unit_starFormationRate
-    subfind_tab_data['Subhalo']['StellarVelDisp'] *= conv_velocity * unit_velocity
+    # subfind_tab_data['Subhalo']['StarsMass'] *= conv_mass * unit_mass
+    # subfind_tab_data['Subhalo']['StarFormationRate'] *= conv_starFormationRate * unit_starFormationRate
+    # subfind_tab_data['Subhalo']['StellarVelDisp'] *= conv_velocity * unit_velocity
 
     # Give units to the datasets: FOF group-tab data
     group_tab_data['FOF']['CentreOfMass'] *= conv_length * unit_length
