@@ -223,7 +223,7 @@ def fof_groups(files: list) -> dict:
 
                 # Convert FOF fields to the corresponding data type
                 subfind_tab_data['FOF'][fof_field] = subfind_tab_data['FOF'][fof_field].astype(
-                    field_data_handle.dtype
+                    str(field_data_handle.dtype)
                 )
 
             for subhalo_field in subhalo_fields:
@@ -235,7 +235,7 @@ def fof_groups(files: list) -> dict:
 
                 # Convert Subhalo fields to the corresponding data type
                 subfind_tab_data['Subhalo'][subhalo_field] = subfind_tab_data['Subhalo'][subhalo_field].astype(
-                    field_data_handle.dtype
+                    str(field_data_handle.dtype)
                 )
 
     st, fh = split(len(files[1]))
@@ -253,7 +253,7 @@ def fof_groups(files: list) -> dict:
 
                 # Convert group data fields to the corresponding data type
                 group_tab_data['FOF'][group_tab_field] = group_tab_data['FOF'][group_tab_field].astype(
-                    field_data_handle.dtype
+                    str(field_data_handle.dtype)
                 )
 
     for fof_field in fof_fields:
@@ -512,7 +512,7 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
 
                 # Convert group data fields to the corresponding data type
                 subfind_particle_data['PartType0'][field] = subfind_particle_data['PartType0'][field].astype(
-                    field_data_handle.dtype
+                    str(field_data_handle.dtype)
                 )
 
             for field in dm_fields:
@@ -525,7 +525,7 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
 
                 # Convert group data fields to the corresponding data type
                 subfind_particle_data['PartType1'][field] = subfind_particle_data['PartType1'][field].astype(
-                    field_data_handle.dtype
+                    str(field_data_handle.dtype)
                 )
 
             for field in stars_fields:
@@ -538,7 +538,7 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
 
                 # Convert group data fields to the corresponding data type
                 subfind_particle_data['PartType4'][field] = subfind_particle_data['PartType4'][field].astype(
-                    field_data_handle.dtype
+                    str(field_data_handle.dtype)
                 )
 
             # Reshape coordinates and velocities
@@ -581,7 +581,7 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
 
                 # Convert group data fields to the corresponding data type
                 subfind_particle_data['PartType1'][field] = subfind_particle_data['PartType1'][field].astype(
-                    field_data_handle.dtype
+                    str(field_data_handle.dtype)
                 )
 
             subfind_particle_data['PartType1']['Coordinates'] = \
