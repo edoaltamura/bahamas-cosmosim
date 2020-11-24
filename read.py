@@ -255,11 +255,12 @@ def fof_groups(files: list) -> dict:
                     field_data_handle.dtype.char
                 )
 
-    # Make a copy of the dictionary to MPI-gather data
+    # Make a deep copy of the dictionary to MPI-gather data
     _subfind_tab_data = deepcopy(subfind_tab_data)
     _group_tab_data = deepcopy(group_tab_data)
 
     for fof_field in fof_fields:
+        pprint(subfind_tab_data['FOF'][fof_field])
         _subfind_tab_data['FOF'][fof_field] = commune(subfind_tab_data['FOF'][fof_field])
 
     for subhalo_field in subhalo_fields:
