@@ -180,7 +180,7 @@ def fof_groups(files: list) -> dict:
     ]
     subhalo_fields = [
         'CentreOfMass', 'CentreOfPotential', 'GasSpin', 'GroupNumber', 'HalfMassProjRad', 'HalfMassRad',
-        'IDMostBound', 'SubLength', 'SubOffset', 'Velocity', 'Vmax', 'VmaxRadius', 'StarsMass', 'StarsSpin',
+        'IDMostBound', 'SubLength', 'SubOffset', 'Velocity', 'Vmax', 'VmaxRadius', 'StarsSpin',
         'StarFormationRate', 'StellarVelDisp'
     ]
 
