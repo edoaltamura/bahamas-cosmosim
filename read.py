@@ -261,13 +261,16 @@ def fof_groups(files: list) -> dict:
 
     for fof_field in fof_fields:
         # pprint(subfind_tab_data['FOF'][fof_field])
-        _subfind_tab_data['FOF'][fof_field] = commune(subfind_tab_data['FOF'][fof_field])
+        filtered_data = subfind_tab_data['FOF'][fof_field]
+        _subfind_tab_data['FOF'][fof_field] = commune(filtered_data)
 
     for subhalo_field in subhalo_fields:
-        _subfind_tab_data['Subhalo'][subhalo_field] = commune(subfind_tab_data['Subhalo'][subhalo_field])
+        filtered_data = subfind_tab_data['Subhalo'][subhalo_field]
+        _subfind_tab_data['Subhalo'][subhalo_field] = commune(filtered_data)
 
     for group_tab_field in group_tab_fields:
-        _group_tab_data['FOF'][group_tab_field] = commune(group_tab_data['FOF'][group_tab_field])
+        filtered_data = group_tab_data['FOF'][group_tab_field]
+        _group_tab_data['FOF'][group_tab_field] = commune(filtered_data)
 
     # Give units to the datasets: FOF Subfind data
     _subfind_tab_data['FOF']['GroupCentreOfPotential'] *= conv_length * unit_length
@@ -349,7 +352,7 @@ def fof_groups(files: list) -> dict:
 
 def fof_group(clusterID: int, fofgroups: dict) -> dict:
     # pprint(f"[+] Find group information for cluster {clusterID}")
-    _fofgroups = deepcopy(fofgroups)
+    _fofgroups = fofgroups.copy()
 
     # Filter groups
     for dataset_category in ['subfind_tab', 'group_tab']:
