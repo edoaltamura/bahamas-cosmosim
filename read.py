@@ -369,7 +369,7 @@ def fof_group(clusterID: int, fofgroups: dict) -> dict:
     data_dict['subfind_tab'] = _fofgroups['subfind_tab']
     data_dict['group_tab'] = _fofgroups['group_tab']
     data_dict['mass_DMpart'] = _fofgroups['mass_DMpart']
-
+    pprint(data_dict)
     return data_dict
 
 
