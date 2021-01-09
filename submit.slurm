@@ -17,7 +17,7 @@ module load python37
 source /home/altamura/nas/rksz-venv/bin/activate
 
 export OMPI_MCA_btl_base_warn_component_unused=0
-mpirun -np $SLURM_NTASKS python3 bahamas-cosmosim/test_read.py
+mpirun -np $SLURM_NTASKS python3 test_read.py
 
 deactivate
 
