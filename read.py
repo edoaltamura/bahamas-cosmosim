@@ -346,7 +346,7 @@ def fof_groups(files: list) -> dict:
     data_dict['subfind_tab'] = _subfind_tab_data
     data_dict['group_tab'] = _group_tab_data
     data_dict['mass_DMpart'] = header['MassTable'][1] * conv_mass * unit_mass
-
+    pprint(data_dict)
     return data_dict
 
 
