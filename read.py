@@ -260,7 +260,7 @@ def fof_groups(files: list) -> dict:
     _group_tab_data = deepcopy(group_tab_data)
 
     for fof_field in fof_fields:
-        pprint(subfind_tab_data['FOF'][fof_field])
+        # pprint(subfind_tab_data['FOF'][fof_field])
         _subfind_tab_data['FOF'][fof_field] = commune(subfind_tab_data['FOF'][fof_field])
 
     for subhalo_field in subhalo_fields:
@@ -500,9 +500,9 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
             particle_idx1 = particle_index_from_csrm(fofgroup, 1, csrm)
             particle_idx4 = particle_index_from_csrm(fofgroup, 4, csrm)
 
-            pprint('particle_idx0', particle_idx0)
-            pprint('particle_idx1', particle_idx1)
-            pprint('particle_idx4', particle_idx4)
+            # pprint('particle_idx0', particle_idx0)
+            # pprint('particle_idx1', particle_idx1)
+            # pprint('particle_idx4', particle_idx4)
 
             for field in gas_fields:
                 subfind_particle_data['PartType0'][field] = np.empty(0)
