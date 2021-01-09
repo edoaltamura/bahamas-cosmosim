@@ -256,8 +256,8 @@ def fof_groups(files: list) -> dict:
                 )
 
     # Make a deep copy of the dictionary to MPI-gather data
-    _subfind_tab_data = deepcopy(subfind_tab_data)
-    _group_tab_data = deepcopy(group_tab_data)
+    _subfind_tab_data = subfind_tab_data.copy()
+    _group_tab_data = group_tab_data.copy()
 
     for fof_field in fof_fields:
         # pprint(subfind_tab_data['FOF'][fof_field])
@@ -624,6 +624,195 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
         data_dict['subfind_tab'] = fofgroup['subfind_tab']
         data_dict['group_tab'] = fofgroup['group_tab']
         data_dict['subfind_particles'] = subfind_particle_data
+        data_dict['mass_DMpart'] = fofgroup['mass_DMpart']
+        data_dict['boxsize'] = boxsize
+
+        return data_dict
+    
+    
+def snapshot_data(fofgroup: dict) -> dict:
+    pprint(f"[+] Find snapshot data...")
+
+    # Conversion factors
+    conv_mass = 1.e10 / fofgroup['header']['subfind_particles']['HubbleParam']
+
+    conv_length = fofgroup['header']['subfind_particles']['ExpansionFactor'] / \
+                  fofgroup['header']['subfind_particles']['HubbleParam']
+
+    conv_density = 1.e10 * fofgroup['header']['subfind_particles']['HubbleParam'] ** 2 / \
+                   fofgroup['header']['subfind_particles']['ExpansionFactor'] ** 3
+
+    conv_velocity = np.sqrt(fofgroup['header']['subfind_particles']['ExpansionFactor'])
+
+    conv_starFormationRate = 1.e10 * fofgroup['header']['subfind_particles']['HubbleParam'] ** 2 / \
+                             fofgroup['header']['subfind_particles']['ExpansionFactor'] ** 3
+
+    conv_time = 3.08568e19
+
+    # Units
+    unit_mass = unyt.Solar_Mass
+    unit_length = unyt.Mpc
+    unit_density = unyt.Solar_Mass / unyt.Mpc ** 3
+    unit_velocity = unyt.km / unyt.s
+    unit_starFormationRate = unyt.Solar_Mass / (unyt.year * unyt.Mpc ** 3)
+
+    snap_data = {}
+
+    with h5.File(fofgroup['files'][3], 'r') as h5file:
+
+        # Create a HYDRO/DMO switch
+        is_hydro = "/PartType0" in h5file
+
+        gas_fields = [
+            'Coordinates',
+            'Density',
+            'InternalEnergy',
+            'Mass',
+            'Metallicity',
+            'OnEquationOfState',
+            'SmoothedMetallicity',
+            'SmoothingLength',
+            'StarFormationRate',
+            'Temperature',
+            'Velocity',
+        ]
+        dm_fields = [
+            'Coordinates',
+            'Velocity',
+        ]
+        stars_fields = [
+            'Mass',
+            'Metallicity',
+            'SmoothingLength',
+            'StellarFormationTime',
+            'Velocity',
+        ]
+
+        if is_hydro:
+
+            snap_data[f'PartType0'] = {}
+            snap_data[f'PartType1'] = {}
+            snap_data[f'PartType4'] = {}
+
+            for field in gas_fields:
+                snap_data['PartType0'][field] = np.empty(0)
+                field_data_handle = h5file[f'PartType0/{field}']
+                snap_data['PartType0'][field] = np.append(
+                    snap_data['PartType0'][field],
+                    field_data_handle[...].flatten()
+                )
+
+                # Convert group data fields to the corresponding data type
+                snap_data['PartType0'][field] = snap_data['PartType0'][field].astype(
+                    str(field_data_handle.dtype)
+                )
+
+            for field in dm_fields:
+                snap_data['PartType1'][field] = np.empty(0)
+                field_data_handle = h5file[f'PartType1/{field}']
+                snap_data['PartType1'][field] = np.append(
+                    snap_data['PartType1'][field],
+                    field_data_handle[...].flatten()
+                )
+
+                # Convert group data fields to the corresponding data type
+                snap_data['PartType1'][field] = snap_data['PartType1'][field].astype(
+                    str(field_data_handle.dtype)
+                )
+
+            for field in stars_fields:
+                snap_data['PartType4'][field] = np.empty(0)
+                field_data_handle = h5file[f'PartType4/{field}']
+                snap_data['PartType4'][field] = np.append(
+                    snap_data['PartType4'][field],
+                    field_data_handle[...].flatten()
+                )
+
+                # Convert group data fields to the corresponding data type
+                snap_data['PartType4'][field] = snap_data['PartType4'][field].astype(
+                    str(field_data_handle.dtype)
+                )
+
+            # Reshape coordinates and velocities
+            for particle_type in ['PartType0', 'PartType1', 'PartType4']:
+                snap_data[particle_type]['Coordinates'] = \
+                    snap_data[particle_type]['Coordinates'].reshape(-1, 3)
+                snap_data[particle_type]['Velocity'] = \
+                    snap_data[particle_type]['Velocity'].reshape(-1, 3)
+
+            snap_data['PartType0']['Coordinates'] *= conv_length * unit_length
+            snap_data['PartType0']['Density'] *= conv_density * unit_density
+            snap_data['PartType0']['Mass'] *= conv_mass * unit_mass
+            snap_data['PartType0']['SmoothingLength'] *= conv_length * unit_length
+            snap_data['PartType0']['StarFormationRate'] *= conv_starFormationRate * unit_starFormationRate
+            snap_data['PartType0']['Temperature'] *= unyt.K
+            snap_data['PartType0']['Velocity'] *= conv_velocity * unit_velocity
+
+            snap_data['PartType1']['Coordinates'] *= conv_length * unit_length
+            snap_data['PartType1']['Velocity'] *= conv_velocity * unit_velocity
+
+            snap_data['PartType4']['Coordinates'] *= conv_length * unit_length
+            snap_data['PartType4']['Density'] *= conv_density * unit_density
+            snap_data['PartType4']['Mass'] *= conv_mass * unit_mass
+            snap_data['PartType4']['SmoothingLength'] *= conv_length * unit_length
+            snap_data['PartType4']['StellarFormationTime'] *= (conv_time * unyt.s).to('Gyr')
+            snap_data['PartType4']['Velocity'] *= conv_velocity * unit_velocity
+
+        else:
+
+            snap_data[f'PartType1'] = {}
+
+            for field in dm_fields:
+                snap_data['PartType1'][field] = np.empty(0)
+                field_data_handle = h5file[f'PartType1/{field}']
+                snap_data['PartType1'][field] = np.append(
+                    snap_data['PartType1'][field],
+                    field_data_handle[...].flatten()
+                )
+
+                # Convert group data fields to the corresponding data type
+                snap_data['PartType1'][field] = snap_data['PartType1'][field].astype(
+                    str(field_data_handle.dtype)
+                )
+
+            snap_data['PartType1']['Coordinates'] = \
+                snap_data['PartType1']['Coordinates'].reshape(-1, 3)
+            snap_data['PartType1']['Velocity'] = \
+                snap_data['PartType1']['Velocity'].reshape(-1, 3)
+
+            snap_data['PartType1']['Coordinates'] *= conv_length * unit_length
+            snap_data['PartType1']['Velocity'] *= conv_velocity * unit_velocity
+
+        for pt in snap_data:
+
+            if pt.startswith('PartType'):
+
+                # Periodic boundary wrapping of particle coordinates
+                coords = snap_data[pt]['Coordinates']
+                boxsize = fofgroup['header']['snaps']['BoxSize'] * conv_length * unit_length
+                cop = fofgroup['subfind_tab']['FOF']['GroupCentreOfPotential']
+                r200 = fofgroup['subfind_tab']['FOF']['Group_R_Crit200']
+
+                for coord_axis in range(3):
+                    # Right boundary
+                    if cop[coord_axis] + 10 * r200 > boxsize:
+                        beyond_index = np.where(coords[:, coord_axis] < boxsize / 2)[0]
+                        coords[beyond_index, coord_axis] += boxsize
+                    # Left boundary
+                    elif cop[coord_axis] - 10 * r200 < 0.:
+                        beyond_index = np.where(coords[:, coord_axis] > boxsize / 2)[0]
+                        coords[beyond_index, coord_axis] -= boxsize
+
+                snap_data[pt]['Coordinates'] = coords
+
+        # Gather all data into a large dictionary
+        data_dict = {}
+        data_dict['files'] = fofgroup['files']
+        data_dict['header'] = fofgroup['header']
+        data_dict['clusterID'] = fofgroup['clusterID']
+        data_dict['subfind_tab'] = fofgroup['subfind_tab']
+        data_dict['group_tab'] = fofgroup['group_tab']
+        data_dict['snaps'] = snap_data
         data_dict['mass_DMpart'] = fofgroup['mass_DMpart']
         data_dict['boxsize'] = boxsize
 
