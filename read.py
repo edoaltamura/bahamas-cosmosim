@@ -346,7 +346,7 @@ def fof_groups(files: list) -> dict:
     data_dict['subfind_tab'] = _subfind_tab_data
     data_dict['group_tab'] = _group_tab_data
     data_dict['mass_DMpart'] = header['MassTable'][1] * conv_mass * unit_mass
-    pprint(data_dict)
+
     return data_dict
 
 
@@ -369,7 +369,7 @@ def fof_group(clusterID: int, fofgroups: dict) -> dict:
     data_dict['subfind_tab'] = _fofgroups['subfind_tab']
     data_dict['group_tab'] = _fofgroups['group_tab']
     data_dict['mass_DMpart'] = _fofgroups['mass_DMpart']
-    pprint(data_dict)
+
     return data_dict
 
 
@@ -706,7 +706,7 @@ def snapshot_data(fofgroup: dict) -> dict:
                     field_data_handle = h5file[f'PartType0/{field}']
                     snap_data['PartType0'][field] = np.append(
                         snap_data['PartType0'][field],
-                        field_data_handle[...].flatten()
+                        field_data_handle[:]
                     )
 
                     # Convert group data fields to the corresponding data type
@@ -719,7 +719,7 @@ def snapshot_data(fofgroup: dict) -> dict:
                     field_data_handle = h5file[f'PartType1/{field}']
                     snap_data['PartType1'][field] = np.append(
                         snap_data['PartType1'][field],
-                        field_data_handle[...].flatten()
+                        field_data_handle[:]
                     )
 
                     # Convert group data fields to the corresponding data type
@@ -732,7 +732,7 @@ def snapshot_data(fofgroup: dict) -> dict:
                     field_data_handle = h5file[f'PartType4/{field}']
                     snap_data['PartType4'][field] = np.append(
                         snap_data['PartType4'][field],
-                        field_data_handle[...].flatten()
+                        field_data_handle[:]
                     )
 
                     # Convert group data fields to the corresponding data type
@@ -741,11 +741,11 @@ def snapshot_data(fofgroup: dict) -> dict:
                     )
 
                 # Reshape coordinates and velocities
-                for particle_type in ['PartType0', 'PartType1', 'PartType4']:
-                    snap_data[particle_type]['Coordinates'] = \
-                        snap_data[particle_type]['Coordinates'].reshape(-1, 3)
-                    snap_data[particle_type]['Velocity'] = \
-                        snap_data[particle_type]['Velocity'].reshape(-1, 3)
+                # for particle_type in ['PartType0', 'PartType1', 'PartType4']:
+                #     snap_data[particle_type]['Coordinates'] = \
+                #         snap_data[particle_type]['Coordinates'].reshape(-1, 3)
+                #     snap_data[particle_type]['Velocity'] = \
+                #         snap_data[particle_type]['Velocity'].reshape(-1, 3)
 
                 snap_data['PartType0']['Coordinates'] *= conv_length * unit_length
                 snap_data['PartType0']['Density'] *= conv_density * unit_density
