@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#SBATCH --nodes=15
-#SBATCH --ntasks-per-node=15
+#SBATCH --nodes=17
+#SBATCH --ntasks-per-node=16
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=20000
+#SBATCH –-mem-per-cpu=1024 # MB
 #SBATCH --exclusive
 #SBATCH -J bahamas_proc
 #SBATCH -o log_bahamas.out
