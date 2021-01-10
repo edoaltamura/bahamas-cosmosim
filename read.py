@@ -740,12 +740,21 @@ def snapshot_data(fofgroup: dict) -> dict:
                         str(field_data_handle.dtype)
                     )
 
+
+                for field_group, particle_type in zip(
+                        [gas_fields, dm_fields, stars_fields],
+                        ['PartType0', 'PartType1', 'PartType4']
+                ):
+                    for field in field_group:
+                        snap_data[particle_type][field] = \
+                            commune(snap_data[particle_type][field].reshape(-1, 1))
+
                 # Reshape coordinates and velocities
-                # for particle_type in ['PartType0', 'PartType1', 'PartType4']:
-                #     snap_data[particle_type]['Coordinates'] = \
-                #         snap_data[particle_type]['Coordinates'].reshape(-1, 3)
-                #     snap_data[particle_type]['Velocity'] = \
-                #         snap_data[particle_type]['Velocity'].reshape(-1, 3)
+                for particle_type in ['PartType0', 'PartType1', 'PartType4']:
+                    snap_data[particle_type]['Coordinates'] = \
+                        snap_data[particle_type]['Coordinates'].reshape(-1, 3)
+                    snap_data[particle_type]['Velocity'] = \
+                        snap_data[particle_type]['Velocity'].reshape(-1, 3)
 
                 snap_data['PartType0']['Coordinates'] *= conv_length * unit_length
                 snap_data['PartType0']['Density'] *= conv_density * unit_density
@@ -789,28 +798,6 @@ def snapshot_data(fofgroup: dict) -> dict:
 
                 snap_data['PartType1']['Coordinates'] *= conv_length * unit_length
                 snap_data['PartType1']['Velocity'] *= conv_velocity * unit_velocity
-
-            for pt in snap_data:
-
-                if pt.startswith('PartType'):
-
-                    # Periodic boundary wrapping of particle coordinates
-                    coords = snap_data[pt]['Coordinates']
-                    boxsize = fofgroup['header']['snaps']['BoxSize'] * conv_length * unit_length
-                    cop = fofgroup['subfind_tab']['FOF']['GroupCentreOfPotential']
-                    r200 = fofgroup['subfind_tab']['FOF']['Group_R_Crit200']
-
-                    for coord_axis in range(3):
-                        # Right boundary
-                        if cop[coord_axis] + 10 * r200 > boxsize:
-                            beyond_index = np.where(coords[:, coord_axis] < boxsize / 2)[0]
-                            coords[beyond_index, coord_axis] += boxsize
-                        # Left boundary
-                        elif cop[coord_axis] - 10 * r200 < 0.:
-                            beyond_index = np.where(coords[:, coord_axis] > boxsize / 2)[0]
-                            coords[beyond_index, coord_axis] -= boxsize
-
-                    snap_data[pt]['Coordinates'] = coords
 
         # Gather all data into a large dictionary
         data_dict = {}
