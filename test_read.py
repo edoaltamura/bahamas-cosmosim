@@ -11,7 +11,7 @@ fofs = read.fof_groups(files)
 # csrm = read.csr_index_matrix(fofs)
 fof = read.fof_group(cluster_id, fofs)
 # cluster_dict = read.fof_particles(fof, csrm)
-# cluster_dict = read.snapshot_data(fof)
+cluster_dict = read.snapshot_data(fof)
 
 # read.pprint("Dark matter particle mass:", cluster_dict['mass_DMpart'])
 #
