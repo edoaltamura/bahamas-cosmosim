@@ -636,20 +636,14 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
 def snapshot_data(fofgroup: dict) -> dict:
     pprint(f"[+] Find snapshot data...")
 
+    header = fofgroup['header']['gadget_snaps']
+
     # Conversion factors
-    conv_mass = 1.e10 / fofgroup['header']['subfind_particles']['HubbleParam']
-
-    conv_length = fofgroup['header']['subfind_particles']['ExpansionFactor'] / \
-                  fofgroup['header']['subfind_particles']['HubbleParam']
-
-    conv_density = 1.e10 * fofgroup['header']['subfind_particles']['HubbleParam'] ** 2 / \
-                   fofgroup['header']['subfind_particles']['ExpansionFactor'] ** 3
-
-    conv_velocity = np.sqrt(fofgroup['header']['subfind_particles']['ExpansionFactor'])
-
-    conv_starFormationRate = 1.e10 * fofgroup['header']['subfind_particles']['HubbleParam'] ** 2 / \
-                             fofgroup['header']['subfind_particles']['ExpansionFactor'] ** 3
-
+    conv_mass = 1.e10 / header['HubbleParam']
+    conv_length = header['ExpansionFactor'] / header['HubbleParam']
+    conv_density = 1.e10 * header['HubbleParam'] ** 2 / header['ExpansionFactor'] ** 3
+    conv_velocity = np.sqrt(header['ExpansionFactor'])
+    conv_starFormationRate = 1.e10 * header['HubbleParam'] ** 2 / header['ExpansionFactor'] ** 3
     conv_time = 3.08568e19
 
     # Units
@@ -660,7 +654,7 @@ def snapshot_data(fofgroup: dict) -> dict:
     unit_starFormationRate = unyt.Solar_Mass / (unyt.year * unyt.Mpc ** 3)
 
     snap_data = {}
-
+    pprint(f"Scattering {len(fofgroup['files'][3])} files")
     st, fh = split(len(fofgroup['files'][3]))
     for x in range(st, fh, 1):
 
@@ -696,17 +690,19 @@ def snapshot_data(fofgroup: dict) -> dict:
             ]
 
             if is_hydro:
+                pprint('Detected hydro')
 
                 snap_data[f'PartType0'] = {}
                 snap_data[f'PartType1'] = {}
                 snap_data[f'PartType4'] = {}
 
                 for field in gas_fields:
+                    pprint(f'PartType0/{field}')
                     snap_data['PartType0'][field] = np.empty(0)
                     field_data_handle = h5file[f'PartType0/{field}']
                     snap_data['PartType0'][field] = np.append(
                         snap_data['PartType0'][field],
-                        field_data_handle[:]
+                        field_data_handle[:].flatten()
                     )
 
                     # Convert group data fields to the corresponding data type
@@ -719,7 +715,7 @@ def snapshot_data(fofgroup: dict) -> dict:
                     field_data_handle = h5file[f'PartType1/{field}']
                     snap_data['PartType1'][field] = np.append(
                         snap_data['PartType1'][field],
-                        field_data_handle[:]
+                        field_data_handle[:].flatten()
                     )
 
                     # Convert group data fields to the corresponding data type
@@ -732,7 +728,7 @@ def snapshot_data(fofgroup: dict) -> dict:
                     field_data_handle = h5file[f'PartType4/{field}']
                     snap_data['PartType4'][field] = np.append(
                         snap_data['PartType4'][field],
-                        field_data_handle[:]
+                        field_data_handle[:].flatten()
                     )
 
                     # Convert group data fields to the corresponding data type
@@ -747,7 +743,7 @@ def snapshot_data(fofgroup: dict) -> dict:
                 ):
                     for field in field_group:
                         snap_data[particle_type][field] = \
-                            commune(snap_data[particle_type][field].reshape(-1, 1))
+                            commune(snap_data[particle_type][field])
 
                 # Reshape coordinates and velocities
                 for particle_type in ['PartType0', 'PartType1', 'PartType4']:
@@ -803,11 +799,6 @@ def snapshot_data(fofgroup: dict) -> dict:
         data_dict = {}
         data_dict['files'] = fofgroup['files']
         data_dict['header'] = fofgroup['header']
-        data_dict['clusterID'] = fofgroup['clusterID']
-        data_dict['subfind_tab'] = fofgroup['subfind_tab']
-        data_dict['group_tab'] = fofgroup['group_tab']
         data_dict['snaps'] = snap_data
-        data_dict['mass_DMpart'] = fofgroup['mass_DMpart']
-        data_dict['boxsize'] = boxsize
 
         return data_dict
