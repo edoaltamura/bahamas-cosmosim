@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=16
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=16000
-#SBATCH --mem-per-cpu=900
+#SBATCH --mem-per-cpu=500
 # SBATCH --exclusive
 #SBATCH -J bahamas_proc
 #SBATCH -o log_bahamas.out
