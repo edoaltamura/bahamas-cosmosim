@@ -711,6 +711,7 @@ def snapshot_data(fofgroup: dict) -> dict:
                     )
 
                 for field in dm_fields:
+                    pprint(f'PartType1/{field}')
                     snap_data['PartType1'][field] = np.empty(0)
                     field_data_handle = h5file[f'PartType1/{field}']
                     snap_data['PartType1'][field] = np.append(
@@ -724,6 +725,7 @@ def snapshot_data(fofgroup: dict) -> dict:
                     )
 
                 for field in stars_fields:
+                    pprint(f'PartType4/{field}')
                     snap_data['PartType4'][field] = np.empty(0)
                     field_data_handle = h5file[f'PartType4/{field}']
                     snap_data['PartType4'][field] = np.append(
@@ -742,6 +744,7 @@ def snapshot_data(fofgroup: dict) -> dict:
                         ['PartType0', 'PartType1', 'PartType4']
                 ):
                     for field in field_group:
+                        pprint(f"Comuning data {particle_type} {field}")
                         snap_data[particle_type][field] = \
                             commune(snap_data[particle_type][field])
 
