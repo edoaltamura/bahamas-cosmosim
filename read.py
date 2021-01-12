@@ -738,22 +738,22 @@ def snapshot_data(fofgroup: dict) -> dict:
                         str(field_data_handle.dtype)
                     )
 
-
+                _snap_data = snap_data.copy()
                 for field_group, particle_type in zip(
                         [gas_fields, dm_fields, stars_fields],
                         ['PartType0', 'PartType1', 'PartType4']
                 ):
                     for field in field_group:
                         pprint(f"Comuning data {particle_type} {field}")
-                        snap_data[particle_type][field] = \
+                        _snap_data[particle_type][field] = \
                             commune(snap_data[particle_type][field])
 
                 # Reshape coordinates and velocities
                 for particle_type in ['PartType0', 'PartType1', 'PartType4']:
-                    snap_data[particle_type]['Coordinates'] = \
-                        snap_data[particle_type]['Coordinates'].reshape(-1, 3)
-                    snap_data[particle_type]['Velocity'] = \
-                        snap_data[particle_type]['Velocity'].reshape(-1, 3)
+                    _snap_data[particle_type]['Coordinates'] = \
+                        _snap_data[particle_type]['Coordinates'].reshape(-1, 3)
+                    _snap_data[particle_type]['Velocity'] = \
+                        _snap_data[particle_type]['Velocity'].reshape(-1, 3)
 
                 snap_data['PartType0']['Coordinates'] *= conv_length * unit_length
                 snap_data['PartType0']['Density'] *= conv_density * unit_density
