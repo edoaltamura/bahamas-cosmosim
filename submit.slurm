@@ -9,7 +9,8 @@
 #SBATCH -t 10:00:00
 
 module purge
-module load rocks-openmpi
+module load gcc7.3.0
+module load openmpi410-gcc730
 module load python37
 
 source /home/altamura/nas/rksz-venv/bin/activate

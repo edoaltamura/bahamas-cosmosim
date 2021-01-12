@@ -738,40 +738,40 @@ def snapshot_data(fofgroup: dict) -> dict:
                         str(field_data_handle.dtype)
                     )
 
-                _snap_data = snap_data.copy()
+                comm_snap_data = snap_data.copy()
                 for field_group, particle_type in zip(
                         [gas_fields, dm_fields, stars_fields],
                         ['PartType0', 'PartType1', 'PartType4']
                 ):
                     for field in field_group:
                         pprint(f"Comuning data {particle_type} {field}")
-                        _snap_data[particle_type][field] = \
+                        comm_snap_data[particle_type][field] = \
                             commune(snap_data[particle_type][field])
 
                 # Reshape coordinates and velocities
                 for particle_type in ['PartType0', 'PartType1', 'PartType4']:
-                    _snap_data[particle_type]['Coordinates'] = \
-                        _snap_data[particle_type]['Coordinates'].reshape(-1, 3)
-                    _snap_data[particle_type]['Velocity'] = \
-                        _snap_data[particle_type]['Velocity'].reshape(-1, 3)
+                    comm_snap_data[particle_type]['Coordinates'] = \
+                        comm_snap_data[particle_type]['Coordinates'].reshape(-1, 3)
+                    comm_snap_data[particle_type]['Velocity'] = \
+                        comm_snap_data[particle_type]['Velocity'].reshape(-1, 3)
 
-                snap_data['PartType0']['Coordinates'] *= conv_length * unit_length
-                snap_data['PartType0']['Density'] *= conv_density * unit_density
-                snap_data['PartType0']['Mass'] *= conv_mass * unit_mass
-                snap_data['PartType0']['SmoothingLength'] *= conv_length * unit_length
-                snap_data['PartType0']['StarFormationRate'] *= conv_starFormationRate * unit_starFormationRate
-                snap_data['PartType0']['Temperature'] *= unyt.K
-                snap_data['PartType0']['Velocity'] *= conv_velocity * unit_velocity
+                comm_snap_data['PartType0']['Coordinates'] *= conv_length * unit_length
+                comm_snap_data['PartType0']['Density'] *= conv_density * unit_density
+                comm_snap_data['PartType0']['Mass'] *= conv_mass * unit_mass
+                comm_snap_data['PartType0']['SmoothingLength'] *= conv_length * unit_length
+                comm_snap_data['PartType0']['StarFormationRate'] *= conv_starFormationRate * unit_starFormationRate
+                comm_snap_data['PartType0']['Temperature'] *= unyt.K
+                comm_snap_data['PartType0']['Velocity'] *= conv_velocity * unit_velocity
 
-                snap_data['PartType1']['Coordinates'] *= conv_length * unit_length
-                snap_data['PartType1']['Velocity'] *= conv_velocity * unit_velocity
+                comm_snap_data['PartType1']['Coordinates'] *= conv_length * unit_length
+                comm_snap_data['PartType1']['Velocity'] *= conv_velocity * unit_velocity
 
-                snap_data['PartType4']['Coordinates'] *= conv_length * unit_length
-                snap_data['PartType4']['Density'] *= conv_density * unit_density
-                snap_data['PartType4']['Mass'] *= conv_mass * unit_mass
-                snap_data['PartType4']['SmoothingLength'] *= conv_length * unit_length
-                snap_data['PartType4']['StellarFormationTime'] *= (conv_time * unyt.s).to('Gyr')
-                snap_data['PartType4']['Velocity'] *= conv_velocity * unit_velocity
+                comm_snap_data['PartType4']['Coordinates'] *= conv_length * unit_length
+                comm_snap_data['PartType4']['Density'] *= conv_density * unit_density
+                comm_snap_data['PartType4']['Mass'] *= conv_mass * unit_mass
+                comm_snap_data['PartType4']['SmoothingLength'] *= conv_length * unit_length
+                comm_snap_data['PartType4']['StellarFormationTime'] *= (conv_time * unyt.s).to('Gyr')
+                comm_snap_data['PartType4']['Velocity'] *= conv_velocity * unit_velocity
 
             else:
 
