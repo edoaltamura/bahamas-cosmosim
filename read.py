@@ -484,6 +484,7 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
         ]
         stars_fields = [
             'Coordinates',
+            'Density',
             'Mass',
             'Metallicity',
             'SmoothingLength',
@@ -693,6 +694,7 @@ def snapshot_data(files: list) -> dict:
             ]
             stars_fields = [
                 'Coordinates',
+                'Density',
                 'Mass',
                 'Metallicity',
                 'SmoothingLength',
