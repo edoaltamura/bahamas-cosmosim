@@ -7,7 +7,7 @@ cluster_id = 1
 # -------------------------------------------------------------------- #
 
 files = read.find_files(simulation_type, redshift)
-read.pprint(files[0])
+read.pprint(files)
 halo_catalogue = read.fof_groups(files)
 csrm = read.csr_index_matrix(halo_catalogue)
 fof = read.fof_group(cluster_id, halo_catalogue)
