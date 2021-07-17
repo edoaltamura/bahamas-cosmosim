@@ -783,6 +783,9 @@ def snapshot_data(files: list) -> dict:
                 comm_snap_data['PartType4']['StellarFormationTime'] *= (conv_time * unyt.s).to('Gyr')
                 comm_snap_data['PartType4']['Velocity'] *= conv_velocity * unit_velocity
 
+                snap_data = comm_snap_data
+                del comm_snap_data
+
             else:
 
                 snap_data[f'PartType1'] = {}
@@ -800,10 +803,8 @@ def snapshot_data(files: list) -> dict:
                         str(field_data_handle.dtype)
                     )
 
-                snap_data['PartType1']['Coordinates'] = \
-                    snap_data['PartType1']['Coordinates'].reshape(-1, 3)
-                snap_data['PartType1']['Velocity'] = \
-                    snap_data['PartType1']['Velocity'].reshape(-1, 3)
+                for field in ['Coordinates', 'Velocity']:
+                    snap_data['PartType1'][field].shape = (-1, 3)
 
                 snap_data['PartType1']['Coordinates'] *= conv_length * unit_length
                 snap_data['PartType1']['Velocity'] *= conv_velocity * unit_velocity

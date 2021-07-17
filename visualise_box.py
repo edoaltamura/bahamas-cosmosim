@@ -15,7 +15,7 @@ resolution = 1024
 
 files = read.find_files(simulation_type, redshift)
 # halo_catalogue = read.fof_groups(files)
-snapshot = read.snapshot_data(files)
+snapshot = read.snapshot_data(files)['snaps']
 
 x_max = np.max(snapshot['PartType0']['Coordinates'][:, 0])
 x_min = np.min(snapshot['PartType0']['Coordinates'][:, 0])
