@@ -66,7 +66,7 @@ def find_files(simulation_type: str, redshift: str):
     # Import the Metadata preloaded class
     paths = Metadata.data.PATHS
     directory = paths.dir_hydro if simulation_type == "hydro" else paths.dir_dmo
-    pprint(f"[+] Find {paths.simulation_name:s} {simulation_type:s} files {redshift:s}...")
+    pprint(f"[+] Find {paths.simulation_name:s} {simulation_type:s} files {redshift:s}")
 
     # Make filepath templates and substitute the redshift index
     template_st = directory + paths.subdir_subfind_groups + paths.filename_subfind_groups_st
@@ -169,7 +169,7 @@ def fof_groups(files: list) -> dict:
     unit_velocity = unyt.km / unyt.s
     unit_starFormationRate = unyt.Solar_Mass / (unyt.year * unyt.Mpc ** 3)
 
-    pprint(f"[+] Find groups information...")
+    pprint(f"[+] Find halo catalogue information")
 
     fof_fields = [
         'FirstSubhaloID', 'GroupCentreOfPotential', 'GroupLength', 'GroupMass', 'GroupOffset',
@@ -644,7 +644,7 @@ def snapshot_data(files: list) -> dict:
         Dictionary output for with particle data and additional
         header data.
     """
-    pprint(f"[+] Find snapshot data...")
+    pprint(f"[+] Find snapshot data")
 
     with h5.File(files[3][0], 'r') as f:
         header = dict(f['Header'].attrs)
