@@ -547,10 +547,9 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
 
             # Reshape coordinates and velocities
             for particle_type in ['PartType0', 'PartType1', 'PartType4']:
-                subfind_particle_data[particle_type]['Coordinates'] = \
-                    subfind_particle_data[particle_type]['Coordinates'].reshape(-1, 3)
-                subfind_particle_data[particle_type]['Velocity'] = \
-                    subfind_particle_data[particle_type]['Velocity'].reshape(-1, 3)
+                for field in ['Coordinates', 'Velocity']:
+                    subfind_particle_data[particle_type][field] = \
+                        subfind_particle_data[particle_type][field].reshape(-1, 3)
 
             subfind_particle_data['PartType0']['Coordinates'] *= conv_length * unit_length
             subfind_particle_data['PartType0']['Density'] *= conv_density * unit_density
