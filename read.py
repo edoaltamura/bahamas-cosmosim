@@ -483,6 +483,7 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
             'Velocity',
         ]
         stars_fields = [
+            'Coordinates',
             'Mass',
             'Metallicity',
             'SmoothingLength',
@@ -548,7 +549,6 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
             # Reshape coordinates and velocities
             for particle_type in ['PartType0', 'PartType1', 'PartType4']:
                 for field in ['Coordinates', 'Velocity']:
-                    pprint(f"subfind_particle_data[{particle_type}][{field}]")
                     subfind_particle_data[particle_type][field].shape = (-1, 3)
 
             subfind_particle_data['PartType0']['Coordinates'] *= conv_length * unit_length
@@ -692,6 +692,7 @@ def snapshot_data(files: list) -> dict:
                 'Velocity',
             ]
             stars_fields = [
+                'Coordinates',
                 'Mass',
                 'Metallicity',
                 'SmoothingLength',
@@ -759,10 +760,8 @@ def snapshot_data(files: list) -> dict:
 
                 # Reshape coordinates and velocities
                 for particle_type in ['PartType0', 'PartType1', 'PartType4']:
-                    comm_snap_data[particle_type]['Coordinates'] = \
-                        comm_snap_data[particle_type]['Coordinates'].reshape(-1, 3)
-                    comm_snap_data[particle_type]['Velocity'] = \
-                        comm_snap_data[particle_type]['Velocity'].reshape(-1, 3)
+                    for field in ['Coordinates', 'Velocity']:
+                        comm_snap_data[particle_type][field].shape = (-1, 3)
 
                 comm_snap_data['PartType0']['Coordinates'] *= conv_length * unit_length
                 comm_snap_data['PartType0']['Density'] *= conv_density * unit_density
