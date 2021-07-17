@@ -95,6 +95,8 @@ def find_files(simulation_type: str, redshift: str):
         gt = template_gt.replace('SPLITIDX', str(split_idx))
         sn = template_sn.replace('SPLITIDX', str(split_idx))
 
+        pprint(st)
+
         if os.path.isfile(st):
             subfind_st.append(st)
             st_isfile = True
