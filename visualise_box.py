@@ -50,4 +50,4 @@ if read.rank == 0:
         origin="lower",
         extent=[x_min, x_max, y_min, y_max]
     )
-    plt.show()
+    fig.savefig('box.png')
