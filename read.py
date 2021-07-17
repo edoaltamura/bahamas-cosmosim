@@ -66,7 +66,6 @@ def find_files(simulation_type: str, redshift: str):
     # Import the Metadata preloaded class
     paths = Metadata.data.PATHS
     directory = paths.dir_hydro if simulation_type == "hydro" else paths.dir_dmo
-    pprint(directory)
     pprint(f"[+] Find {paths.simulation_name:s} {simulation_type:s} files {redshift:s}...")
 
     # Make filepath templates and substitute the redshift index
@@ -118,6 +117,7 @@ def find_files(simulation_type: str, redshift: str):
         else:
             split_idx += 1
 
+    pprint(gadget_sn)
     return subfind_st, subfind_gt, subfind_pd, gadget_sn, custom_metadata
 
 
