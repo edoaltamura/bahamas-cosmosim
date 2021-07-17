@@ -29,6 +29,7 @@
 
 import yaml
 import os
+
 _dir_config = os.path.dirname(os.path.realpath(__file__))
 
 config_file = os.path.join(_dir_config, 'hdf5_metadata_config.yml')
