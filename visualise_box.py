@@ -32,6 +32,7 @@ x = np.asarray(x.value, dtype=np.float64)
 y = np.asarray(y.value, dtype=np.float64)
 m = np.asarray(snapshot['PartType0']['Density'].value, dtype=np.float32)
 h = np.asarray(h.value, dtype=np.float32)
+read.pprint(f'Computing map ({resolution} x {resolution})')
 smoothed_map = scatter(x=x, y=y, m=m, h=h, res=resolution).T
 smoothed_map = np.ma.masked_where(np.abs(smoothed_map) < 1.e-9, smoothed_map)
 
