@@ -2,9 +2,9 @@
 ---
 PATHS:
   simulation_name: "BAHAMAS"
-  computername: "centaurus.jb.man.ac.uk"
-  dir_hydro: "/share/nas_virgo/Cosmo-OWLS/AGN_TUNED_nu0_L400N1024_Planck"
-  dir_dmo: "/share/nas_virgo/Cosmo-OWLS/DM-Only"
+  computername: "mizar.jb.man.ac.uk"
+  dir_hydro: "/scratch/nas_virgo/Cosmo-OWLS/AGN_TUNED_nu0_L400N1024_Planck"
+  dir_dmo: "/scratch/nas_virgo/Cosmo-OWLS/DM-Only"
   subdir_subfind_groups: "/groups_REDSHIFTIDX"
   subdir_subfind_particledata: "/particledata_REDSHIFTIDX"
   subdir_gadget_snapshots: "/snapshot_REDSHIFTIDX"
