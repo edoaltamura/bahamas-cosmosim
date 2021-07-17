@@ -95,7 +95,6 @@ def find_files(simulation_type: str, redshift: str):
         gt = template_gt.replace('SPLITIDX', str(split_idx))
         sn = template_sn.replace('SPLITIDX', str(split_idx))
 
-        pprint(st)
         st_isfile = False
         gt_isfile = False
         sn_isfile = False
@@ -117,7 +116,6 @@ def find_files(simulation_type: str, redshift: str):
         else:
             split_idx += 1
 
-    pprint(gadget_sn)
     return subfind_st, subfind_gt, subfind_pd, gadget_sn, custom_metadata
 
 
@@ -496,9 +494,9 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
 
         if is_hydro:
 
-            subfind_particle_data[f'PartType0'] = {}
-            subfind_particle_data[f'PartType1'] = {}
-            subfind_particle_data[f'PartType4'] = {}
+            subfind_particle_data['PartType0'] = {}
+            subfind_particle_data['PartType1'] = {}
+            subfind_particle_data['PartType4'] = {}
 
             particle_idx0 = particle_index_from_csrm(fofgroup, 0, csrm)
             particle_idx1 = particle_index_from_csrm(fofgroup, 1, csrm)
