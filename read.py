@@ -633,10 +633,22 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
         return data_dict
     
     
-def snapshot_data(fofgroup: dict) -> dict:
+def snapshot_data(files: list) -> dict:
+    """
+    Reads in the snapshot (with no FOF information) and returns it as
+    a dictionary with additional metadata.
+
+    :param files: list
+        List object containing the absolute paths to files for the
+        specified redshift output.
+    :return: dict
+        Dictionary output for with particle data and additional
+        header data.
+    """
     pprint(f"[+] Find snapshot data...")
 
-    header = fofgroup['header']['gadget_snaps']
+    with h5.File(files[3][0], 'r') as f:
+        header = dict(f['Header'].attrs)
 
     # Conversion factors
     conv_mass = 1.e10 / header['HubbleParam']
@@ -654,12 +666,12 @@ def snapshot_data(fofgroup: dict) -> dict:
     unit_starFormationRate = unyt.Solar_Mass / (unyt.year * unyt.Mpc ** 3)
 
     snap_data = {}
-    pprint(f"Scattering {len(fofgroup['files'][3])} files")
-    st, fh = split(len(fofgroup['files'][3]))
+    pprint(f"Scattering {len(files[3])} files")
+    st, fh = split(len(files[3]))
     for x in range(st, fh, 1):
 
         # Operate on the group data file
-        with h5.File(fofgroup['files'][3][x], 'r') as h5file:
+        with h5.File(files[3][x], 'r') as h5file:
 
             # Create a HYDRO/DMO switch
             is_hydro = "/PartType0" in h5file
@@ -745,8 +757,7 @@ def snapshot_data(fofgroup: dict) -> dict:
                 ):
                     for field in field_group:
                         pprint(f"Comuning data {particle_type} {field}")
-                        comm_snap_data[particle_type][field] = \
-                            commune(snap_data[particle_type][field])
+                        comm_snap_data[particle_type][field] = commune(snap_data[particle_type][field])
 
                 # Reshape coordinates and velocities
                 for particle_type in ['PartType0', 'PartType1', 'PartType4']:
@@ -800,8 +811,8 @@ def snapshot_data(fofgroup: dict) -> dict:
 
         # Gather all data into a large dictionary
         data_dict = {}
-        data_dict['files'] = fofgroup['files']
-        data_dict['header'] = fofgroup['header']
+        data_dict['files'] = files
+        data_dict['header'] = header
         data_dict['snaps'] = snap_data
 
         return data_dict
