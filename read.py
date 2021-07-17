@@ -546,6 +546,7 @@ def fof_particles(fofgroup: dict, csrm: dict) -> dict:
                 )
 
             # Reshape coordinates and velocities
+            pprint(subfind_particle_data.keys())
             for particle_type in ['PartType0', 'PartType1', 'PartType4']:
                 for field in ['Coordinates', 'Velocity']:
                     subfind_particle_data[particle_type][field] = \
