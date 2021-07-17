@@ -96,25 +96,23 @@ def find_files(simulation_type: str, redshift: str):
         sn = template_sn.replace('SPLITIDX', str(split_idx))
 
         pprint(st)
+        st_isfile = False
+        gt_isfile = False
+        sn_isfile = False
 
         if os.path.isfile(st):
             subfind_st.append(st)
             st_isfile = True
-        else:
-            st_isfile = False
         if os.path.isfile(gt):
             subfind_gt.append(gt)
             gt_isfile = True
-        else:
-            gt_isfile = False
         if os.path.isfile(sn):
             gadget_sn.append(sn)
             sn_isfile = True
-        else:
-            sn_isfile = False
 
         # If none of these files is found break loop
         if not any([st_isfile, gt_isfile, sn_isfile]):
+            assert len(subfind_st) > 0 and len(subfind_gt) > 0 and len(gadget_sn) > 0
             break
         else:
             split_idx += 1
