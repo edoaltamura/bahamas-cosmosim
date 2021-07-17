@@ -42,7 +42,7 @@ axes.axis("off")
 axes.set_aspect("equal")
 axes.imshow(
     smoothed_map.T,
-    norm=LogNorm(vmin=1E5, vmax=3E8),
+    norm=LogNorm(),
     cmap=cmap,
     origin="lower",
     extent=[x_min, x_max, y_min, y_max]
