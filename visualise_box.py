@@ -18,20 +18,21 @@ files = read.find_files(simulation_type, redshift)
 snapshot = read.snapshot_data(files)['snaps']
 
 if read.rank == 0:
-    x_max = np.max(snapshot['PartType0']['Coordinates'][:, 0])
-    x_min = np.min(snapshot['PartType0']['Coordinates'][:, 0])
-    y_max = np.max(snapshot['PartType0']['Coordinates'][:, 1])
-    y_min = np.min(snapshot['PartType0']['Coordinates'][:, 1])
+    depth_mask = np.where(snapshot['PartType0']['Coordinates'][:, 2].value < 20)[0]
+    x_max = np.max(snapshot['PartType0']['Coordinates'][depth_mask, 0])
+    x_min = np.min(snapshot['PartType0']['Coordinates'][depth_mask, 0])
+    y_max = np.max(snapshot['PartType0']['Coordinates'][depth_mask, 1])
+    y_min = np.min(snapshot['PartType0']['Coordinates'][depth_mask, 1])
     x_range = x_max - x_min
     y_range = y_max - y_min
-    x = (snapshot['PartType0']['Coordinates'][:, 0] - x_min) / x_range
-    y = (snapshot['PartType0']['Coordinates'][:, 1] - y_min) / y_range
-    h = snapshot['PartType0']['SmoothingLength'] / x_range
+    x = (snapshot['PartType0']['Coordinates'][depth_mask, 0] - x_min) / x_range
+    y = (snapshot['PartType0']['Coordinates'][depth_mask, 1] - y_min) / y_range
+    h = snapshot['PartType0']['SmoothingLength'][depth_mask] / x_range
 
     # Gather and handle coordinates to be processed
     x = np.asarray(x.value, dtype=np.float64)
     y = np.asarray(y.value, dtype=np.float64)
-    m = np.asarray(snapshot['PartType0']['Density'].value, dtype=np.float32)
+    m = np.asarray(snapshot['PartType0']['Density'][depth_mask].value, dtype=np.float32)
     h = np.asarray(h.value, dtype=np.float32)
     read.pprint(f'Computing map ({resolution} x {resolution})')
     smoothed_map = scatter(x=x, y=y, m=m, h=h, res=resolution).T
